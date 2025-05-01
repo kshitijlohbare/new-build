@@ -182,10 +182,10 @@ const DailyPractices = () => {
         {FILTERS.map((filter, idx) => (
           <div
             key={idx}
-            className={`flex-1 min-w-[120px] px-4 py-2 rounded-[10px] font-happy-monkey text-[14px] lowercase text-center border-[1px] border-[#148BAF] ${
+            className={`flex-1 min-w-[120px] px-4 py-2 rounded-[10px] font-happy-monkey text-base lowercase text-center border-[1px] border-[#49DADD] ${
               filter.active
                 ? 'bg-[#148BAF] text-white'
-                : 'bg-white text-[#148BAF]'
+                : 'bg-white text-[#04C4D5]'
             }`}
           >
             {filter.label}
@@ -203,14 +203,14 @@ const DailyPractices = () => {
             {/* Card Content */}
             <div className="flex flex-col gap-[10px] flex-grow">
               {/* Header Section */}
-              <div className="w-full p-[4px] rounded-[8px] flex flex-col items-center gap-[8px]">
+              <div className="w-full p-[4px] rounded-[8px] flex flex-col items-center">
                 <div className="w-full flex items-center gap-[10px]">
                   <div>{icons[practice.icon]}</div>
-                  <div className="flex-1 text-center text-[#148BAF] font-happy-monkey text-[24px] lowercase">
+                  <div className="flex-1 text-center text-[#148BAF] font-happy-monkey text-sm lowercase">
                     {practice.title}
                   </div>
                 </div>
-                <div className="w-full text-black font-happy-monkey text-[16px] lowercase">
+                <div className="w-full text-black font-happy-monkey text-base text-center lowercase">
                   {practice.subtitle}
                 </div>
               </div>
@@ -228,7 +228,7 @@ const DailyPractices = () => {
                     ))}
                   </span>
                   <button 
-                    className="text-xs text-[#148BAF] hover:underline lowercase mt-1"
+                    className="text-xs text-black hover:underline lowercase mt-1"
                   >
                     see more
                   </button>
@@ -239,7 +239,7 @@ const DailyPractices = () => {
             {/* Button Section */}
             <div className="w-full flex flex-col gap-[10px]">
               <div className="w-full p-[8px] bg-white shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)] rounded-[8px] border border-[#49DADD] flex justify-center items-center">
-                <span className="text-center text-[#148BAF] font-happy-monkey text-[16px] lowercase">
+                <span className="text-center text-[#148BAF] font-happy-monkey text-base lowercase">
                   Guided Practice
                 </span>
               </div>
@@ -247,11 +247,11 @@ const DailyPractices = () => {
                 onClick={() => handleToggleCompletion(practice.id)}
                 className={`w-full p-[8px] ${
                   practice.completed 
-                    ? 'bg-[#148BAF] text-black' 
+                    ? 'bg-[#148BAF] text-white border border-[#49DADD]' 
                     : 'bg-[#F7FFFF] text-[#148BAF] border border-[#49DADD]'
                 } rounded-[8px] flex justify-center items-center cursor-pointer`}
               >
-                <span className="text-center font-happy-monkey text-[16px] lowercase">
+                <span className="text-center font-happy-monkey text-base lowercase">
                   {practice.completed ? 'Completed' : 'Mark as Complete'}
                 </span>
               </div>
@@ -260,9 +260,9 @@ const DailyPractices = () => {
         ))}
         
         {/* Empty cards */}
-        <div className="flex flex-col bg-white rounded-[10px] border border-[#d9d9d9] p-3"></div>
-        <div className="flex flex-col bg-white rounded-[10px] border border-[#d9d9d9] p-3"></div>
-        <div className="flex flex-col bg-white rounded-[10px] border border-[#d9d9d9] p-3"></div>
+        <div className="flex flex-col bg-white rounded-[10px] p-3"></div>
+        <div className="flex flex-col bg-white rounded-[10px] p-3"></div>
+        <div className="flex flex-col bg-white rounded-[10px] p-3"></div>
       </div>
     </div>
   );

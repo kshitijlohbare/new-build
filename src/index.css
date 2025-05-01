@@ -54,6 +54,7 @@
     margin: 0;
     min-height: 100vh;
     font-family: 'Happy Monkey', cursive;
+    line-height: 1.6;
     color: hsl(var(--foreground));
     background: hsl(var(--background));
   }
@@ -80,6 +81,12 @@
     border: 1px solid hsl(var(--border));
     background: hsl(var(--background));
     border-radius: var(--radius);
+  }
+}
+
+@layer utilities {
+  .text-base {
+    font-family: 'Protest Riot', sans-serif !important;
   }
 }
 
@@ -243,4 +250,18 @@ input[type="range"].vertical-slider:focus {
   cursor: pointer;
   border-radius: 0; /* Make it square */
   border: none; /* Remove default border in Firefox */
+}
+
+/* Font classes with uniform line height */
+.font-happy-monkey {
+  line-height: 1.2;
+}
+
+.font-kavoon {
+  line-height: 1.2;
+}
+
+/* Apply to all text by default */
+p, h1, h2, h3, h4, h5, h6, span, div {
+  line-height: 1.2;
 }

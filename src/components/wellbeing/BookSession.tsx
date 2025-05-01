@@ -90,8 +90,8 @@ const BookSession = () => {
                 </div>
               )}
             </div>
-            <div className="font-happy-monkey text-black lowercase mb-1">{practitioner.name}</div>
-            <div className="text-sm text-[#148BAF] font-happy-monkey lowercase mb-1">{practitioner.specialty}</div>
+            <div className="text-sm font-happy-monkey text-black lowercase mb-1">{practitioner.name}</div>
+            <div className="text-xs text-[#148BAF] font-happy-monkey lowercase mb-1">{practitioner.specialty}</div>
             
             <div className="flex items-center gap-0.5 mb-1">
               <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">

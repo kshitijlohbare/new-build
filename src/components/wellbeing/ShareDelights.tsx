@@ -131,7 +131,7 @@ export const ShareDelights = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col items-start p-[20px_10px] gap-5 w-full bg-[rgba(83,252,255,0.1)] rounded-[20px]">
-        <h2 className="text-4xl text-center text-black font-happy-monkey lowercase w-full">
+        <h2 className="text-3xl text-center text-black font-happy-monkey lowercase w-full">
           share your delights
         </h2>
 
@@ -166,7 +166,7 @@ export const ShareDelights = () => {
           </div>
           <button 
             onClick={handleShare}
-            className="bg-[#148BAF] rounded-[10px] text-white py-2.5 px-4 font-happy-monkey lowercase hover:bg-[#1279A0] transition-colors"
+            className="bg-[#148BAF] rounded-[10px] text-white py-2.5 px-4 text-base font-happy-monkey lowercase hover:bg-[#1279A0] transition-colors"
             disabled={!user || !inputText.trim()}
           >
             post delight
@@ -190,7 +190,6 @@ export const ShareDelights = () => {
           )}
         </div>
       </div>
-      
       <div className="flex flex-col sm:flex-row gap-2.5 w-full">
         <div className="flex-1 p-2.5 relative rounded-[10px] border border-[#49DADD]">
           <div className="absolute left-1/2 transform -translate-x-1/2 top-[-10px] px-2.5 py-1 bg-white rounded-md" style={{

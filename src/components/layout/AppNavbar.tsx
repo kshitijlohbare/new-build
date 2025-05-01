@@ -1,43 +1,34 @@
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { useTheme } from "@/context/ThemeContext";
-import { Moon, Sun } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 const AppNavbar = () => {
-  const { theme, toggleTheme } = useTheme();
-
   return (
-    <nav className="border-b border-moody-primary/10 bg-white/80 dark:bg-black/80 backdrop-blur-sm sticky top-0 z-50">
-      <div className="container flex h-16 items-center">
-        <div className="mr-4 flex">
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="font-happy-monkey text-xl font-bold text-moody-primary dark:text-moody-secondary">Wellbeing</span>
+    <nav className="bg-[#9CE7F9] sticky top-0 z-50 py-2">
+      <div className="container flex h-12 items-center justify-between px-4">
+        <div className="mr-4">
+          <Link to="/" className="flex items-center">
+            <span className="font-happy-monkey text-2xl font-bold text-black">CACTUS COCO</span>
           </Link>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          <nav className="flex items-center space-x-4">
-            <Button asChild variant="ghost">
-              <Link to="/practices" className="font-happy-monkey lowercase">Practices</Link>
-            </Button>
-            <Button asChild variant="ghost">
-              <Link to="/progress" className="font-happy-monkey lowercase">Progress</Link>
-            </Button>
-            <Button asChild variant="outline" className="border-moody-primary text-moody-primary dark:border-moody-secondary dark:text-moody-secondary">
-              <Link to="/meditation" className="font-happy-monkey lowercase">Meditate</Link>
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="w-10 h-10 rounded-full"
-            >
-              {theme === 'dark' ? (
-                <Sun className="h-5 w-5 text-moody-secondary" />
-              ) : (
-                <Moon className="h-5 w-5 text-moody-primary" />
-              )}
-            </Button>
-          </nav>
+        
+        <div className="flex items-center space-x-4">
+          <div className="text-black font-medium">
+            current streak : 12
+          </div>
+          
+          <div className="flex items-center space-x-1">
+            <div className="w-7 h-7 bg-white rounded-md flex items-center justify-center">
+              <span className="text-gray-500 text-lg">📝</span>
+            </div>
+            <div className="w-7 h-7 bg-white rounded-md flex items-center justify-center">
+              <span className="text-gray-500 text-lg">🔔</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center bg-[#088BAF] text-white px-4 py-1 rounded-full">
+            <span className="mr-1">hi, kshitij lohbare</span>
+            <ChevronDown size={16} />
+          </div>
         </div>
       </div>
     </nav>

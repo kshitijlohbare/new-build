@@ -133,8 +133,8 @@ const FocusTimer = () => {
   const volumePercentage = volume; // Volume is already 0-100
 
   return (
-    <div className="flex flex-col gap-10 p-5 md:p-10 items-center w-full min-h-screen bg-[#F7FFFF]">
-      <div className="text-center text-[#04C4D5] text-3xl font-happy-monkey lowercase w-full">get things done</div>
+    <div className="flex flex-col gap-10 p-2 md:p-5 items-center w-full min-h-screen">
+      <div className="text-center text-[#04C4D5] text-2xl font-happy-monkey lowercase w-full">get things done</div>
       <div className="w-full flex flex-col gap-4">
         <div className="flex flex-wrap justify-center gap-4">
           {focusPresets.map((preset, idx) => (
@@ -149,8 +149,8 @@ const FocusTimer = () => {
                 // No need to set work/break time here, useEffect handles it
               }}
             >
-              <div className={`text-center font-happy-monkey text-2xl lowercase ${selectedPreset === idx ? "text-white" : "text-[#148BAF]"}`}>{preset.label}</div>
-              <div className={`text-center font-happy-monkey text-base lowercase ${selectedPreset === idx ? "text-white" : "text-[#04C4D5]"}`}>work: {preset.work} min<br/>break : {preset.break} mins</div>
+              <div className={`text-center font-happy-monkey text-base lowercase ${selectedPreset === idx ? "text-white" : "text-[#148BAF]"}`}>{preset.label}</div>
+              <div className={`text-center font-happy-monkey text-sm lowercase ${selectedPreset === idx ? "text-white" : "text-[#04C4D5]"}`}>work: {preset.work} min<br/>break : {preset.break} mins</div>
             </div>
           ))}
         </div>
@@ -158,8 +158,8 @@ const FocusTimer = () => {
           {/* Customize session - Conditionally render with width: fit-content and standardized height */}
           {selectedPreset === createPresetIndex && (
             <div className="bg-[#53FCFF1A] rounded-lg flex flex-col items-center gap-5 p-5 w-fit h-[350px]">
-              <div className="text-[#148BAF] font-happy-monkey text-lg lowercase">customize session</div>
-              <div className="flex justify-around w-full h-[220px] gap-4">
+              <div className="text-[#148BAF] font-happy-monkey text-base lowercase">customize session</div>
+              <div className="flex justify-around h-[220px] gap-4">
                 {/* Work Slider */}
                 <div className="flex flex-col items-center justify-start h-full">
                   {/* Fixed text color to black/dark */}
@@ -176,7 +176,7 @@ const FocusTimer = () => {
                       style={{ '--slider-percentage': `${workPercentage}%` } as React.CSSProperties}
                     />
                   </div>
-                  <span className="font-happy-monkey text-black text-base">work</span>
+                  <span className="text-[#148BAF] font-happy-monkey text-base">work</span>
                 </div>
                 {/* Break Slider */}
                 <div className="flex flex-col items-center justify-start h-full">
@@ -194,7 +194,7 @@ const FocusTimer = () => {
                       style={{ '--slider-percentage': `${breakPercentage}%` } as React.CSSProperties}
                     />
                   </div>
-                  <span className="font-happy-monkey text-black text-base">break</span>
+                  <span className="text-[#148BAF] font-happy-monkey text-base">break</span>
                 </div>
               </div>
             </div>
@@ -202,7 +202,7 @@ const FocusTimer = () => {
           
           {/* Focus session */}
           <div className="bg-[#53FCFF1A] rounded-lg flex flex-col items-center gap-2 p-5 min-w-[350px] h-[350px]">
-            <div className="text-[#148BAF] font-happy-monkey text-lg lowercase">
+            <div className="text-[#148BAF] font-happy-monkey text-sm lowercase">
               {isWorkPhase ? 'work phase' : 'break phase'}
             </div>
             <div className="flex gap-2 items-center">
@@ -218,7 +218,7 @@ const FocusTimer = () => {
               <span className="text-[#148BAF] font-happy-monkey text-sm">cycles :</span>
               <button className="w-5 h-5 bg-[#F7FFFF] shadow-md rounded outline outline-1 outline-[#04C4D5] flex items-center justify-center disabled:opacity-50" onClick={() => setCycles(Math.max(1, cycles - 1))} disabled={isRunning}>-</button>
               {/* Fixed text color to black */}
-              <div className="bg-white border outline outline-1 outline-[#04C4D5] rounded px-2 py-1 font-happy-monkey text-lg text-black">{cycles}</div>
+              <div className="bg-white border outline outline-1 outline-[#04C4D5] rounded px-2 py-1 font-happy-monkey text-base text-black">{cycles}</div>
               <button className="w-5 h-5 bg-[#F7FFFF] shadow-md rounded outline outline-1 outline-[#04C4D5] flex items-center justify-center disabled:opacity-50" onClick={() => setCycles(cycles + 1)} disabled={isRunning}>+</button>
             </div>
             <div className="flex gap-2 mt-2">
@@ -247,7 +247,7 @@ const FocusTimer = () => {
           
           {/* Add music - Full Height containers and standardized height */}
           <div className="bg-[#53FCFF1A] rounded-lg flex flex-col items-center gap-5 p-5 min-w-[300px] h-[350px]">
-            <div className="text-[#148BAF] font-happy-monkey text-lg lowercase w-full text-center">add music to the session</div>
+            <div className="text-[#148BAF] font-happy-monkey text-base lowercase w-full text-center">add music to the session</div>
             <div className="flex w-full justify-between gap-4 flex-grow">
               {/* Music Options List */}
               <div className="flex flex-col gap-2 w-3/4 h-full overflow-y-auto scrollbar-hide">
@@ -259,7 +259,7 @@ const FocusTimer = () => {
                     onClick={() => setSelectedMusic(music)}
                   >
                     {/* Added text-center class and w-full to center the text */}
-                    <span className="text-[#148BAF] font-happy-monkey text-base lowercase truncate text-center w-full">{music}</span>
+                    <span className="text-[#148BAF] font-happy-monkey text-sm lowercase truncate text-center w-full py-1.5">{music}</span>
                   </div>
                 ))}
               </div>
@@ -303,7 +303,7 @@ const FocusTimer = () => {
         
         {/* Focus History Graph */}
         <div className="bg-[#53FCFF1A] rounded-lg flex flex-col items-center gap-5 p-5 w-full mt-6 max-w-4xl mx-auto">
-          <div className="text-[#148BAF] font-happy-monkey text-lg lowercase w-full text-center">focus history</div>
+          <div className="text-[#148BAF] font-happy-monkey text-base lowercase w-full text-center">focus history</div>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={focusHistoryData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>

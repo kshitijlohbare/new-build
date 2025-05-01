@@ -10,6 +10,10 @@ export default {
       fontFamily: {
         'happy-monkey': ['"Happy Monkey"', 'cursive'],
         'kavoon': ['Kavoon', 'cursive'],
+        'protest-riot': ['"Protest Riot"', 'sans-serif'],
+      },
+      lineHeight: {
+        'default': '1.6',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
