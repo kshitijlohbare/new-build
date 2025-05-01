@@ -1,3 +1,4 @@
+/* tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,7 +11,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 221.2 83.2% 53.3%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -22,7 +23,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
   }
  
@@ -47,22 +48,199 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
+
+  /* base styles */
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Happy Monkey', cursive;
+    color: hsl(var(--foreground));
+    background: hsl(var(--background));
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
+
+  /* For the homepage sections that need scrolling */
+  .custom-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 }
 
-@layer base {
-  
-  html {
-    @apply antialiased;
+@layer components {
+  .card-base {
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--background));
+    border-radius: var(--radius);
   }
-  
-  body {
-    @apply bg-background text-foreground min-h-screen font-happy-monkey;
-  }
+}
 
-  /* Add smooth transitions for theme changes */
-  *, *::before, *::after {
-    transition-property: background-color, border-color, color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 200ms;
-  }
+/* ... existing styles ... */
+
+/* Remove old slider thumb styles if they exist */
+.slider-thumb-square::-webkit-slider-thumb,
+.slider-thumb-square::-moz-range-thumb {
+  /* Remove previous styles here if any */
+  all: unset; /* Reset any previous thumb styles */
+}
+
+/* Remove or comment out previous vertical slider styles */
+/*
+input[type="range"].vertical-slider {
+  -webkit-appearance: slider-vertical;
+  appearance: none;
+  width: 10px; 
+  padding: 0;
+  margin: 10px 0; 
+  background: linear-gradient(180deg, #49DAEA 0%, rgba(195.50, 253.79, 255, 0.20) 100%); 
+  border-radius: 4px; 
+  cursor: pointer;
+  outline: none; 
+}
+input[type="range"].vertical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; 
+  appearance: none;
+  width: 20px; 
+  height: 20px; 
+  background: #49DADD; 
+  border-radius: 4px; 
+  border: none; 
+  filter: drop-shadow(1px 2px 2px rgba(73, 218, 234, 0.5));
+  margin-left: -5px; 
+}
+input[type="range"].vertical-slider::-moz-range-thumb {
+  width: 20px; 
+  height: 20px; 
+  background: #49DADD; 
+  border-radius: 4px; 
+  border: none; 
+  cursor: pointer;
+  box-shadow: 1px 2px 2px rgba(73, 218, 234, 0.5);
+}
+input[type="range"].vertical-slider::-moz-range-track {
+  width: 10px;
+  background: linear-gradient(180deg, #49DAEA 0%, rgba(195.50, 253.79, 255, 0.20) 100%);
+  border-radius: 4px;
+  cursor: pointer;
+}
+input[type="range"].vertical-slider:focus::-moz-range-track {
+  background: linear-gradient(180deg, #49DAEA 0%, rgba(195.50, 253.79, 255, 0.20) 100%); 
+}
+*/
+
+/* New Rotated Vertical Slider Styles */
+.vertical-rotated-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 150px; /* Adjust width to control the visual length of the rotated slider */
+  height: 10px; /* Height becomes the track thickness when rotated */
+  padding: 0;
+  margin: 0;
+  /* Use CSS variable for dynamic fill */
+  background: linear-gradient(
+    to right, /* Visually bottom to top when rotated */
+    #49daea00 0%, /* Fill color */
+    #49DAEA var(--slider-percentage, 0%), /* Fill color up to percentage */
+    rgba(195.50, 253.79, 255, 0.20) var(--slider-percentage, 0%), /* Unfilled color from percentage */
+    rgba(195.50, 253.79, 255, 0.20) 100% /* Unfilled color to end */
+  );
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  transform-origin: center center;
+  transform: rotate(-90deg);
+  transition: background 0.3s ease;
+}
+
+/* Thumb Styles for Rotated Slider (WebKit) */
+.vertical-rotated-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #49DADD;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  filter: drop-shadow(1px 2px 2px rgba(73, 218, 234, 0.5));
+  /* No margin needed usually with rotation */
+  /* Ensure thumb rotates with the track */
+  transform: rotate(0deg); /* Counter-rotation not needed if track is rotated */
+}
+
+/* Thumb Styles for Rotated Slider (Firefox) */
+.vertical-rotated-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #49DADD;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 1px 2px 2px rgba(73, 218, 234, 0.5);
+}
+
+/* Track styling for Firefox (less direct control) */
+.vertical-rotated-slider::-moz-range-track {
+  width: 100%; /* Track takes full width before rotation */
+  height: 10px;
+  /* Use CSS variable for dynamic fill */
+  background: linear-gradient(
+    to right,
+    #49DAEA 0%,
+    #49DAEA var(--slider-percentage, 0%),
+    rgba(195.50, 253.79, 255, 0.20) var(--slider-percentage, 0%),
+    rgba(195.50, 253.79, 255, 0.20) 100%
+  );
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Remove focus outline for Firefox */
+.vertical-rotated-slider:focus {
+  outline: none;
+}
+.vertical-rotated-slider:focus::-moz-range-track {
+  /* Keep the dynamic gradient on focus */
+  background: linear-gradient(
+    to right,
+    #49DAEA 0%,
+    #49DAEA var(--slider-percentage, 0%),
+    rgba(195.50, 253.79, 255, 0.20) var(--slider-percentage, 0%),
+    rgba(195.50, 253.79, 255, 0.20) 100%
+  );
+}
+
+/* ... rest of your styles ... */
+
+/* Hide the outline for Firefox */
+input[type="range"].vertical-slider:focus {
+  outline: none;
+}
+
+/* Custom styles for square slider thumb */
+.slider-thumb-square::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 16px; /* Square dimensions */
+  height: 16px;
+  background: #148BAF; /* Adjust color as needed */
+  cursor: pointer;
+  border-radius: 0; /* Make it square */
+}
+
+.slider-thumb-square::-moz-range-thumb {
+  width: 16px; /* Square dimensions */
+  height: 16px;
+  background: #148BAF; /* Adjust color as needed */
+  cursor: pointer;
+  border-radius: 0; /* Make it square */
+  border: none; /* Remove default border in Firefox */
 }
