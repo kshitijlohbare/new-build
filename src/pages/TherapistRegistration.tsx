@@ -84,7 +84,7 @@ const TherapistRegistration = () => {
         badge: "new" as const // Mark as new
       };
       
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('practitioners')
         .insert([practitionerData])
         .select();

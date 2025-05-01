@@ -4,6 +4,7 @@ import { Toast } from "@radix-ui/react-toast"
 interface ToastProps extends React.ComponentPropsWithoutRef<typeof Toast> {
   title?: string
   description?: string
+  variant?: "default" | "destructive" | "success" // Added variant property
 }
 
 const useToast = () => {

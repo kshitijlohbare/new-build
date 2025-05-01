@@ -5,8 +5,9 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { useToast } from "@/hooks/useToast";
 
+// Updated interface to accept both number and string IDs for flexibility
 interface Delight {
-  id: number;
+  id: number | string;
   text: string;
   user_id: string;
   created_at: string;
@@ -29,6 +30,8 @@ export const ShareDelights = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  // Define tempId at component level so it's accessible throughout the component
+  const [tempId, setTempId] = useState<string | null>(null);
 
   // Fetch delights for today and current user
   useEffect(() => {
@@ -82,10 +85,12 @@ export const ShareDelights = () => {
 
     try {
       // Optimistic UI update
-      const tempId = Date.now();
+      const newTempId = Date.now().toString();
+      setTempId(newTempId); // Store the tempId in state
+      
       const optimisticEntry: Delight = {
         ...newDelightData,
-        id: tempId,
+        id: newTempId,
         created_at: new Date().toISOString(),
       };
       setEntries(prev => [optimisticEntry, ...prev]);
@@ -101,17 +106,19 @@ export const ShareDelights = () => {
         console.error("Error saving delight:", error);
         toast({ title: "Error", description: "Could not save your delight.", variant: "destructive" });
         // Revert optimistic update
-        setEntries(prev => prev.filter(entry => entry.id !== tempId));
+        setEntries(prev => prev.filter(entry => entry.id !== newTempId));
         setInputText(newDelightText);
       } else if (data) {
          // Replace optimistic entry with actual data from DB
-         setEntries(prev => prev.map(entry => entry.id === tempId ? data : entry));
+         setEntries(prev => prev.map(entry => entry.id === newTempId ? data : entry));
       }
     } catch (err) {
       console.error("Unexpected error saving delight:", err);
       toast({ title: "Error", description: "An unexpected error occurred.", variant: "destructive" });
       // Revert optimistic update on error
-      setEntries(prev => prev.filter(entry => entry.id !== tempId));
+      if (tempId) {
+        setEntries(prev => prev.filter(entry => entry.id !== tempId));
+      }
       setInputText(newDelightText);
     }
   };
