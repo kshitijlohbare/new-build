@@ -29,13 +29,13 @@ const musicOptions = [
 
 // Sample data for focus history graph
 const focusHistoryData = [
-  { day: 'Mon', workHours: 1.5, breakPercentage: 25 },
-  { day: 'Tue', workHours: 2.0, breakPercentage: 20 },
-  { day: 'Wed', workHours: 1.0, breakPercentage: 30 },
-  { day: 'Thu', workHours: 2.5, breakPercentage: 22 },
-  { day: 'Fri', workHours: 1.8, breakPercentage: 28 },
-  { day: 'Sat', workHours: 3.0, breakPercentage: 15 },
-  { day: 'Sun', workHours: 2.2, breakPercentage: 18 },
+  { day: 'mon', workHours: 1.5, breakPercentage: 25 },
+  { day: 'tue', workHours: 2.0, breakPercentage: 20 },
+  { day: 'wed', workHours: 1.0, breakPercentage: 30 },
+  { day: 'thu', workHours: 2.5, breakPercentage: 22 },
+  { day: 'fri', workHours: 1.8, breakPercentage: 28 },
+  { day: 'sat', workHours: 3.0, breakPercentage: 15 },
+  { day: 'sun', workHours: 2.2, breakPercentage: 18 },
 ];
 
 const FocusTimer = () => {
@@ -134,9 +134,9 @@ const FocusTimer = () => {
 
   return (
     <div className="flex flex-col gap-10 p-2 md:p-5 items-center w-full min-h-screen">
-      <div className="text-center text-[#04C4D5] text-2xl font-happy-monkey lowercase w-full">get things done</div>
-      <div className="w-full flex flex-col gap-4">
-        <div className="flex flex-wrap justify-center gap-4">
+      <div className="text-center text-[#04C4D5] text-3xl font-happy-monkey lowercase w-full">get things done</div>
+      <div className="w-full flex flex-col gap-2">
+        <div className="flex flex-wrap justify-center gap-2">
           {focusPresets.map((preset, idx) => (
             <div
               key={idx}
@@ -202,7 +202,7 @@ const FocusTimer = () => {
           
           {/* Focus session */}
           <div className="bg-[#53FCFF1A] rounded-lg flex flex-col items-center gap-2 p-5 min-w-[350px] h-[350px]">
-            <div className="text-[#148BAF] font-happy-monkey text-sm lowercase">
+            <div className="text-[#148BAF] font-happy-monkey text-base lowercase">
               {isWorkPhase ? 'work phase' : 'break phase'}
             </div>
             <div className="flex gap-2 items-center">
@@ -216,14 +216,14 @@ const FocusTimer = () => {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[#148BAF] font-happy-monkey text-sm">cycles :</span>
-              <button className="w-5 h-5 bg-[#F7FFFF] shadow-md rounded outline outline-1 outline-[#04C4D5] flex items-center justify-center disabled:opacity-50" onClick={() => setCycles(Math.max(1, cycles - 1))} disabled={isRunning}>-</button>
+              <button className="w-5 h-5 bg-[#FFFFFF] shadow-md rounded outline outline-1 outline-[#04C4D5] flex items-center justify-center disabled:opacity-50" onClick={() => setCycles(Math.max(1, cycles - 1))} disabled={isRunning}>-</button>
               {/* Fixed text color to black */}
               <div className="bg-white border outline outline-1 outline-[#04C4D5] rounded px-2 py-1 font-happy-monkey text-base text-black">{cycles}</div>
-              <button className="w-5 h-5 bg-[#F7FFFF] shadow-md rounded outline outline-1 outline-[#04C4D5] flex items-center justify-center disabled:opacity-50" onClick={() => setCycles(cycles + 1)} disabled={isRunning}>+</button>
+              <button className="w-5 h-5 bg-[#FFFFFF] shadow-md rounded outline outline-1 outline-[#04C4D5] flex items-center justify-center disabled:opacity-50" onClick={() => setCycles(cycles + 1)} disabled={isRunning}>+</button>
             </div>
             <div className="flex gap-2 mt-2">
               {/* Toggle Play/Pause */}
-              <button className="p-2 bg-[#F7FFFF] shadow-md rounded outline outline-1 outline-[#04C4D5]" onClick={() => setIsRunning(!isRunning)}>
+              <button className="p-2 bg-[#FFFFFF] shadow-md rounded outline outline-1 outline-[#04C4D5]" onClick={() => setIsRunning(!isRunning)}>
                 {isRunning ? (
                   <svg width="24" height="24" fill="#148BAF"><rect x="8" y="8" width="3" height="8" rx="1"/><rect x="13" y="8" width="3" height="8" rx="1"/></svg> // Pause Icon
                 ) : (
@@ -232,7 +232,7 @@ const FocusTimer = () => {
               </button>
               {/* Reset Button */}
               <button
-                className="p-2 bg-[#F7FFFF] shadow-md rounded outline outline-1 outline-[#04C4D5]"
+                className="p-2 bg-[#FFFFFF] shadow-md rounded outline outline-1 outline-[#04C4D5]"
                 onClick={() => {
                   setIsRunning(false);
                   setCurrentCycle(1);
@@ -303,41 +303,46 @@ const FocusTimer = () => {
         
         {/* Focus History Graph */}
         <div className="bg-[#53FCFF1A] rounded-lg flex flex-col items-center gap-5 p-5 w-full mt-6 max-w-4xl mx-auto">
-          <div className="text-[#148BAF] font-happy-monkey text-base lowercase w-full text-center">focus history</div>
+          <div className="text-[#148BAF] font-happy-monkey text-base lowercase w-full text-center">YOUR WEEKLY ACTIVITY TREND</div>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={focusHistoryData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(73, 218, 234, 0.2)" />
-                <XAxis dataKey="day" stroke="#148BAF" />
+                <XAxis dataKey="day" stroke="#148BAF" fontSize={14} />
                 <YAxis 
                   yAxisId="left" 
+                  fontSize={14}
+                  orientation="left"
                   stroke="#148BAF" 
-                  label={{ value: 'Work Hours', angle: -90, position: 'insideLeft', fill: '#148BAF', style: { textAnchor: 'middle' } }} 
+                  label={{ value: 'work hours', angle: -90, position: 'insideLeft', fill: '#148BAF', style: { textAnchor: 'middle' } }} 
                 />
                 <YAxis 
                   yAxisId="right" 
+                  fontSize={14}
                   orientation="right" 
                   stroke="#04C4D5" 
-                  label={{ value: 'Break %', angle: 90, position: 'insideRight', fill: '#04C4D5', style: { textAnchor: 'middle' } }} 
+                  label={{ value: 'break %', angle: 90, position: 'insideRight', fill: '#04C4D5', style: { textAnchor: 'middle' } }} 
                 />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: 'rgba(247, 255, 255, 0.9)',
                     borderColor: '#49DADD',
                     fontFamily: 'Happy Monkey, cursive',
+                    textAlign: 'center',
+                    fontSize: '14px',
                     borderRadius: '4px'
                   }} 
                   labelStyle={{ color: '#148BAF' }}
                 />
-                <Legend wrapperStyle={{ fontFamily: 'Happy Monkey, cursive' }} />
+                <Legend wrapperStyle={{ fontFamily: 'Righteous, cursive' }} />
                 <Line 
                   yAxisId="left" 
                   type="monotone" 
                   dataKey="workHours" 
                   stroke="#148BAF" 
                   strokeWidth={2} 
-                  activeDot={{ r: 8, fill: '#148BAF', stroke: '#F7FFFF' }} 
-                  name="Work Hours" 
+                  activeDot={{ r: 8, fill: '#148BAF', stroke: '#FFFFFF' }} 
+                  name="work hours" 
                 />
                 <Line 
                   yAxisId="right" 
@@ -345,8 +350,8 @@ const FocusTimer = () => {
                   dataKey="breakPercentage" 
                   stroke="#04C4D5" 
                   strokeWidth={2} 
-                  activeDot={{ r: 8, fill: '#04C4D5', stroke: '#F7FFFF' }} 
-                  name="Break %" 
+                  activeDot={{ r: 8, fill: '#04C4D5', stroke: '#FFFFFF' }} 
+                  name="break %" 
                 />
               </LineChart>
             </ResponsiveContainer>

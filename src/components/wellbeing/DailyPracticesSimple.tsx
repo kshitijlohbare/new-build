@@ -55,9 +55,9 @@ const DailyPracticesSimple = () => {
               className="flex justify-between items-center p-[10px_20px] bg-white rounded-[10px] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)]"
             >
               <div className="flex items-center gap-[10px]">
-                <span className="font-happy-monkey text-[#148BAF] text-base lowercase">{practice.name}</span>
+                <span className="font-happy-monkey text-[#04C4D5] text-base lowercase">{practice.name}</span>
                 {practice.duration && (
-                  <div className="px-[8px] py-[2px] bg-[#F7FFFF] border border-[#148BAF] rounded-[4px] flex items-center gap-1">
+                  <div className="px-[8px] py-[2px] bg-[#FFFFFF] border border-[#148BAF] rounded-[4px] flex items-center gap-1">
                     <span className="text-[#148BAF] font-happy-monkey text-sm lowercase">{practice.duration} min</span>
                     <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M1 1L5 5L9 1" stroke="#148BAF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -91,9 +91,9 @@ const DailyPracticesSimple = () => {
               className="flex justify-between items-center p-[10px_20px] bg-white rounded-[10px] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)]"
             >
               <div className="flex items-center gap-[10px]">
-                <span className="font-happy-monkey text-[16px] lowercase">{practice.name}</span>
+                <span className="font-happy-monkey text-base text-[#04C4D5] lowercase">{practice.name}</span>
                 {practice.duration && (
-                  <div className="px-[8px] py-[2px] bg-[#F7FFFF] border border-[#148BAF] rounded-[4px] flex items-center gap-1">
+                  <div className="px-[8px] py-[2px] bg-[#FFFFFF] border border-[#148BAF] rounded-[4px] flex items-center gap-1">
                     <span className="text-[#148BAF] font-happy-monkey text-[14px] lowercase">{practice.duration} min</span>
                     <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M1 1L5 5L9 1" stroke="#148BAF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -105,7 +105,7 @@ const DailyPracticesSimple = () => {
                 onClick={() => handleToggleCompletion(practice.id)}
                 className={`min-w-[136px] px-[8px] py-[2px] rounded-[4px] whitespace-nowrap ${
                   practice.completed 
-                    ? 'bg-[#148BAF] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)]' 
+                    ? 'bg-[#148BAF] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)] border border-[#04C4D5]' 
                     : 'bg-white border border-[#04C4D5]'
                 }`}
               >

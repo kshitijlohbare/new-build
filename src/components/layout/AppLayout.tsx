@@ -6,7 +6,9 @@ import { useToast } from "@/hooks/useToast";
 
 const AppLayout = () => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -16,10 +18,29 @@ const AppLayout = () => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
       }
+      
+      // Close sidebar when clicking outside on mobile
+      if (sidebarRef.current && 
+          !sidebarRef.current.contains(event.target as Node) && 
+          window.innerWidth < 768) {
+        setSidebarVisible(false);
+      }
+    };
+
+    // Close mobile sidebar when screen size changes to desktop
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setSidebarVisible(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const handleSignOut = async () => {
@@ -56,20 +77,36 @@ const AppLayout = () => {
     }
   };
 
+  const toggleSidebar = () => {
+    setSidebarVisible(!sidebarVisible);
+  };
+
   return (
-    <div className="flex flex-col h-screen w-full bg-white overflow-hidden">
+    <div className="flex flex-col h-screen w-full bg-[#ffffff] overflow-hidden">
       {/* Top navbar - fixed at top */}
-      <header className="bg-gradient-to-b from-[#49DAEA] to-[rgba(195.50,253.79,255,0.20)] h-[70px] w-full z-10 flex items-center justify-between px-10 flex-shrink-0">
-        <div className="mr-4">
-          <h1 className="font-happy-monkey text-2xl font-bold text-black">CACTUS COCO</h1>
+      <header className="bg-gradient-to-b from-[#49DAEA] to-[rgba(195.50,253.79,255,0.20)] h-[70px] w-full z-20 flex items-center justify-between px-4 sm:px-10 flex-shrink-0">
+        <div className="flex items-center">
+          {/* Mobile menu button */}
+          <button 
+            className="md:hidden mr-3 text-black"
+            onClick={toggleSidebar}
+            aria-label="Toggle menu"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <h1 className="font-luckiest-guy text-xl sm:text-2xl font-bold text-black">CACTUS COCO</h1>
         </div>
         
-        <div className="flex items-center space-x-4">
-          <div className="text-black font-medium">
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="hidden sm:block text-black font-medium text-sm sm:text-base">
             current streak : 12
           </div>
           
-          <div className="flex items-center space-x-1">
+          <div className="hidden sm:flex items-center space-x-1">
             <div className="w-7 h-7 bg-white rounded-md flex items-center justify-center">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M15.8333 3.33331H4.16667C3.24619 3.33331 2.5 4.07951 2.5 4.99998V16.6666C2.5 17.5871 3.24619 18.3333 4.16667 18.3333H15.8333C16.7538 18.3333 17.5 17.5871 17.5 16.6666V4.99998C17.5 4.07951 16.7538 3.33331 15.8333 3.33331Z" stroke="#148BAF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -89,9 +126,9 @@ const AppLayout = () => {
           <div className="relative" ref={dropdownRef}>
             <button 
               onClick={() => setShowDropdown(!showDropdown)}
-              className="bg-[#088BAF] text-white px-4 py-1 rounded-full flex items-center gap-2"
+              className="bg-[#088BAF] text-white px-2 sm:px-4 py-1 rounded-full flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
             >
-              <span className="mr-1">hi, {user?.email?.split('@')[0] || 'kshitij lohbare'}</span>
+              <span className="mr-1 truncate max-w-[100px] sm:max-w-none">hi, {user?.email?.split('@')[0] || 'kshitij lohbare'}</span>
               <svg 
                 width="12" 
                 height="12" 
@@ -105,21 +142,21 @@ const AppLayout = () => {
             </button>
             
             {showDropdown && (
-              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1 z-10">
+              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1 z-20">
                 <button onClick={() => handleProfileAction('settings')} 
-                  className="block w-full text-left px-4 py-2 text-sm text-[#148BAF] hover:bg-[#F7FFFF] font-happy-monkey">
+                  className="block w-full text-left px-4 py-2 text-sm text-[#148BAF] hover:bg-[#FFFFFF] font-happy-monkey">
                   Settings
                 </button>
                 <button onClick={() => handleProfileAction('profile')}
-                  className="block w-full text-left px-4 py-2 text-sm text-[#148BAF] hover:bg-[#F7FFFF] font-happy-monkey">
+                  className="block w-full text-left px-4 py-2 text-sm text-[#148BAF] hover:bg-[#FFFFFF] font-happy-monkey">
                   Profile
                 </button>
                 <button onClick={() => handleProfileAction('appointments')}
-                  className="block w-full text-left px-4 py-2 text-sm text-[#148BAF] hover:bg-[#F7FFFF] font-happy-monkey">
+                  className="block w-full text-left px-4 py-2 text-sm text-[#148BAF] hover:bg-[#FFFFFF] font-happy-monkey">
                   My Appointments
                 </button>
                 <button onClick={() => handleProfileAction('logout')}
-                  className="block w-full text-left px-4 py-2 text-sm text-[#148BAF] hover:bg-[#F7FFFF] font-happy-monkey">
+                  className="block w-full text-left px-4 py-2 text-sm text-[#148BAF] hover:bg-[#FFFFFF] font-happy-monkey">
                   Logout
                 </button>
               </div>
@@ -130,13 +167,27 @@ const AppLayout = () => {
 
       {/* content-body container - takes remaining height */}
       <div className="content-body flex flex-1 overflow-hidden">
-        {/* Sidebar - fixed height, no scroll */}
-        <aside className="w-[110px] flex-shrink-0">
-          <Sidebar />
+        {/* Mobile sidebar overlay */}
+        {sidebarVisible && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-30 z-10 md:hidden"
+            onClick={() => setSidebarVisible(false)}
+          />
+        )}
+        
+        {/* Sidebar - adaptive for mobile */}
+        <aside 
+          ref={sidebarRef}
+          className={`
+            md:w-[110px] md:relative md:block flex-shrink-0
+            ${sidebarVisible ? 'fixed inset-y-0 left-0 w-[200px] z-20' : 'hidden'}
+          `}
+        >
+          <Sidebar onNavigate={() => setSidebarVisible(false)} />
         </aside>
 
         {/* Main content area - scrollable independently */}
-        <main className="flex-1 overflow-y-auto p-10">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10">
           <Outlet />
         </main>
       </div>

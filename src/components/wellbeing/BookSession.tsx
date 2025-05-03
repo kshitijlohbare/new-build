@@ -90,7 +90,7 @@ const BookSession = () => {
                 </div>
               )}
             </div>
-            <div className="text-sm font-happy-monkey text-black lowercase mb-1">{practitioner.name}</div>
+            <div className="text-base font-happy-monkey text-black lowercase mb-1">{practitioner.name}</div>
             <div className="text-xs text-[#148BAF] font-happy-monkey lowercase mb-1">{practitioner.specialty}</div>
             
             <div className="flex items-center gap-0.5 mb-1">
@@ -110,7 +110,7 @@ const BookSession = () => {
                 </svg>
                 <span className="text-xs text-[#148BAF] font-happy-monkey lowercase">{practitioner.rating} ({practitioner.reviews} reviews)</span>
               </div>
-              <span className="text-xs text-black font-happy-monkey lowercase">$ {practitioner.price}/session</span>
+              <span className="text-sm text-black font-happy-monkey lowercase">$ {practitioner.price}/session</span>
             </div>
           </div>
         ))}

@@ -123,57 +123,100 @@ export const ShareDelights = () => {
     }
   };
 
+  const deleteDelight = async (id: number | string) => {
+    if (!user) return;
+    
+    // Optimistic UI update - remove the delight immediately
+    const deletedDelight = entries.find(entry => entry.id === id);
+    setEntries(prev => prev.filter(entry => entry.id !== id));
+    
+    try {
+      // For temporary IDs (optimistic entries not yet saved to DB), no DB call needed
+      if (typeof id === 'string' && isNaN(parseInt(id as string))) {
+        return;
+      }
+      
+      // Delete from database
+      const { error } = await supabase
+        .from('delights')
+        .delete()
+        .eq('id', id);
+      
+      if (error) {
+        console.error("Error deleting delight:", error);
+        toast({ title: "Error", description: "Could not delete the delight.", variant: "destructive" });
+        
+        // Revert optimistic deletion on error
+        if (deletedDelight) {
+          setEntries(prev => [...prev, deletedDelight]);
+        }
+      } else {
+        toast({ title: "Success", description: "Delight deleted successfully." });
+      }
+    } catch (err) {
+      console.error("Unexpected error deleting delight:", err);
+      toast({ title: "Error", description: "An unexpected error occurred.", variant: "destructive" });
+      
+      // Revert optimistic deletion on error
+      if (deletedDelight) {
+        setEntries(prev => [...prev, deletedDelight]);
+      }
+    }
+  };
+
   const onEmojiSelect = (emoji: EmojiObject) => {
     setInputText(prev => prev + emoji.native);
     setShowEmojiPicker(false);
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col items-start p-[20px_10px] gap-5 w-full bg-[rgba(83,252,255,0.1)] rounded-[20px]">
-        <h2 className="text-3xl text-center text-black font-happy-monkey lowercase w-full">
+    <div className="px-2 sm:px-3 md:padding-[20px] w-full flex flex-col items-center">
+      <div className="flex flex-col items-start p-3 sm:p-4 md:p-[20px_10px] gap-3 sm:gap-4 md:gap-5 w-full bg-[rgba(83,252,255,0.1)] rounded-[20px]">
+        <h2 className="text-xl sm:text-2xl md:text-3xl text-center text-black font-happy-monkey lowercase w-full">
           share your delights
         </h2>
 
-        <div className="flex justify-center items-center p-[10px] gap-[10px] w-full h-[59px] bg-white border border-[#148BAF] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[10px]">
+        <div className="flex flex-col sm:flex-row justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[10px] w-full bg-white border border-[#148BAF] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[10px]">
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleShare()}
             placeholder="what delighted you today?"
-            className={`flex-1 bg-transparent border-none ${inputText ? 'text-[#148BAF]' : 'text-[#43D3E0]'} placeholder-[#43D3E0] font-happy-monkey lowercase focus:outline-none`}
+            className={`flex-1 bg-transparent border-none ${inputText ? 'text-[#148BAF]' : 'text-[#43D3E0]'} placeholder-[#43D3E0] font-happy-monkey lowercase focus:outline-none w-full sm:w-auto mb-2 sm:mb-0`}
             disabled={!user}
           />
-          <div className="relative">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button 
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className="w-6 h-6 flex items-center justify-center mx-1"
+                disabled={!user}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12Z" fill="white"/>
+                  <path d="M9.5 9C9.5 10.1046 8.60457 11 7.5 11C6.39543 11 5.5 10.1046 5.5 9C5.5 7.89543 6.39543 7 7.5 7C8.60457 7 9.5 7.89543 9.5 9Z" fill="#49DADD"/>
+                  <path d="M18.5 9C18.5 10.1046 17.6046 11 16.5 11C15.3954 11 14.5 10.1046 14.5 9C14.5 7.89543 15.3954 7 16.5 7C17.6046 7 18.5 7.89543 18.5 9Z" fill="#49DADD"/>
+                  <path d="M12 1C18.3513 1 23.5 6.14873 23.5 12C23.5 17.8513 18.3513 23 12 23C5.64873 23 0.5 17.8513 0.5 12C0.5 6.14873 5.64873 1 12 1ZM9 9C9 9.82843 8.32843 10.5 7.5 10.5C6.67157 10.5 6 9.82843 6 9C6 8.17157 6.67157 7.5 7.5 7.5C8.32843 7.5 9 8.17157 9 9ZM18 9C18 9.82843 17.3284 10.5 16.5 10.5C15.6716 10.5 15 9.82843 15 9C15 8.17157 15.6716 7.5 16.5 7.5C17.3284 7.5 18 8.17157 18 9Z" stroke="#49DADD" strokeMiterlimit="1.05762" strokeLinecap="round"/>
+                </svg>
+              </button>
+              {showEmojiPicker && (
+                <div className="absolute bottom-full right-0 z-50 max-w-[90vw] sm:max-w-none">
+                  <Picker data={data} onEmojiSelect={onEmojiSelect} />
+                </div>
+              )}
+            </div>
             <button 
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="w-6 h-6 flex items-center justify-center mx-1"
-              disabled={!user}
+              onClick={handleShare}
+              className="bg-[#148BAF] rounded-[10px] text-white py-2 px-3 sm:py-2.5 sm:px-4 text-sm sm:text-base font-happy-monkey lowercase hover:bg-[#1279A0] transition-colors w-full sm:w-auto"
+              disabled={!user || !inputText.trim()}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12Z" fill="white"/>
-                <path d="M9.5 9C9.5 10.1046 8.60457 11 7.5 11C6.39543 11 5.5 10.1046 5.5 9C5.5 7.89543 6.39543 7 7.5 7C8.60457 7 9.5 7.89543 9.5 9Z" fill="#49DADD"/>
-                <path d="M18.5 9C18.5 10.1046 17.6046 11 16.5 11C15.3954 11 14.5 10.1046 14.5 9C14.5 7.89543 15.3954 7 16.5 7C17.6046 7 18.5 7.89543 18.5 9Z" fill="#49DADD"/>
-                <path d="M12 1C18.3513 1 23.5 6.14873 23.5 12C23.5 17.8513 18.3513 23 12 23C5.64873 23 0.5 17.8513 0.5 12C0.5 6.14873 5.64873 1 12 1ZM9 9C9 9.82843 8.32843 10.5 7.5 10.5C6.67157 10.5 6 9.82843 6 9C6 8.17157 6.67157 7.5 7.5 7.5C8.32843 7.5 9 8.17157 9 9ZM18 9C18 9.82843 17.3284 10.5 16.5 10.5C15.6716 10.5 15 9.82843 15 9C15 8.17157 15.6716 7.5 16.5 7.5C17.3284 7.5 18 8.17157 18 9Z" stroke="#49DADD" strokeMiterlimit="1.05762" strokeLinecap="round"/>
-              </svg>
+              post delight
             </button>
-            {showEmojiPicker && (
-              <div className="absolute bottom-full right-0 z-50">
-                <Picker data={data} onEmojiSelect={onEmojiSelect} />
-              </div>
-            )}
           </div>
-          <button 
-            onClick={handleShare}
-            className="bg-[#148BAF] rounded-[10px] text-white py-2.5 px-4 text-base font-happy-monkey lowercase hover:bg-[#1279A0] transition-colors"
-            disabled={!user || !inputText.trim()}
-          >
-            post delight
-          </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[10px] w-full min-h-[50px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-[10px] w-full min-h-[50px]">
           {loading ? (
              <p className="text-center text-gray-500 col-span-full">Loading delights...</p>
           ) : entries.length === 0 ? (
@@ -182,41 +225,25 @@ export const ShareDelights = () => {
             entries.map((entry) => (
               <div
                 key={entry.id}
-                className="p-2.5 bg-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[10px] flex items-center justify-center"
+                className="p-2 bg-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)] border border-[#04C4D5] rounded-[10px] flex items-center justify-between relative"
               >
-                <span className="text-[#04C4D5] font-happy-monkey text-base lowercase">{entry.text}</span>
+                <span className="text-[#04C4D5] font-happy-monkey text-xs sm:text-sm lowercase flex-grow text-center pr-4">{entry.text}</span>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteDelight(entry.id);
+                  }}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-[#04C4D5] hover:text-red-500 transition-colors"
+                  aria-label="Delete delight"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
               </div>
             ))
           )}
-        </div>
-      </div>
-      <div className="flex flex-col sm:flex-row gap-2.5 w-full">
-        <div className="flex-1 p-2.5 relative rounded-[10px] border border-[#49DADD]">
-          <div className="absolute left-1/2 transform -translate-x-1/2 top-[-10px] px-2.5 py-1 bg-white rounded-md" style={{
-            borderImage: 'linear-gradient(90deg, #49DADD 0%, #148BAF 100%)',
-            borderImageSlice: 1,
-            borderStyle: 'solid',
-            borderWidth: '1px'
-          }}>
-            <span className="text-[#04C4D5] font-happy-monkey text-base lowercase text-center">daily tip by huberman</span>
-          </div>
-          <p className="text-center text-[#148BAF] font-happy-monkey lowercase mt-5">
-            improve your mental health with practices shared by andrew huberman and naval ravikant
-          </p>
-        </div>
-        
-        <div className="flex-1 p-2.5 relative rounded-[10px] border border-[#49DADD]">
-          <div className="absolute left-1/2 transform -translate-x-1/2 top-[-10px] px-2.5 py-1 bg-white rounded-md" style={{
-            borderImage: 'linear-gradient(90deg, #49DADD 0%, #148BAF 100%)',
-            borderImageSlice: 1,
-            borderStyle: 'solid',
-            borderWidth: '1px'
-          }}>
-            <span className="text-[#04C4D5] font-happy-monkey text-base lowercase text-center">todays quote by naval</span>
-          </div>
-          <p className="text-center text-[#148BAF] font-happy-monkey lowercase mt-5">
-            improve your mental health with practices shared by andrew huberman and naval ravikant
-          </p>
         </div>
       </div>
     </div>

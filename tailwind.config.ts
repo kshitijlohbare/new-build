@@ -10,7 +10,7 @@ export default {
       fontFamily: {
         'happy-monkey': ['"Happy Monkey"', 'cursive'],
         'kavoon': ['Kavoon', 'cursive'],
-        'protest-riot': ['"Protest Riot"', 'sans-serif'],
+        'righteous': ['Righteous', 'sans-serif'],
       },
       lineHeight: {
         'default': '1.6',

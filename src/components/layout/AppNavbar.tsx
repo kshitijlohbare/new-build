@@ -7,7 +7,7 @@ const AppNavbar = () => {
       <div className="container flex h-12 items-center justify-between px-4">
         <div className="mr-4">
           <Link to="/" className="flex items-center">
-            <span className="font-happy-monkey text-2xl font-bold text-black">CACTUS COCO</span>
+            <span className="font-happy-monkey text-2xl font-bold text-base">CACTUS COCO</span>
           </Link>
         </div>
         
@@ -25,8 +25,8 @@ const AppNavbar = () => {
             </div>
           </div>
           
-          <div className="flex items-center bg-[#088BAF] text-white px-4 py-1 rounded-full">
-            <span className="mr-1">hi, kshitij lohbare</span>
+          <div className="flex items-center bg-[#088BAF] text-white text-base px-4 py-2 rounded-full">
+            <span className="mr-1 text-base">hi, kshitij lohbare</span>
             <ChevronDown size={16} />
           </div>
         </div>

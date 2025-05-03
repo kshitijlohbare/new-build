@@ -248,7 +248,7 @@ const DailyPractices = () => {
                 className={`w-full p-[8px] ${
                   practice.completed 
                     ? 'bg-[#148BAF] text-white border border-[#49DADD]' 
-                    : 'bg-[#F7FFFF] text-[#148BAF] border border-[#49DADD]'
+                    : 'bg-[#FFFFFF] text-[#148BAF] border border-[#49DADD]'
                 } rounded-[8px] flex justify-center items-center cursor-pointer`}
               >
                 <span className="text-center font-happy-monkey text-base lowercase">
