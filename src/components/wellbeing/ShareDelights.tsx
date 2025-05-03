@@ -170,7 +170,7 @@ export const ShareDelights = () => {
   };
 
   return (
-    <div className="px-2 sm:px-3 md:padding-[20px] w-full flex flex-col items-center">
+    <div className="px-2 sm:px-3 md:p-[20px] w-full flex flex-col items-center">
       <div className="flex flex-col items-start p-3 sm:p-4 md:p-[20px_10px] gap-3 sm:gap-4 md:gap-5 w-full bg-[rgba(83,252,255,0.1)] rounded-[20px]">
         <h2 className="text-xl sm:text-2xl md:text-3xl text-center text-black font-happy-monkey lowercase w-full">
           share your delights

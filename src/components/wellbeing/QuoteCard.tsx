@@ -1,19 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 interface Quote {
   id: number;
   text: string;
   author: string;
-}
-
-interface QuoteCardProps {
-  quote: string;
-  author: 'huberman' | 'naval';
-  type?: 'tip' | 'quote';
-  className?: string;
 }
 
 export const QuoteCard = () => {

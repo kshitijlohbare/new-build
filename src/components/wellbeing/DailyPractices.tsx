@@ -198,7 +198,7 @@ const DailyPractices = () => {
         {practices.map((practice) => (
           <div
             key={practice.id}
-            className="w-full p-[10px] bg-[rgba(83,252,255,0.10)] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)] rounded-[10px] flex flex-col gap-[20px] h-full"
+            className="w-full p-[10px] bg-[rgba(83,252,255,0.10)] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)] rounded-[10px] flex flex-col gap-[20px] h-auto"
           >
             {/* Card Content */}
             <div className="flex flex-col gap-[10px] flex-grow">
@@ -259,10 +259,10 @@ const DailyPractices = () => {
           </div>
         ))}
         
-        {/* Empty cards */}
-        <div className="flex flex-col bg-white rounded-[10px] p-3"></div>
-        <div className="flex flex-col bg-white rounded-[10px] p-3"></div>
-        <div className="flex flex-col bg-white rounded-[10px] p-3"></div>
+        {/* Empty cards for consistent grid spacing */}
+        <div className="hidden md:flex flex-col bg-transparent rounded-[10px] p-3"></div>
+        <div className="hidden lg:flex flex-col bg-transparent rounded-[10px] p-3"></div>
+        <div className="hidden xl:flex flex-col bg-transparent rounded-[10px] p-3"></div>
       </div>
     </div>
   );

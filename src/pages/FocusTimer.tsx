@@ -201,7 +201,7 @@ const FocusTimer = () => {
           )}
           
           {/* Focus session */}
-          <div className="bg-[#53FCFF1A] rounded-lg flex flex-col items-center gap-2 p-5 min-w-[350px] h-[350px]">
+          <div className="bg-[#53FCFF1A] rounded-lg flex flex-col items-center gap-2 p-5 w-full max-w-[350px] h-auto md:h-[350px]">
             <div className="text-[#148BAF] font-happy-monkey text-base lowercase">
               {isWorkPhase ? 'work phase' : 'break phase'}
             </div>
@@ -210,7 +210,7 @@ const FocusTimer = () => {
               <span className="text-[#148BAF] font-happy-monkey text-base">|</span>
               <div className="text-[#148BAF] font-happy-monkey text-base lowercase">total time : {workTime * cycles + breakTime * (cycles > 0 ? cycles -1 : 0)} mins</div>
             </div>
-            <div className="bg-white rounded-lg flex flex-col items-center justify-center w-[300px] h-[120px] my-2">
+            <div className="bg-white rounded-lg flex flex-col items-center justify-center w-full max-w-[300px] h-auto md:h-[120px] my-2">
               {/* Fixed text color to #148BAF */}
               <div className="text-[#148BAF] font-happy-monkey text-5xl">{Math.floor(timer / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}</div>
             </div>
