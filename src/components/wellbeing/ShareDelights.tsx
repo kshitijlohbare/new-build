@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { useToast } from "@/hooks/useToast";
+import { usePractices } from "@/context/PracticeContext"; // Import usePractices
 
 // Updated interface to accept both number and string IDs for flexibility
 interface Delight {
@@ -30,6 +31,7 @@ export const ShareDelights = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { addPointsForAction } = usePractices(); // Get the function from context
   // Define tempId at component level so it's accessible throughout the component
   const [tempId, setTempId] = useState<string | null>(null);
 
@@ -111,6 +113,9 @@ export const ShareDelights = () => {
       } else if (data) {
          // Replace optimistic entry with actual data from DB
          setEntries(prev => prev.map(entry => entry.id === newTempId ? data : entry));
+         // Add points for sharing the delight
+         addPointsForAction(5, 'Shared a Delight'); // Add 5 points
+         toast({ title: "Success", description: "Delight shared and points added!" }); // Optional: Update toast message
       }
     } catch (err) {
       console.error("Unexpected error saving delight:", err);
