@@ -18,7 +18,7 @@ export const LoadingSpinner = ({ className, size = "md" }: LoadingSpinnerProps) 
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        className="text-moody-primary dark:text-moody-secondary"
+        className="text-moody-primary"
       >
         <circle
           className="opacity-25"

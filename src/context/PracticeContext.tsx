@@ -1,4 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { savePracticeData, loadPracticeData } from './practiceUtils';
 
 // --- Interfaces (Consider moving to a types file) ---
 export interface Practice { // Export the interface
@@ -11,6 +13,7 @@ export interface Practice { // Export the interface
   points?: number; // Add optional fixed points for non-duration practices
   completed: boolean;
   streak?: number;
+  tags?: string[]; // Optional: Add tags for filtering
   // New fields for detailed steps
   steps?: {
     title: string;
@@ -20,6 +23,7 @@ export interface Practice { // Export the interface
   }[];
   source?: string; // Attribution (e.g., "Andrew Huberman", "Naval Ravikant")
   stepProgress?: number; // Track overall progress as percentage
+  isDaily?: boolean; // Added field to mark as daily practice
 }
 
 interface Achievement {
@@ -35,6 +39,7 @@ interface UserProgress {
   nextLevelPoints: number;
   streakDays: number;
   totalCompleted: number;
+  lastCompletionDate?: string; // Track the last completion date for streak calculation
   achievements: Achievement[];
 }
 
@@ -66,6 +71,15 @@ const calculateLevel = (points: number): { level: number; nextLevelPoints: numbe
   if (points < 300) return { level: 3, nextLevelPoints: 300 };
   if (points < 500) return { level: 4, nextLevelPoints: 500 };
   return { level: 5, nextLevelPoints: Infinity }; // Max level 5
+};
+
+// Add a new utility function for date comparisons
+const isSameDay = (date1: Date, date2: Date): boolean => {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
 };
 
 // --- Initial Data (Consider fetching from API/storage) ---
@@ -253,8 +267,11 @@ type PracticeContextType = {
   getPracticeById: (id: number) => Practice | undefined;
   toggleStepCompletion: (practiceId: number, stepIndex: number) => void;
   getStepProgress: (practiceId: number) => number;
-  addPointsForAction: (points: number, actionName?: string) => void; // Add function to add arbitrary points
+  addPointsForAction: (points: number, actionName?: string) => void;
+  addPractice: (newPractice: Practice) => number;
+  removePractice: (practiceId: number, removeFromDaily?: boolean) => void; // Updated to handle daily practice removal
   isLoading: boolean;
+  newAchievements: Achievement[];
 };
 
 const PracticeContext = createContext<PracticeContextType | undefined>(undefined);
@@ -279,6 +296,7 @@ const initializeStepsCompletion = (practices: Practice[]): Practice[] => {
 };
 
 export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) => {
+  const { user } = useAuth();
   const [practices, setPractices] = useState<Practice[]>(initializeStepsCompletion(INITIAL_PRACTICE_DATA));
   const [userProgress, setUserProgress] = useState<UserProgress>({
     totalPoints: 0,
@@ -286,58 +304,148 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
     nextLevelPoints: 50,
     streakDays: 0,
     totalCompleted: 0,
+    lastCompletionDate: undefined, // Initialize without a completion date
     achievements: [],
   });
   const [isLoading, setIsLoading] = useState<boolean>(true); // Start as loading
+  const [newAchievements, setNewAchievements] = useState<Achievement[]>([]); // State to track new achievements
+  // Status for potential UI feedback in the future
+  const [, setSaveStatus] = useState<'idle' | 'saving' | 'error' | 'success'>('idle');
 
-  // --- Effect for Initial Calculation ---
+  // --- Effect for Data Loading from Supabase ---
   useEffect(() => {
-    // Simulate loading if needed, or fetch data here
-    setIsLoading(true);
-    const initialCompleted = practices.filter(p => p.completed);
-    const initialPoints = initialCompleted.reduce((sum, p) => sum + calculatePoints(p.duration), 0);
-    const { level, nextLevelPoints } = calculateLevel(initialPoints);
-    // More robust streak calculation needed if based on historical data
-    const initialStreak = initialCompleted.length > 0 ? 1 : 0; // Simplified: Assume 1 day streak if any completed initially
+    const loadUserData = async () => {
+      setIsLoading(true);
+      
+      if (user?.id) {
+        try {
+          const userData = await loadPracticeData(user.id);
+          
+          if (userData) {
+            // We have saved user data - initialize with it
+            if (userData.practices) {
+              setPractices(initializeStepsCompletion(userData.practices));
+            }
+            
+            if (userData.progress) {
+              setUserProgress(userData.progress);
+              console.log("Loaded user progress:", userData.progress);
+            }
+          } else {
+            // No saved data - use initial data and calculate
+            const initialCompleted = practices.filter(p => p.completed);
+            const initialPoints = initialCompleted.reduce((sum, p) => sum + calculatePoints(p.duration), 0);
+            const { level, nextLevelPoints } = calculateLevel(initialPoints);
+            const initialStreak = initialCompleted.length > 0 ? 1 : 0;
 
-    const initialAchievements = ALL_ACHIEVEMENTS
-      .filter(ach => ach.criteria({ ...userProgress, totalPoints: initialPoints, level, streakDays: initialStreak }, practices))
-      .map(({ criteria, ...rest }) => rest);
+            const initialAchievements = ALL_ACHIEVEMENTS
+              .filter(ach => ach.criteria({ 
+                ...userProgress, 
+                totalPoints: initialPoints, 
+                level, 
+                streakDays: initialStreak 
+              }, practices))
+              .map(({ criteria, ...rest }) => rest);
 
-    setUserProgress({
-      totalPoints: initialPoints,
-      level,
-      nextLevelPoints,
-      streakDays: initialStreak,
-      totalCompleted: initialCompleted.length,
-      achievements: initialAchievements,
-    });
-    setIsLoading(false);
+            setUserProgress({
+              totalPoints: initialPoints,
+              level,
+              nextLevelPoints,
+              streakDays: initialStreak,
+              totalCompleted: initialCompleted.length,
+              achievements: initialAchievements,
+            });
+          }
+        } catch (error) {
+          console.error("Error loading user data:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        // No user - use default initialization
+        const initialCompleted = practices.filter(p => p.completed);
+        const initialPoints = initialCompleted.reduce((sum, p) => sum + calculatePoints(p.duration), 0);
+        const { level, nextLevelPoints } = calculateLevel(initialPoints);
+        const initialStreak = initialCompleted.length > 0 ? 1 : 0;
+
+        const initialAchievements = ALL_ACHIEVEMENTS
+          .filter(ach => ach.criteria({ ...userProgress, totalPoints: initialPoints, level, streakDays: initialStreak }, practices))
+          .map(({ criteria, ...rest }) => rest);
+
+        setUserProgress({
+          totalPoints: initialPoints,
+          level,
+          nextLevelPoints,
+          streakDays: initialStreak,
+          totalCompleted: initialCompleted.length,
+          achievements: initialAchievements,
+        });
+        
+        setIsLoading(false);
+      }
+    };
+
+    loadUserData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Recalculate only if initial data source changes (e.g., fetched data)
+  }, [user?.id]); // Reload whenever the user ID changes
 
   // --- Update Logic (Centralized) ---
   // Refactored recalculateProgress to accept points directly
   const recalculateProgressAndAchievements = useCallback((currentPoints: number, updatedPractices: Practice[]) => {
     const { level, nextLevelPoints } = calculateLevel(currentPoints);
 
-    // Basic daily streak logic - Needs improvement for real-world app
+    // Daily streak logic with proper date tracking
     const completedPractices = updatedPractices.filter(p => p.completed);
-    const todaysCompletions = completedPractices.length;
-    const prevTotalCompleted = userProgress.totalCompleted; // Get previous count
+    const today = new Date();
     let newStreak = userProgress.streakDays;
-    // Simplified streak logic - needs date tracking for accuracy
-    if (todaysCompletions > 0 && prevTotalCompleted === 0) {
+    const lastCompletionDate = userProgress.lastCompletionDate ? new Date(userProgress.lastCompletionDate) : null;
+    
+    if (completedPractices.length > 0) {
+      // If this is the first completion ever
+      if (!lastCompletionDate) {
         newStreak = 1;
-    } else if (todaysCompletions > 0 && prevTotalCompleted > 0) {
-        newStreak += 1; // Incrementing daily for now
-    } else if (todaysCompletions === 0) {
-        newStreak = 0;
+      } 
+      // If there was a previous completion
+      else {
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        // If the last completion was yesterday, increment the streak
+        if (isSameDay(lastCompletionDate, yesterday)) {
+          newStreak += 1;
+        } 
+        // If the last completion was today, maintain the streak
+        else if (isSameDay(lastCompletionDate, today)) {
+          // No change to streak - already counted for today
+        } 
+        // If more than one day has passed, reset the streak to 1
+        else {
+          newStreak = 1;
+        }
+      }
+    } else {
+      // If no practices are completed, check if streak should be reset
+      if (lastCompletionDate) {
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        // If the last completion wasn't yesterday or today, reset streak
+        if (!isSameDay(lastCompletionDate, yesterday) && !isSameDay(lastCompletionDate, today)) {
+          newStreak = 0;
+        }
+      }
     }
 
     // Check for new achievements
     const currentAchievements = userProgress.achievements;
-    const potentialNewProgress = { ...userProgress, totalPoints: currentPoints, level, streakDays: newStreak };
+    const potentialNewProgress = { 
+      ...userProgress, 
+      totalPoints: currentPoints, 
+      level, 
+      streakDays: newStreak,
+      lastCompletionDate: completedPractices.length > 0 ? today.toISOString() : userProgress.lastCompletionDate
+    };
+    
     const newlyEarnedAchievements = ALL_ACHIEVEMENTS
       .filter(ach => !currentAchievements.some(earned => earned.id === ach.id))
       .filter(ach => ach.criteria(potentialNewProgress, updatedPractices))
@@ -348,16 +456,49 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
       totalPoints: currentPoints,
       level,
       nextLevelPoints,
-      totalCompleted: completedPractices.length, // Keep this based on practices
+      totalCompleted: completedPractices.length,
       streakDays: newStreak,
+      lastCompletionDate: completedPractices.length > 0 ? today.toISOString() : prev.lastCompletionDate,
       achievements: [...prev.achievements, ...newlyEarnedAchievements],
     }));
 
     if (newlyEarnedAchievements.length > 0) {
       console.log("New achievements unlocked:", newlyEarnedAchievements.map(a => a.name).join(', '));
-      // TODO: Integrate toast notifications if available
+      setNewAchievements(newlyEarnedAchievements); // Update state with new achievements
     }
   }, [userProgress]); // Dependency includes userProgress for streak/achievement logic
+
+  // Effect to save data after state changes
+  useEffect(() => {
+    // Don't save during initial loading
+    if (isLoading) return;
+    
+    // Don't attempt to save if no user is logged in
+    if (!user?.id) return;
+    
+    // Debounce saving to avoid excessive database calls
+    const saveTimeout = setTimeout(async () => {
+      setSaveStatus('saving');
+      try {
+        // Make a deep copy of the data to avoid any reference issues
+        const practicesCopy = JSON.parse(JSON.stringify(practices));
+        const progressCopy = JSON.parse(JSON.stringify(userProgress));
+        
+        // Save to Supabase
+        const success = await savePracticeData(user.id, practicesCopy, progressCopy);
+        setSaveStatus(success ? 'success' : 'error');
+        
+        if (!success) {
+          console.warn("Data saved but response indicates potential issue");
+        }
+      } catch (error) {
+        console.error("Error saving data:", error);
+        setSaveStatus('error');
+      }
+    }, 1000); // Wait 1 second after changes before saving
+    
+    return () => clearTimeout(saveTimeout);
+  }, [practices, userProgress, user?.id, isLoading]);
 
   // Function to add points for specific actions (like sharing a delight)
   const addPointsForAction = useCallback((pointsToAdd: number, actionName: string = 'Action') => {
@@ -367,22 +508,110 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
     recalculateProgressAndAchievements(newTotalPoints, practices);
   }, [userProgress.totalPoints, practices, recalculateProgressAndAchievements]);
 
+  // Function to add a new practice or update an existing one (e.g., for isDaily)
+  const addPractice = useCallback((practiceToUpdate: Practice) => {
+    setPractices(prevPractices => {
+      const existingPracticeIndex = prevPractices.findIndex(p => p.id === practiceToUpdate.id);
+
+      if (existingPracticeIndex !== -1) {
+        // Practice exists, update it (e.g., setting isDaily)
+        const updatedPractices = [...prevPractices];
+        updatedPractices[existingPracticeIndex] = {
+          ...updatedPractices[existingPracticeIndex],
+          ...practiceToUpdate, // Apply updates, like isDaily: true
+        };
+        console.log("Updated existing practice:", updatedPractices[existingPracticeIndex].name, "isDaily:", updatedPractices[existingPracticeIndex].isDaily);
+        return updatedPractices;
+      } else {
+        // Practice does not exist, add it as a new practice
+        // Ensure required fields are present for a truly new practice
+        if (!practiceToUpdate.name || practiceToUpdate.id === undefined) {
+          console.error("Cannot add new practice: missing required fields (name, id)");
+          return prevPractices; // Return previous state if validation fails
+        }
+        const practiceWithDefaults = {
+          ...practiceToUpdate,
+          completed: practiceToUpdate.completed || false,
+          streak: practiceToUpdate.streak || 0,
+          duration: practiceToUpdate.duration || 5,
+          benefits: Array.isArray(practiceToUpdate.benefits) && practiceToUpdate.benefits.length > 0
+            ? practiceToUpdate.benefits
+            : ["Customized for you"],
+          // Ensure isDaily is explicitly set if it's a new practice being added as daily
+          isDaily: practiceToUpdate.isDaily || false,
+        };
+        console.log("Added new practice:", practiceWithDefaults.name);
+        return [...prevPractices, practiceWithDefaults];
+      }
+    });
+    return practiceToUpdate.id; // Return the ID for reference
+  }, []);
+
+  // Function to remove a practice from the user's list or just remove from daily practices
+  const removePractice = useCallback((practiceId: number, removeFromDaily = true) => {
+    setPractices(prevPractices => {
+      // If removeFromDaily is true, just update isDaily flag, otherwise completely remove the practice
+      if (removeFromDaily) {
+        return prevPractices.map(p => {
+          if (p.id === practiceId) {
+            return { ...p, isDaily: false }; // Remove from daily practices
+          }
+          return p;
+        });
+      } else {
+        // Completely remove the practice
+        const updatedPractices = prevPractices.filter(p => p.id !== practiceId);
+        console.log("Removed practice with ID:", practiceId);
+        return updatedPractices;
+      }
+    });
+    // The useEffect for saving will persist this change.
+  }, []);
+
   const togglePracticeCompletion = useCallback((id: number) => {
     let pointsChange = 0;
-    const updatedPractices = practices.map(practice => {
-      if (practice.id === id) {
-        const nowCompleted = !practice.completed;
-        const practicePoints = practice.points ?? calculatePoints(practice.duration);
-        pointsChange = nowCompleted ? practicePoints : -practicePoints;
-        const updatedStreak = nowCompleted ? (practice.streak || 0) + 1 : 0;
-        return { ...practice, completed: nowCompleted, streak: updatedStreak };
-      }
-      return practice;
-    });
-    setPractices(updatedPractices);
-    // Update total points directly and recalculate
-    const newTotalPoints = userProgress.totalPoints + pointsChange;
-    recalculateProgressAndAchievements(newTotalPoints, updatedPractices);
+    // First check if this practice exists, if not, it's a new practice from the dialog
+    const practiceExists = practices.some(p => p.id === id);
+    
+    if (!practiceExists) {
+      // Handle case when practice doesn't exist yet
+      console.log("Practice not found, might be a new practice pending addition");
+      return;
+    }
+    
+    try {
+      const updatedPractices = practices.map(practice => {
+        if (practice.id === id) {
+          const nowCompleted = !practice.completed;
+          // Calculate points based on either fixed points or duration
+          const practicePoints = practice.points ?? calculatePoints(practice.duration);
+          // Points change based on completion status
+          pointsChange = nowCompleted ? practicePoints : -practicePoints;
+          // Update streak - increment if completing, reset if uncompleting
+          const updatedStreak = nowCompleted ? (practice.streak || 0) + 1 : 0;
+          
+          // Return updated practice
+          return { 
+            ...practice, 
+            completed: nowCompleted, 
+            streak: updatedStreak,
+            lastCompletedAt: nowCompleted ? new Date().toISOString() : undefined
+          };
+        }
+        return practice;
+      });
+      
+      // Update practices state
+      setPractices(updatedPractices);
+      
+      // Update total points and recalculate achievements
+      const newTotalPoints = Math.max(0, userProgress.totalPoints + pointsChange);
+      recalculateProgressAndAchievements(newTotalPoints, updatedPractices);
+      
+      console.log(`Practice '${practices.find(p => p.id === id)?.name}' ${pointsChange > 0 ? 'completed' : 'uncompleted'}`);
+    } catch (error) {
+      console.error("Error toggling practice completion:", error);
+    }
   }, [practices, userProgress.totalPoints, recalculateProgressAndAchievements]);
 
   const updatePracticeDuration = useCallback((id: number, duration: number) => {
@@ -443,7 +672,10 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
     toggleStepCompletion,
     getStepProgress,
     addPointsForAction, // Expose the new function
+    addPractice, // Expose the function to add practices
+    removePractice, // Expose removePractice
     isLoading,
+    newAchievements, // Expose the new achievements
   };
 
   return <PracticeContext.Provider value={value}>{children}</PracticeContext.Provider>;

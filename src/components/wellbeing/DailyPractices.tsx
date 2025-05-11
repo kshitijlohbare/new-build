@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { usePractices } from '../../context/PracticeContext'; // Remove unused Practice import
+import { useState, useEffect, useRef } from 'react'; // Added useRef
+import { usePractices, Practice } from '../../context/PracticeContext'; // Ensure Practice type is imported
 import PracticeDetailPopup from './PracticeDetailPopup';
+import { useToast } from '@/hooks/useToast';
+import { useNavigate } from 'react-router-dom';
 
 // SVG ICONS
 const icons = {
@@ -71,24 +73,87 @@ const icons = {
 
 type IconType = keyof typeof icons;
 
-const FILTERS = [
-  { label: "feeling stressed", active: false },
-  { label: "i am anxious", active: false },
-  { label: "finding hard to focus", active: true },
-  { label: "guided practice", active: false },
-  { label: "guided practice", active: false },
-  { label: "guided practice", active: false },
+// Updated filters with proper id property
+const practiceFilters = [
+  { id: "stress", label: "feeling stressed" },
+  { id: "anxiety", label: "i am anxious" },
+  { id: "focus", label: "finding hard to focus" },
+  { id: "guided", label: "guided practice" },
+  { id: "meditation", label: "meditation" }, 
+  { id: "breathing", label: "breathing exercise" }
 ];
 
 const DailyPractices = () => {
-  // Consume context - remove unused getPracticeById
-  const { practices, userProgress, togglePracticeCompletion, isLoading } = usePractices();
+  const { practices, isLoading, addPractice, removePractice, updatePracticeDuration } = usePractices(); // Removed unused userProgress
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  // Local state for UI interactions
-  const [selectedPracticeId, setSelectedPracticeId] = useState<number | null>(null); // State for popup
+  const [selectedPracticeId, setSelectedPracticeId] = useState<number | null>(null);
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [filteredPractices, setFilteredPractices] = useState<Practice[]>(practices); // Ensure type
 
-  const handleToggleCompletion = (id: number) => {
-    togglePracticeCompletion(id); // Use context function
+  // State for context menu
+  const [contextMenu, setContextMenu] = useState<{ practiceId: number; x: number; y: number } | null>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
+
+  // State for inline duration editing
+  const [editingDuration, setEditingDuration] = useState<{ practiceId: number; currentDuration: string } | null>(null);
+
+  // Ref for long press timer
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Ref to track touch position for distinguishing tap from scroll/drag
+  const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    setFilteredPractices(practices); // Update filteredPractices when practices from context change
+  }, [practices]);
+
+  useEffect(() => {
+    if (selectedFilters.length === 0) {
+      setFilteredPractices(practices);
+    } else {
+      const filtered = practices.filter(practice => {
+        return Array.isArray(practice.tags) && practice.tags.some((tag: string) => selectedFilters.includes(tag));
+      });
+      setFilteredPractices(filtered);
+    }
+  }, [selectedFilters, practices]);
+
+  // Close context menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(event.target as Node)) {
+        setContextMenu(null);
+      }
+      // Also close duration editing if clicking outside the input
+      if (editingDuration && event.target && !(event.target as HTMLElement).closest(`#duration-input-${editingDuration.practiceId}`)) {
+        // Check if the click was on the span that triggers editing, to prevent immediate closing
+        const practiceCard = (event.target as HTMLElement).closest(".practice-card-class"); // Add a class to your practice card div
+        if (practiceCard) {
+            const spanClicked = (event.target as HTMLElement).tagName === 'SPAN' && (event.target as HTMLElement).dataset.practiceId === String(editingDuration.practiceId);
+            if (!spanClicked) {
+                 // handleDurationBlur(); // Call blur to save or discard
+            }
+        } else {
+            // handleDurationBlur(); // Clicked outside any card, save/discard
+        }
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [contextMenu, editingDuration]); // Added editingDuration dependency
+
+
+  const handleToggleFilter = (filterId: string) => {
+    setSelectedFilters(prev => {
+      if (prev.includes(filterId)) {
+        return prev.filter(id => id !== filterId);
+      } else {
+        return [...prev, filterId];
+      }
+    });
   };
 
   const handleGuidedPracticeClick = (id: number) => {
@@ -99,86 +164,177 @@ const DailyPractices = () => {
     setSelectedPracticeId(null); // Close the popup
   };
 
+  const handleAddToDailyPractices = (practice: Practice) => {
+    if (practice.isDaily) { // Prevent action if already daily
+      toast({
+        title: 'Already Added!',
+        description: 'This practice is already in your daily practices.',
+      });
+      return;
+    }
+    addPractice({ ...practice, isDaily: true });
+    toast({
+      title: 'Added to Daily Practices!',
+      description: 'This practice has been added to your daily practices.',
+      action: (
+        <button
+          className="ml-2 px-3 py-1 bg-[#148BAF] text-white rounded font-happy-monkey text-sm hover:bg-[#0a7c9c] transition-colors"
+          onClick={() => {
+            navigate('/#daily-practices');
+            // Optionally, scroll into view after navigation
+            setTimeout(() => {
+              const el = document.getElementById('daily-practices');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+          }}
+        >
+          view
+        </button>
+      ),
+    });
+  };
+
+  const openContextMenu = (practiceId: number, x: number, y: number) => {
+    setContextMenu({ practiceId, x, y });
+  };
+
+  const handleContextMenu = (event: React.MouseEvent, practiceId: number) => {
+    event.preventDefault();
+    openContextMenu(practiceId, event.clientX, event.clientY);
+  };
+
+  const handleTouchStart = (event: React.TouchEvent, practiceId: number) => {
+    // Prevent context menu if duration is being edited for this item
+    if (editingDuration && editingDuration.practiceId === practiceId) return;
+
+    touchStartPosRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+    }
+    longPressTimerRef.current = setTimeout(() => {
+      // Check if touch has moved significantly, if so, don't open context menu (it might be a scroll)
+      const touchMoveThreshold = 10; // pixels
+      if (touchStartPosRef.current && 
+          Math.abs(touchStartPosRef.current.x - event.touches[0].clientX) < touchMoveThreshold &&
+          Math.abs(touchStartPosRef.current.y - event.touches[0].clientY) < touchMoveThreshold) {
+        openContextMenu(practiceId, event.touches[0].clientX, event.touches[0].clientY);
+      }
+      longPressTimerRef.current = null;
+    }, 700); // 700ms for long press
+  };
+
+  const handleTouchMove = () => {
+    // If touch moves significantly, cancel the long press timer
+    if (longPressTimerRef.current && touchStartPosRef.current) {
+        // This check would ideally use the current touch position from the event if available
+        // For simplicity, we clear if any move is detected after timer starts.
+        // A more robust solution would compare current event.touches[0] with touchStartPosRef.current
+        clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    touchStartPosRef.current = null;
+  };
+
+  const handleRemovePractice = (practiceId: number) => {
+    // In the main practice list, we should completely remove the practice (false = don't just remove from daily)
+    removePractice(practiceId, false);
+    setContextMenu(null); // Close context menu
+    toast({ title: "Practice Removed", description: "The practice has been removed from your list." });
+  };
+
+  const handleDurationClick = (practice: Practice) => {
+    // Prevent opening duration edit if context menu is already open for this item or any other
+    if (contextMenu) return;
+    setEditingDuration({ practiceId: practice.id, currentDuration: String(practice.duration || "") });
+  };
+
+  const handleDurationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (editingDuration) {
+      setEditingDuration({ ...editingDuration, currentDuration: event.target.value });
+    }
+  };
+
+  const handleDurationBlur = () => {
+    if (editingDuration) {
+      const newDuration = parseInt(editingDuration.currentDuration, 10);
+      const originalPractice = practices.find(p => p.id === editingDuration.practiceId);
+
+      if (!isNaN(newDuration) && newDuration > 0) {
+        updatePracticeDuration(editingDuration.practiceId, newDuration);
+      } else if (originalPractice) {
+        // Revert to original duration if input is invalid
+        setEditingDuration({ practiceId: originalPractice.id, currentDuration: String(originalPractice.duration || "")});
+        toast({title: "Invalid Duration", description: "Duration reverted. Please enter a valid number."}); // Variant removed for now
+      } else {
+        // Fallback if original practice not found (should not happen)
+         toast({title: "Error", description: "Could not update duration."});
+      }
+      setEditingDuration(null);
+    }
+  };
+  
+  const handleDurationKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleDurationBlur();
+    } else if (event.key === 'Escape') {
+      const originalPractice = practices.find(p => p.id === editingDuration?.practiceId);
+      if (originalPractice && editingDuration) {
+         // Revert to original value on Escape and stop editing
+         setEditingDuration(null); 
+      } else {
+        setEditingDuration(null);
+      }
+    }
+  };
+
+
   if (isLoading) {
     return <div>Loading practices...</div>; // Add a loading state
   }
 
   return (
     <div className="w-full flex flex-col gap-6 p-3 bg-transparent">
-      {/* Progress and Gamification Summary */}
-      <div className="w-full flex flex-wrap justify-between items-center gap-3 p-4 bg-white rounded-[10px] border border-[#49DADD] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)]">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-[rgba(83,252,255,0.10)] rounded-full">
-            {icons.trophy}
-          </div>
-          <div className="flex flex-col">
-            <span className="font-happy-monkey text-[#148BAF] text-lg lowercase">Level {userProgress.level}</span>
-            <div className="w-full max-w-[200px] bg-[#E6F7F9] rounded-full h-2 overflow-hidden relative">
-              {/* Progress bar */}
-              <div 
-                className="bg-[#148BAF] h-full rounded-full transition-all duration-500 ease-in-out"
-                style={{ width: `${(userProgress.totalPoints / userProgress.nextLevelPoints) * 100}%` }}
-              ></div>
-              
-              {/* Percentage text in the center of the bar */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-[#148BAF] text-[10px] font-happy-monkey lowercase" style={{
-                  textShadow: `
-                    -0.5px -0.5px 0 #E6F7F9,
-                    0.5px -0.5px 0 #E6F7F9,
-                    -0.5px 0.5px 0 #E6F7F9,
-                    0.5px 0.5px 0 #E6F7F9
-                  `,
-                  fontWeight: 'bold'
-                }}>
-                  {Math.round((userProgress.totalPoints / userProgress.nextLevelPoints) * 100)}%
-                </span>
-              </div>
+      {/* Filter Chips - Updated to be clickable filters */}
+      <div className="w-full overflow-x-auto pb-2 hide-scrollbar">
+        <div className="inline-flex gap-[10px] whitespace-nowrap">
+          {practiceFilters.map((filter) => (
+            <div
+              key={filter.id}
+              onClick={() => handleToggleFilter(filter.id)}
+              className={`min-w-[120px] py-[10px] px-[15px] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)] overflow-hidden rounded-[8px] border border-[#04C4D5] flex justify-center items-center cursor-pointer flex-shrink-0 ${
+                selectedFilters.includes(filter.id) 
+                  ? 'bg-[#148BAF] text-white' 
+                  : 'bg-white text-[#04C4D5]'
+              }`}
+            >
+              <span className="text-center font-happy-monkey text-[16px] lowercase whitespace-nowrap">{filter.label}</span>
             </div>
-            <span className="font-happy-monkey text-[#148BAF] text-xs lowercase">{userProgress.totalPoints}/{userProgress.nextLevelPoints} pts</span>
-          </div>
+          ))}
         </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 p-2 bg-[rgba(255,195,0,0.10)] rounded-[8px] border border-[#FFC700]">
-            {icons.flame}
-            <span className="font-happy-monkey text-[#FF8A00] text-base lowercase">{userProgress.streakDays} day streak</span>
-          </div>
-          
-          <div className="flex items-center gap-2 p-2 bg-[rgba(83,252,255,0.10)] rounded-[8px] border border-[#49DADD]">
-            {icons.star}
-            <span className="font-happy-monkey text-[#148BAF] text-base lowercase">{userProgress.totalPoints} points</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Filter Bar */}
-      <div className="flex flex-wrap gap-2 w-full">
-        {FILTERS.map((filter, idx) => (
-          <div
-            key={idx}
-            className={`flex-1 min-w-[120px] px-4 py-2 rounded-[10px] font-happy-monkey text-base lowercase text-center border-[1px] border-[#49DADD] ${
-              filter.active
-                ? 'bg-[#148BAF] text-white'
-                : 'bg-white text-[#04C4D5]'
-            }`}
-          >
-            {filter.label}
-          </div>
-        ))}
       </div>
 
       {/* Cards Grid */}
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-stretch">
-        {practices.map((practice) => {
-          // Handle case where icon might not exist
+        {filteredPractices.map((practice) => {
           const iconKey = (practice.icon as IconType) || 'default';
           const icon = icons[iconKey] || icons.default;
+          const isAlreadyDaily = practice.isDaily === true;
 
           return (
             <div
               key={practice.id}
-              className="w-full p-[10px] bg-[rgba(83,252,255,0.10)] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)] rounded-[10px] flex flex-col gap-[20px] h-auto"
+              onContextMenu={(e) => handleContextMenu(e, practice.id)}
+              onTouchStart={(e) => handleTouchStart(e, practice.id)}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="relative w-full p-[10px] bg-[rgba(83,252,255,0.10)] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)] rounded-[10px] flex flex-col gap-[20px] h-auto practice-card-class select-none" // Added select-none to prevent text selection issues during long press
             >
               {/* Card Content */}
               <div className="flex flex-col gap-[10px] flex-grow">
@@ -195,6 +351,36 @@ const DailyPractices = () => {
                   </div>
                 </div>
                 
+                {/* Duration Display/Input - MODIFIED */}
+                <div className="text-[#148BAF] font-happy-monkey text-[14px] lowercase">
+                  Duration: {" "}
+                  {editingDuration && editingDuration.practiceId === practice.id ? (
+                    <input
+                      type="text"
+                      id={`duration-input-${practice.id}`} // Unique ID for targeting
+                      value={editingDuration.currentDuration}
+                      onChange={handleDurationChange}
+                      onBlur={handleDurationBlur}
+                      onKeyDown={handleDurationKeyDown}
+                      className="w-16 px-1 md:px-2 py-0.5 border border-[#04C4D5] rounded text-center bg-white text-[#148BAF] text-xs md:text-sm font-happy-monkey"
+                      autoFocus
+                      onClick={(e) => e.stopPropagation()} // Prevent card click/touch events when interacting with input
+                      onTouchStart={(e) => e.stopPropagation()} // Prevent card touch events when interacting with input
+                    />
+                  ) : (
+                    <span 
+                      onClick={(e) => { 
+                        e.stopPropagation(); // Prevent card click if we are just clicking span
+                        handleDurationClick(practice); 
+                      }}
+                      className="cursor-pointer hover:underline" 
+                      data-practice-id={practice.id}
+                    >
+                      {practice.duration} min
+                    </span>
+                  )}
+                </div>
+
                 {/* Description Section */}
                 <div className="flex flex-col gap-[10px]">
                   <div className="text-[#148BAF] font-happy-monkey text-[14px] lowercase line-clamp-2">
@@ -214,51 +400,42 @@ const DailyPractices = () => {
                       {selectedPracticeId === practice.id ? "see less" : "see more"}
                     </button>
                   </div>
-                  
-                  {/* Gamification indicators */}
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {practice.streak && practice.streak > 0 && (
-                      <div className="px-[8px] py-[2px] bg-[#FFEDCC] border border-[#FFC700] rounded-[4px] flex items-center gap-1">
-                        <span className="text-[#FF8A00] font-happy-monkey text-xs lowercase">{practice.streak}🔥 streak</span>
-                      </div>
-                    )}
-                    
-                    {practice.points && (
-                      <div className="px-[8px] py-[2px] bg-[#E6F7F9] border border-[#04C4D5] rounded-[4px] flex items-center gap-1">
-                        <span className="text-[#148BAF] font-happy-monkey text-xs lowercase">+{practice.points}pts</span>
-                      </div>
-                    )}
-                  </div>
+                  {/* Removed gamification indicators here */}
                 </div>
               </div>
               
               {/* Button Section */}
               <div className="w-full flex flex-col gap-[10px]">
-                {/* New "add to your practices" button */}
                 <button
-                  onClick={() => handleToggleCompletion(practice.id)} 
-                  className="w-full p-[8px] bg-white border border-[#49DADD] rounded-[8px] flex justify-center items-center cursor-pointer text-[#148BAF] hover:bg-[#E6F7F9] transition-colors"
+                  onClick={() => handleAddToDailyPractices(practice)}
+                  disabled={isAlreadyDaily}
+                  className={`w-full p-[8px] bg-white border border-[#49DADD] rounded-[8px] flex justify-center items-center cursor-pointer text-[#148BAF] hover:bg-[#E6F7F9] transition-colors font-happy-monkey text-base lowercase ${isAlreadyDaily ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <span className="text-center font-happy-monkey text-base lowercase">
-                    add to your practices
+                  <span className="text-center">
+                    {isAlreadyDaily ? "Added" : "add to daily practices"}
                   </span>
                 </button>
-
                 <button 
                   onClick={() => handleGuidedPracticeClick(practice.id)}
-                  className="px-3 py-1 bg-white border border-[#04C4D5] rounded-[4px] text-[#148BAF] font-happy-monkey text-sm lowercase hover:bg-[#E6F7F9] transition-colors whitespace-nowrap"
+                  className="w-full p-[8px] bg-white border border-[#49DADD] rounded-[8px] flex justify-center items-center cursor-pointer text-[#148BAF] hover:bg-[#E6F7F9] transition-colors font-happy-monkey text-base lowercase"
                 >
-                  Guided Practice
+                  <span className="text-center">
+                    guided practice
+                  </span>
                 </button>
               </div>
             </div>
           );
         })}
         
-        {/* Empty cards for consistent grid spacing - fixed syntax */}
-        <div className="hidden md:flex flex-col bg-transparent rounded-[10px] p-3"></div>
-        <div className="hidden lg:flex flex-col bg-transparent rounded-[10px] p-3"></div>
-        <div className="hidden xl:flex flex-col bg-transparent rounded-[10px] p-3"></div>
+        {/* Empty cards for consistent grid spacing */}
+        {filteredPractices.length > 0 && (
+          <>
+            <div className="hidden md:flex flex-col bg-transparent rounded-[10px] p-3"></div>
+            <div className="hidden lg:flex flex-col bg-transparent rounded-[10px] p-3"></div>
+            <div className="hidden xl:flex flex-col bg-transparent rounded-[10px] p-3"></div>
+          </>
+        )}
       </div>
 
       {/* Render the popup when a practice is selected */}
@@ -267,6 +444,22 @@ const DailyPractices = () => {
           practiceId={selectedPracticeId}
           onClose={handleClosePopup}
         />
+      )}
+
+      {/* Context Menu for Remove */}
+      {contextMenu && (
+        <div
+          ref={contextMenuRef}
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          className="absolute z-50 bg-white border border-[#04C4D5] rounded-[8px] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] py-1"
+        >
+          <button
+            onClick={() => handleRemovePractice(contextMenu.practiceId)}
+            className="block w-full text-left px-4 py-2 text-sm font-happy-monkey text-[#148BAF] hover:bg-[#E6F7F9] transition-colors lowercase"
+          >
+            Delete practice
+          </button>
+        </div>
       )}
     </div>
   );

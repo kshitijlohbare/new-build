@@ -9,7 +9,7 @@ const WellbeingTipsSection = () => (
         borderRadius: '10px',
         padding: '4px 20px'
       }}>
-        <span className="text-[#000000] font-happy-monkey text-base lowercase text-center">daily tip by huberman</span>
+        <span className="text-[#000000] inline-flex font-happy-monkey text-base lowercase text-center">daily tip by huberman</span>
       </div>
       <p className="text-center text-[#148BAF] font-happy-monkey lowercase mt-5">
         improve your mental health with practices shared by andrew huberman and naval ravikant
@@ -24,7 +24,7 @@ const WellbeingTipsSection = () => (
         borderRadius: '10px',
         padding: '4px 20px'
       }}>
-        <span className="text-[#000000] font-happy-monkey text-base lowercase text-center">todays quote by naval</span>
+        <span className="text-[#000000] inline-flex font-happy-monkey text-base lowercase text-center">todays quote by naval</span>
       </div>
       <p className="text-center text-[#148BAF] font-happy-monkey lowercase mt-5">
         improve your mental health with practices shared by andrew huberman and naval ravikant

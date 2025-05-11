@@ -2,6 +2,7 @@ import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useToast as useToastState } from "@/hooks/useToast"
 
 const ToastProvider = ToastPrimitives.Provider
 const ToastViewport = React.forwardRef<
@@ -21,18 +22,28 @@ ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & { 
+    action?: React.ReactNode;
+    variant?: "default" | "destructive" | "success";
+  }
+>(({ className, action, variant = "default", ...props }, ref) => {
   return (
     <ToastPrimitives.Root
       ref={ref}
       className={cn(
-        "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border border-moody-primary/10 p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
-        "bg-white dark:bg-gray-950",
+        "bg-white p-6 shadow-lg rounded-md border",
+        {
+          "border-gray-300": variant === "default",
+          "border-red-500 bg-red-50": variant === "destructive",
+          "border-green-500 bg-green-50": variant === "success"
+        },
         className
       )}
       {...props}
-    />
+    >
+      {props.children}
+      {action && <div className="ml-auto pl-4">{action}</div>}
+    </ToastPrimitives.Root>
   )
 })
 Toast.displayName = ToastPrimitives.Root.displayName
@@ -78,5 +89,22 @@ const ToastDescription = React.forwardRef<
   />
 ))
 ToastDescription.displayName = ToastPrimitives.Description.displayName
+
+// Toaster component to render the toast UI
+export function Toaster() {
+  const { open, setOpen, title, description, action } = useToastState();
+
+  if (!open) { // If not open, render nothing.
+    return null;
+  }
+
+  return (
+    <Toast open={open} onOpenChange={setOpen} action={action}>
+      {title && <ToastTitle>{title}</ToastTitle>}
+      {description && <ToastDescription>{description}</ToastDescription>}
+      <ToastClose />
+    </Toast>
+  );
+}
 
 export { ToastProvider, ToastViewport, Toast, ToastTitle, ToastDescription, ToastClose }

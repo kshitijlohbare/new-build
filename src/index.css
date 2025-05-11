@@ -1,8 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Happy+Monkey&family=Righteous&display=swap');
+
 /* tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --primary: #04C4D5;
+  --font-happy-monkey: 'Happy Monkey', cursive;
+  --font-righteous: 'Righteous', cursive;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+  --radius: 0.5rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -26,35 +73,13 @@
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
   }
- 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-  }
 
   /* base styles */
   body {
     margin: 0;
     min-height: 100vh;
     font-family: 'Happy Monkey', cursive;
-    line-height: 1.6;
+    line-height: 1.4;
     color: hsl(var(--foreground));
     background: hsl(var(--background));
   }
@@ -94,6 +119,16 @@
     font-family: 'Righteous', sans-serif !important;
     color:#000000 !important;
     font-size: 24px !important;
+  }
+  
+  /* Hide scrollbar utility class */
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
   }
 }
 
@@ -298,4 +333,244 @@ input[type="range"].vertical-slider:focus {
 /* Apply to all text by default */
 p, h1, h2, h3, h4, h5, h6, span, div {
   line-height: 1.2;
+}
+
+/* Reduce line heights for better spacing */
+p, li, div {
+  line-height: 1.4; /* Default reduction */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2; /* Tighter heading line heights */
+}
+
+.leading-tight {
+  line-height: 1.2 !important; /* Ensuring tight spacing when this class is used */
+}
+
+.font-happy-monkey {
+  font-family: var(--font-happy-monkey);
+}
+
+.font-righteous {
+  font-family: var(--font-righteous);
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+/* Mobile-first spacing reductions */
+@media (max-width: 640px) {
+  .card, .section, .container {
+    padding: 0.5rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  h1, h2, h3 {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .gap-reduced-mobile > * + * {
+    margin-top: 0.5rem !important;
+  }
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive container classes */
+.container-sm {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.container-md {
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.container-lg {
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.container-xl {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Animation helpers */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-in-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+/* Fix for flexbox gap on Safari */
+@supports not (gap: 1rem) {
+  .flex > * + * {
+    margin-left: 1rem;
+  }
+}
+
+/* Badge Achievement Animation Styles */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes badge-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.badge-confetti {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.badge-confetti::before,
+.badge-confetti::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  animation: confetti-fall 3s ease-out infinite;
+}
+
+.badge-confetti::before {
+  background-color: #49DADD;
+  animation-delay: 0.2s;
+  left: 30%;
+}
+
+.badge-confetti::after {
+  background-color: #FFC700;
+  animation-delay: 0.5s;
+  left: 70%;
+}
+
+/* Generate multiple confetti pieces with different colors */
+.badge-confetti::before,
+.badge-confetti::after {
+  box-shadow:
+    /* Blue confetti */
+    10px 0 0 #49DADD,
+    -20px 0 0 #49DADD,
+    30px 0 0 #49DADD,
+    -40px 0 0 #49DADD,
+    50px 0 0 #49DADD,
+    /* Yellow confetti */
+    -10px 0 0 #FFC700,
+    20px 0 0 #FFC700,
+    -30px 0 0 #FFC700,
+    40px 0 0 #FFC700,
+    -50px 0 0 #FFC700,
+    /* Pink confetti */
+    15px 0 0 #FF8A9A,
+    -25px 0 0 #FF8A9A,
+    35px 0 0 #FF8A9A,
+    -45px 0 0 #FF8A9A;
+}
+
+/* Badge achievement popup entrance/exit animations */
+@keyframes badge-popup-in {
+  0% {
+    transform: translateY(20px) scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes badge-popup-out {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(20px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+.badge-popup-enter {
+  animation: badge-popup-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.badge-popup-exit {
+  animation: badge-popup-out 0.4s ease-in forwards;
+}
+
+/* Shimmer effect for badge icon */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-effect {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.8) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
 }

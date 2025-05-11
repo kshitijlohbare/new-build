@@ -19,7 +19,7 @@ interface Practitioner {
 const therapyConditions = [
   { id: "depression", label: "depression", active: false },
   { id: "adhd", label: "adhd", active: false },
-  { id: "ocd", label: "ocd", active: true },
+  { id: "ocd", label: "ocd", active: false },
   { id: "anxiety", label: "anxiety", active: false },
   { id: "postpartum", label: "postpartum depression", active: false },
   { id: "bipolar", label: "bi-polar disorder", active: false }
@@ -35,7 +35,7 @@ const TherapyBooking = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [locationQuery, setLocationQuery] = useState("");
   const [activeTab, setActiveTab] = useState("recommended");
-  const [selectedConditions, setSelectedConditions] = useState<string[]>(["ocd"]);
+  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [practitioners, setPractitioners] = useState<Practitioner[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -198,8 +198,8 @@ const TherapyBooking = () => {
                       />
                     )}
                     {practitioner.badge && (
-                      <div className="Frame5 p-[6px] left-[10px] top-[8px] absolute bg-black overflow-hidden rounded-[10px] flex flex-col justify-start items-start gap-[10px]">
-                        <span className="text-[#ECFFFF] text-[14px] font-happy-monkey lowercase">{practitioner.badge}</span>
+                      <div className="Frame5 p-[6px] left-[10px] top-[8px] absolute bg-[#E6F9FA] overflow-hidden rounded-[10px] flex flex-col justify-start items-start gap-[10px]">
+                        <span className="text-[#148BAF] text-[14px] font-happy-monkey lowercase">{practitioner.badge}</span>
                       </div>
                     )}
                   </div>
