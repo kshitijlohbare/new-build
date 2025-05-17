@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "setup-db": "node create-tables.js",
+    "test-daily": "node test-daily-practices.js"
   },
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",

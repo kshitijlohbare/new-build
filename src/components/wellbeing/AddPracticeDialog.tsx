@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react'; 
 import { usePractices } from '@/context/PracticeContext';
+import { useToast } from '@/hooks/useToast';
 
 interface AddPracticeDialogProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ const AddPracticeDialog: React.FC<AddPracticeDialogProps> = ({ isOpen, onClose }
   const [duration, setDuration] = useState("5"); // Default duration as string
   const [benefits, setBenefits] = useState("");
   const { practices, addPractice } = usePractices();
+  const { toast } = useToast();
   
   if (!isOpen) return null;
   
@@ -30,7 +32,11 @@ const AddPracticeDialog: React.FC<AddPracticeDialogProps> = ({ isOpen, onClose }
       duration: parseInt(duration) || 5, // Parse duration string to number
       benefits: benefitsArray.length > 0 ? benefitsArray : ["Customized for you"],
       completed: false,
-      streak: 0
+      streak: 0,
+      userCreated: true, // Mark as user-created
+      isDaily: true, // New practices are automatically added to daily practices
+      isSystemPractice: false // Not a system practice
+      // createdByUserId will be set in the addPractice function
     };
     
     // Add the new practice
@@ -43,8 +49,13 @@ const AddPracticeDialog: React.FC<AddPracticeDialogProps> = ({ isOpen, onClose }
     setBenefits("");
     onClose();
     
-    // Show success message
-    alert("New practice added successfully!");
+    // Show success message using useToast instead of alert
+    // alert("New practice added successfully!");
+    toast({
+      title: "Success!",
+      description: "New practice added successfully!",
+      variant: "success"
+    });
   };
   
   return (

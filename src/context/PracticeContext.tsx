@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { savePracticeData, loadPracticeData } from './practiceUtils';
+import { savePracticeData } from './practiceUtils.enhanced';
+import { savePracticeDataToLocalStorage, loadPracticeDataFromLocalStorage } from './practiceUtils.localStorage';
 
 // --- Interfaces (Consider moving to a types file) ---
 export interface Practice { // Export the interface
@@ -24,6 +25,9 @@ export interface Practice { // Export the interface
   source?: string; // Attribution (e.g., "Andrew Huberman", "Naval Ravikant")
   stepProgress?: number; // Track overall progress as percentage
   isDaily?: boolean; // Added field to mark as daily practice
+  userCreated?: boolean; // Track if a practice was created by the user
+  createdByUserId?: string; // Store the user ID who created this practice
+  isSystemPractice?: boolean; // Flag to mark system-provided practices
 }
 
 interface Achievement {
@@ -94,6 +98,8 @@ const INITIAL_PRACTICE_DATA: Practice[] = [
     duration: 3, 
     completed: false, 
     streak: 0,
+    isDaily: true, // Mark key practices as daily by default
+    isSystemPractice: true, // Ensure system practice flag is set
     source: "Andrew Huberman",
     steps: [
       {
@@ -173,6 +179,8 @@ const INITIAL_PRACTICE_DATA: Practice[] = [
     duration: 5, 
     completed: false, 
     streak: 0,
+    isDaily: true, // Mark key practices as daily by default
+    isSystemPractice: true, // Ensure system practice flag is set
     source: "Andrew Huberman",
     steps: [
       {
@@ -213,6 +221,8 @@ const INITIAL_PRACTICE_DATA: Practice[] = [
     duration: 10, 
     completed: false, 
     streak: 0,
+    isDaily: true, // Mark key practices as daily by default
+    isSystemPractice: true, // Ensure system practice flag is set
     source: "Naval Ravikant",
     steps: [
       {
@@ -239,10 +249,10 @@ const INITIAL_PRACTICE_DATA: Practice[] = [
   },
   
   // Keep other original practices but without detailed steps
-  { id: 3, icon: "sun", name: "Morning Sunlight", description: "Wake up active.", benefits: ["Regulates circadian rhythm", "Boosts Vitamin D"], duration: 15, completed: false, streak: 0 },
-  { id: 5, name: "Outdoor Walking", description: "Clear your head.", benefits: ["Improves cardiovascular health", "Reduces anxiety"], duration: 30, completed: false, streak: 0 },
-  { id: 7, icon: "shower", name: "Evening Cold Rinse", description: "Cool down before bed.", benefits: ["May improve sleep quality", "Reduces inflammation"], duration: 2, completed: false, streak: 0 },
-  { id: 8, name: "Mindful Eating", description: "Savor your meals.", benefits: ["Improves digestion", "Increases satisfaction"], duration: 15, completed: false, streak: 0 },
+  { id: 3, icon: "sun", name: "Morning Sunlight", description: "Wake up active.", benefits: ["Regulates circadian rhythm", "Boosts Vitamin D"], duration: 15, completed: false, streak: 0, isSystemPractice: true },
+  { id: 5, name: "Outdoor Walking", description: "Clear your head.", benefits: ["Improves cardiovascular health", "Reduces anxiety"], duration: 30, completed: false, streak: 0, isSystemPractice: true },
+  { id: 7, icon: "shower", name: "Evening Cold Rinse", description: "Cool down before bed.", benefits: ["May improve sleep quality", "Reduces inflammation"], duration: 2, completed: false, streak: 0, isSystemPractice: true },
+  { id: 8, name: "Mindful Eating", description: "Savor your meals.", benefits: ["Improves digestion", "Increases satisfaction"], duration: 15, completed: false, streak: 0, isSystemPractice: true },
   // Add Share Your Delights
   { 
     id: 9, 
@@ -253,8 +263,146 @@ const INITIAL_PRACTICE_DATA: Practice[] = [
     points: 5, // Assign fixed points
     completed: false, 
     streak: 0, // Can track streak if desired
+    isSystemPractice: true, // Ensure system practice flag is set
     source: "Inspired by The Book of Delights"
   },
+  // New Neuroscience Practice: Mindful Observation
+  {
+    id: 10,
+    icon: "brain", // Consider adding a 'brain' or 'neuron' icon to your icon set
+    name: "Mindful Observation",
+    description: "Practice focused attention on an object or sensory input to enhance neural pathways for concentration.",
+    benefits: ["Strengthens focus", "Improves sensory acuity", "Calms the mind", "Reduces mind-wandering"],
+    duration: 10, // Duration in minutes
+    completed: false,
+    streak: 0,
+    isDaily: false,
+    isSystemPractice: true,
+    source: "Neuroscience Principles",
+    tags: ["neuroscience", "focus", "mindfulness"],
+    steps: [
+      {
+        title: "Choose an Object",
+        description: "Select a simple object (e.g., a pen, a leaf, your breath) or a sound to focus on.",
+        imageUrl: "https://images.unsplash.com/photo-1520052205864-92d142b3f2b0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bWluZGZ1bCUyMG9iamVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=60"
+      },
+      {
+        title: "Observe Details",
+        description: "Examine its color, texture, shape, sound, or sensation without judgment. Notice as many details as possible.",
+        imageUrl: "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZGV0YWlsc3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=60"
+      },
+      {
+        title: "Acknowledge Distractions",
+        description: "When your mind wanders (and it will), gently acknowledge the distraction and return your focus to the object.",
+        imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHJlbGF4ZWR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60"
+      },
+      {
+        title: "Practice Regularly",
+        description: "Start with 5-10 minutes daily and gradually increase duration. Consistency is key to building focus.",
+        imageUrl: "https://images.unsplash.com/photo-1471039497385-b6d6ba609f9c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y29uc2lzdGVuY3l8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60"
+      }
+    ]
+  },
+  // New Naval Ravikant Practice: Specific Knowledge
+  {
+    id: 11,
+    icon: "anchor", // Using the anchor icon as used in Learn.tsx for Naval
+    name: "Build Specific Knowledge",
+    description: "Develop unique skills and knowledge that cannot be easily taught or outsourced, leveraging your genuine curiosity and passion.",
+    benefits: ["Creates unique value", "Leads to leverage", "Cannot be easily replicated", "Authentic to your interests"],
+    points: 20, // Assign fixed points as it's more of a long-term pursuit
+    completed: false,
+    streak: 0,
+    isDaily: false,
+    isSystemPractice: true,
+    source: "Naval Ravikant",
+    tags: ["naval", "wisdom", "skill-building", "career"],
+    steps: [
+      {
+        title: "Identify Genuine Curiosity",
+        description: "What are you naturally drawn to learn or do, even if it's not for external reward? This is the foundation of specific knowledge.",
+        imageUrl: "https://images.unsplash.com/photo-1531346972006-72a4e0387959?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y3VyaW9zaXR5fGVufDB8fDB8fHww&auto=format&fit=crop&w=600&q=60"
+      },
+      {
+        title: "Iterate and Learn",
+        description: "Continuously learn and experiment in your chosen area. Don't be afraid to explore unconventional paths.",
+        imageUrl: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGVhcm5pbmd8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60"
+      },
+      {
+        title: "Build in Public (Optional)",
+        description: "Sharing your journey and learnings can attract like-minded individuals and opportunities.",
+        imageUrl: "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c2hhcmluZ3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=60"
+      },
+      {
+        title: "Combine Skills",
+        description: "Specific knowledge often arises from the unique intersection of multiple skills or interests.",
+        imageUrl: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y29sbGFib3JhdGlvbnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=60"
+      }
+    ]
+  },
+  // Vagus Nerve Breathing (Neuroscience)
+  {
+    id: 12,
+    icon: "brain",
+    name: "Vagus Nerve Breathing",
+    description: "Stimulate your vagus nerve to promote calm and regulate stress.",
+    benefits: ["Reduces anxiety", "Improves heart rate variability", "Promotes relaxation", "Balances nervous system"],
+    duration: 5,
+    completed: false,
+    streak: 0,
+    isDaily: false,
+    isSystemPractice: true,
+    source: "Neuroscience Principles",
+    tags: ["neuroscience", "breathing", "calm"],
+    steps: [
+      { title: "Get Comfortable", description: "Sit comfortably and exhale fully." },
+      { title: "Inhale", description: "Inhale through your nose for 4 seconds." },
+      { title: "Exhale", description: "Exhale slowly through pursed lips for 8 seconds." },
+      { title: "Repeat", description: "Repeat for 5-10 cycles, focusing on the long exhale." }
+    ]
+  },
+  // Walking Reflection (Wisdom/Philosophy)
+  {
+    id: 13,
+    icon: "anchor",
+    name: "Walking Reflection",
+    description: "Take a mindful walk and reflect on a question or idea to gain clarity.",
+    benefits: ["Boosts creativity", "Improves mood", "Encourages insight", "Supports physical health"],
+    duration: 15,
+    completed: false,
+    streak: 0,
+    isDaily: false,
+    isSystemPractice: true,
+    source: "Naval Ravikant / Stoic Philosophy",
+    tags: ["naval", "wisdom", "reflection", "walking"],
+    steps: [
+      { title: "Pick a Topic", description: "Choose a question or topic to reflect on." },
+      { title: "Walk Mindfully", description: "Walk at a comfortable pace, focusing on your breath and surroundings." },
+      { title: "Reflect", description: "Let your mind wander gently around the topic." },
+      { title: "Capture Insights", description: "After 10-15 minutes, jot down any insights." }
+    ]
+  },
+  // Implementation Intentions (Psychology)
+  {
+    id: 14,
+    icon: "sparkles",
+    name: "Implementation Intentions",
+    description: "Boost your follow-through by planning exactly when, where, and how you'll act.",
+    benefits: ["Increases goal achievement", "Reduces procrastination", "Clarifies intentions"],
+    points: 10,
+    completed: false,
+    streak: 0,
+    isDaily: false,
+    isSystemPractice: true,
+    source: "Behavioral Psychology",
+    tags: ["psychology", "habits", "planning"],
+    steps: [
+      { title: "Choose a Goal", description: "Choose a goal or habit you want to build." },
+      { title: "Write an If-Then Plan", description: "Write an 'if-then' plan (e.g., 'If it is 7am, then I will meditate for 5 minutes')." },
+      { title: "Visualize", description: "Visualize yourself following through." },
+      { title: "Review & Adjust", description: "Review and adjust your plan as needed." }
+    ]
+  }
 ];
 
 
@@ -312,49 +460,115 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
   // Status for potential UI feedback in the future
   const [, setSaveStatus] = useState<'idle' | 'saving' | 'error' | 'success'>('idle');
 
-  // --- Effect for Data Loading from Supabase ---
+  // --- Effect for Data Loading from localStorage with Supabase backup ---
   useEffect(() => {
     const loadUserData = async () => {
+      console.log("PracticeContext - loadUserData starting", { userId: user?.id });
       setIsLoading(true);
       
       if (user?.id) {
         try {
-          const userData = await loadPracticeData(user.id);
+          // Try to load data from localStorage first as the preferred source
+          let userData = loadPracticeDataFromLocalStorage(user.id);
+          
+          if (userData) {
+            console.log("Successfully loaded data from localStorage");
+          } else {
+            console.log("No localStorage data, this might be expected for first-time users or after clearing browser data");
+          }
           
           if (userData) {
             // We have saved user data - initialize with it
             if (userData.practices) {
+              const dailyPracticesCount = userData.practices.filter((p: Practice) => p.isDaily === true).length;
+              console.log(`Loaded ${userData.practices.length} user practices, including ${dailyPracticesCount} daily practices`);
+              
+              // Log the daily practices
+              userData.practices
+                .filter((p: Practice) => p.isDaily)
+                .forEach((p: Practice) => console.log(`Daily practice from DB: "${p.name}" (ID: ${p.id})`));
+                
               setPractices(initializeStepsCompletion(userData.practices));
+            } else {
+              console.log("No practices found in user data, initializing with defaults");
+              // No practices data - initialize with default practices but mark none as daily by default
+              const defaultPractices = INITIAL_PRACTICE_DATA.map(p => ({
+                ...p,
+                // Preserve isDaily for key practices, reset others
+                isDaily: p.name === "Cold Shower Exposure" || 
+                         p.name === "Gratitude Journal" || 
+                         p.name === "Focus Breathing (3:3:6)" ? true : false,
+                completed: false, // Ensure nothing is marked completed for new user
+                streak: 0 // Reset streaks
+              }));
+              setPractices(initializeStepsCompletion(defaultPractices));
             }
             
             if (userData.progress) {
               setUserProgress(userData.progress);
               console.log("Loaded user progress:", userData.progress);
+            } else {
+              // Initialize basic progress
+              setUserProgress({
+                totalPoints: 0,
+                level: 1,
+                nextLevelPoints: 50,
+                streakDays: 0,
+                totalCompleted: 0,
+                achievements: [],
+              });
             }
           } else {
-            // No saved data - use initial data and calculate
-            const initialCompleted = practices.filter(p => p.completed);
-            const initialPoints = initialCompleted.reduce((sum, p) => sum + calculatePoints(p.duration), 0);
-            const { level, nextLevelPoints } = calculateLevel(initialPoints);
-            const initialStreak = initialCompleted.length > 0 ? 1 : 0;
-
-            const initialAchievements = ALL_ACHIEVEMENTS
-              .filter(ach => ach.criteria({ 
-                ...userProgress, 
-                totalPoints: initialPoints, 
-                level, 
-                streakDays: initialStreak 
-              }, practices))
-              .map(({ criteria, ...rest }) => rest);
-
+            // No saved data at all - initialize with default practices
+            console.log("No user data found, initializing with defaults");
+            const defaultPractices = INITIAL_PRACTICE_DATA.map(p => ({
+              ...p,
+              // Preserve isDaily for key practices, reset others
+              isDaily: p.name === "Cold Shower Exposure" || 
+                       p.name === "Gratitude Journal" || 
+                       p.name === "Focus Breathing (3:3:6)" ? true : false,
+              completed: false, // Ensure nothing is marked completed
+              streak: 0 // Reset streaks
+            }));
+            setPractices(initializeStepsCompletion(defaultPractices));
+            
+            // Initialize basic progress
             setUserProgress({
-              totalPoints: initialPoints,
-              level,
-              nextLevelPoints,
-              streakDays: initialStreak,
-              totalCompleted: initialCompleted.length,
-              achievements: initialAchievements,
+              totalPoints: 0,
+              level: 1,
+              nextLevelPoints: 50,
+              streakDays: 0,
+              totalCompleted: 0,
+              achievements: [],
             });
+            
+            // Save this initial data both to localStorage and Supabase
+            try {
+              // Always save to localStorage first as a backup
+              savePracticeDataToLocalStorage(user.id, defaultPractices, {
+                totalPoints: 0,
+                level: 1,
+                nextLevelPoints: 50,
+                streakDays: 0,
+                totalCompleted: 0,
+                achievements: [],
+              });
+              console.log("Saved initial user data to localStorage");
+              
+              // Then try Supabase
+              await savePracticeData(user.id, defaultPractices, {
+                totalPoints: 0,
+                level: 1,
+                nextLevelPoints: 50,
+                streakDays: 0,
+                totalCompleted: 0,
+                achievements: [],
+              });
+              console.log("Saved initial user data to database");
+            } catch (saveError) {
+              console.error("Error saving initial user data:", saveError);
+              // We still have localStorage backup at this point
+            }
           }
         } catch (error) {
           console.error("Error loading user data:", error);
@@ -362,23 +576,26 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
           setIsLoading(false);
         }
       } else {
-        // No user - use default initialization
-        const initialCompleted = practices.filter(p => p.completed);
-        const initialPoints = initialCompleted.reduce((sum, p) => sum + calculatePoints(p.duration), 0);
-        const { level, nextLevelPoints } = calculateLevel(initialPoints);
-        const initialStreak = initialCompleted.length > 0 ? 1 : 0;
-
-        const initialAchievements = ALL_ACHIEVEMENTS
-          .filter(ach => ach.criteria({ ...userProgress, totalPoints: initialPoints, level, streakDays: initialStreak }, practices))
-          .map(({ criteria, ...rest }) => rest);
-
+        // No user - use default initialization with no daily practices (for demo/guest mode)
+        console.log("No user logged in, using demo mode");
+        const demoPractices = INITIAL_PRACTICE_DATA.map(p => ({
+          ...p,
+          // Preserve isDaily for key practices, reset others
+          isDaily: p.name === "Cold Shower Exposure" || 
+                   p.name === "Gratitude Journal" || 
+                   p.name === "Focus Breathing (3:3:6)" ? true : false,
+          completed: false,
+          streak: 0
+        }));
+        setPractices(initializeStepsCompletion(demoPractices));
+        
         setUserProgress({
-          totalPoints: initialPoints,
-          level,
-          nextLevelPoints,
-          streakDays: initialStreak,
-          totalCompleted: initialCompleted.length,
-          achievements: initialAchievements,
+          totalPoints: 0,
+          level: 1,
+          nextLevelPoints: 50,
+          streakDays: 0,
+          totalCompleted: 0,
+          achievements: [],
         });
         
         setIsLoading(false);
@@ -484,12 +701,27 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
         const practicesCopy = JSON.parse(JSON.stringify(practices));
         const progressCopy = JSON.parse(JSON.stringify(userProgress));
         
-        // Save to Supabase
+        // Log daily practices in detail
+        const dailyPractices = practicesCopy.filter((p: Practice) => p.isDaily === true);
+        console.log(`Saving data for user ${user.id}: ${dailyPractices.length} daily practices out of ${practicesCopy.length} total`);
+        
+        // Show detailed info about each daily practice
+        dailyPractices.forEach((p: Practice) => {
+          console.log(`Daily practice being saved: "${p.name}" (ID: ${p.id})`);
+        });
+        
+        // Always save to localStorage as a failsafe backup first
+        savePracticeDataToLocalStorage(user.id, practicesCopy, progressCopy);
+        
+        // Then try to save to Supabase
         const success = await savePracticeData(user.id, practicesCopy, progressCopy);
         setSaveStatus(success ? 'success' : 'error');
         
         if (!success) {
-          console.warn("Data saved but response indicates potential issue");
+          console.warn("Data saved to localStorage but Supabase save may have failed");
+          console.log("Using localStorage as primary data source");
+        } else {
+          console.log("Successfully saved practice data and daily practices to both localStorage and Supabase");
         }
       } catch (error) {
         console.error("Error saving data:", error);
@@ -510,17 +742,66 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
 
   // Function to add a new practice or update an existing one (e.g., for isDaily)
   const addPractice = useCallback((practiceToUpdate: Practice) => {
+    console.log("addPractice called with:", { 
+      practiceId: practiceToUpdate.id, 
+      name: practiceToUpdate.name,
+      isDaily: practiceToUpdate.isDaily,
+      fullObject: JSON.stringify(practiceToUpdate)
+    });
+    
+    // Special handling for our key practices - ensure they're always properly marked
+    const isKeyPractice = (name: string) => {
+      return name === "Cold Shower Exposure" || 
+             name === "Gratitude Journal" || 
+             name === "Focus Breathing (3:3:6)";
+    };
+    
+    // Make a copy with proper handling for isDaily
+    let practiceToAdd = {...practiceToUpdate};
+    
+    // If this is one of our key practices, override to ensure it's marked as daily
+    // (unless explicitly told to unmark it)
+    if (isKeyPractice(practiceToAdd.name) && practiceToAdd.isDaily !== false) {
+      practiceToAdd.isDaily = true;
+      console.log(`Ensuring key practice "${practiceToAdd.name}" is marked as daily`);
+    }
+    
     setPractices(prevPractices => {
-      const existingPracticeIndex = prevPractices.findIndex(p => p.id === practiceToUpdate.id);
+      const existingPracticeIndex = prevPractices.findIndex(p => p.id === practiceToAdd.id);
 
       if (existingPracticeIndex !== -1) {
         // Practice exists, update it (e.g., setting isDaily)
         const updatedPractices = [...prevPractices];
-        updatedPractices[existingPracticeIndex] = {
-          ...updatedPractices[existingPracticeIndex],
-          ...practiceToUpdate, // Apply updates, like isDaily: true
+        const existingPractice = updatedPractices[existingPracticeIndex];
+        
+        // Ensure isDaily is explicitly set as a boolean with the value from practiceToAdd, defaulting to the existing value
+        const updatedPractice = {
+          ...existingPractice,
+          ...practiceToAdd, // Apply general updates
+          // Force isDaily to be an explicit boolean - important for database persistence
+          isDaily: practiceToAdd.isDaily === true ? true : 
+                  (practiceToAdd.isDaily === false ? false : 
+                  (existingPractice.isDaily === true))
         };
-        console.log("Updated existing practice:", updatedPractices[existingPracticeIndex].name, "isDaily:", updatedPractices[existingPracticeIndex].isDaily);
+        
+        // One more safety check for key practices
+        if (isKeyPractice(updatedPractice.name) && updatedPractice.isDaily !== false) {
+          updatedPractice.isDaily = true;
+        }
+        
+        updatedPractices[existingPracticeIndex] = updatedPractice;
+        
+        console.log("Practice update details:", {
+          name: updatedPractice.name,
+          beforeUpdate: {
+            isDaily: existingPractice.isDaily,
+            id: existingPractice.id
+          },
+          afterUpdate: {
+            isDaily: updatedPractice.isDaily,
+            id: updatedPractice.id
+          }
+        });
         return updatedPractices;
       } else {
         // Practice does not exist, add it as a new practice
@@ -529,6 +810,8 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
           console.error("Cannot add new practice: missing required fields (name, id)");
           return prevPractices; // Return previous state if validation fails
         }
+        
+        // For new practices added by the user, ensure they're marked as user-created
         const practiceWithDefaults = {
           ...practiceToUpdate,
           completed: practiceToUpdate.completed || false,
@@ -539,17 +822,28 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
             : ["Customized for you"],
           // Ensure isDaily is explicitly set if it's a new practice being added as daily
           isDaily: practiceToUpdate.isDaily || false,
+          userCreated: true, // Mark as user-created to differentiate from built-in practices
+          isSystemPractice: practiceToUpdate.isSystemPractice || false, // Default to not a system practice
+          createdByUserId: user?.id || undefined, // Set the creator's user ID
         };
-        console.log("Added new practice:", practiceWithDefaults.name);
+        console.log("Added new practice:", practiceWithDefaults.name, "by user:", practiceWithDefaults.createdByUserId);
         return [...prevPractices, practiceWithDefaults];
       }
     });
     return practiceToUpdate.id; // Return the ID for reference
-  }, []);
+  }, [user?.id]);
 
   // Function to remove a practice from the user's list or just remove from daily practices
   const removePractice = useCallback((practiceId: number, removeFromDaily = true) => {
     setPractices(prevPractices => {
+      const practiceToUpdate = prevPractices.find(p => p.id === practiceId);
+      
+      // If practice doesn't exist, return current state
+      if (!practiceToUpdate) {
+        console.error("Cannot remove non-existent practice:", practiceId);
+        return prevPractices;
+      }
+      
       // If removeFromDaily is true, just update isDaily flag, otherwise completely remove the practice
       if (removeFromDaily) {
         return prevPractices.map(p => {
@@ -559,10 +853,21 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
           return p;
         });
       } else {
-        // Completely remove the practice
-        const updatedPractices = prevPractices.filter(p => p.id !== practiceId);
-        console.log("Removed practice with ID:", practiceId);
-        return updatedPractices;
+        // Only completely remove if it's a user-created practice, otherwise just remove from daily
+        if (practiceToUpdate.userCreated) {
+          const updatedPractices = prevPractices.filter(p => p.id !== practiceId);
+          console.log("Removed user-created practice with ID:", practiceId);
+          return updatedPractices;
+        } else {
+          // For built-in practices, just mark as not daily
+          console.log("Built-in practice removed from daily list:", practiceId);
+          return prevPractices.map(p => {
+            if (p.id === practiceId) {
+              return { ...p, isDaily: false };
+            }
+            return p;
+          });
+        }
       }
     });
     // The useEffect for saving will persist this change.

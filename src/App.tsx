@@ -4,6 +4,10 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
 import { PracticeProvider } from "./context/PracticeContext"; // Import the new provider
 import { AchievementProvider } from "./context/AchievementContext"; // Import the achievement provider
+import { ProfileProvider } from "./context/ProfileContext"; // Import the profile provider
+import { useEffect } from "react";
+import { checkCommunityDelightsTable } from "./scripts/checkCommunityDelights";
+import { checkUserProfileTables } from "./scripts/profileUtils";
 import { ToastProvider, ToastViewport, Toaster } from "./components/ui/toast";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { Login } from "./components/auth/Login";
@@ -25,19 +29,46 @@ import Booking from "./pages/Booking"; // Import the Booking page
 import TherapistRegistration from "./pages/TherapistRegistration";
 import FocusTimer from "./pages/FocusTimer";
 import PractitionerOnboarding from "./pages/PractitionerOnboarding"; // Import PractitionerOnboarding
+import Community from "./pages/Community"; // Import Community
+import Learn from "./pages/Learn"; // Import Learn
 import './App.css';
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <AuthProvider>
-    <ThemeProvider>
-      <ToastProvider>
-        <Toaster />
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <PracticeProvider> {/* Wrap with PracticeProvider */}
-              <AchievementProvider> {/* Wrap with AchievementProvider */}
+const App = () => {
+  // Initialize necessary tables when app loads
+  useEffect(() => {
+    const initTables = async () => {
+      try {
+        // Check community delights table
+        const communityResult = await checkCommunityDelightsTable();
+        if (communityResult) {
+          console.log("Community delights table verification complete");
+        }
+        
+        // Check user profile tables
+        const profileResult = await checkUserProfileTables();
+        if (profileResult) {
+          console.log("User profile tables verification complete");
+        }
+      } catch (error) {
+        console.error("Error initializing database tables:", error);
+      }
+    };
+    
+    initTables();
+  }, []);
+  
+  return (
+    <AuthProvider>
+      <ThemeProvider>
+        <ToastProvider>
+          <Toaster />
+          <QueryClientProvider client={queryClient}>
+            <BrowserRouter>
+              <PracticeProvider> {/* Wrap with PracticeProvider */}
+                <AchievementProvider> {/* Wrap with AchievementProvider */}
+                <ProfileProvider> {/* Wrap with ProfileProvider */}
                 <Routes>
                   {/* Auth routes */}
                   <Route path="/login" element={<Login />} />
@@ -67,19 +98,33 @@ const App = () => (
                     <Route path="therapist-registration" element={<TherapistRegistration />} />
                     <Route path="focus-timer" element={<FocusTimer />} />
                     <Route path="practitioner-onboarding" element={<PractitionerOnboarding />} />
+                    <Route path="community" element={<Community />} /> {/* Add the new community route */}
+                    <Route path="learn" element={<Learn />} /> {/* Add the learn page route */}
                   </Route>
 
                   {/* Catch-all redirect */}
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
+                </ProfileProvider>
               </AchievementProvider>
             </PracticeProvider>
           </BrowserRouter>
         </QueryClientProvider>
         <ToastViewport />
       </ToastProvider>
+      <style>{`
+        /* Hide scrollbars for all browsers */
+        html, body, * {
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+        }
+        html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, Opera */
+        }
+      `}</style>
     </ThemeProvider>
   </AuthProvider>
-);
+  );
+};
 
 export default App;

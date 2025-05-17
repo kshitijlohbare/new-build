@@ -50,6 +50,142 @@ body {
   overflow-x: hidden;
 }
 
+/* Custom styles for vertical slider in focus timer */
+.vertical-rotated-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #04C4D5 var(--slider-percentage), #E5E7EB var(--slider-percentage));
+  outline: none;
+  transform: rotate(270deg);
+  transform-origin: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -65px; /* Half of the width to center it */
+}
+
+.slider-container {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px; /* Ensure minimum height for the slider container */
+  margin-top: 20px; /* Add space from the top elements */
+  margin-bottom: 15px; /* Add space from the bottom elements */
+}
+
+.vertical-rotated-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #04C4D5;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.vertical-rotated-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #04C4D5;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom timer styles */
+.timer-container {
+  position: relative;
+}
+
+.timer-display {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 4px 20px rgba(4, 196, 213, 0.2);
+  border: 2px solid rgba(4, 196, 213, 0.3);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.timer-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    #04C4D5 var(--progress-percentage), 
+    rgba(4, 196, 213, 0.1) var(--progress-percentage)
+  );
+  z-index: 0;
+}
+
+.timer-inner {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* Breathing animation for active session */
+@keyframes breathing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(4, 196, 213, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(4, 196, 213, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(4, 196, 213, 0);
+  }
+}
+
+.breathing-animation {
+  animation: breathing 4s infinite;
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Card hover effects */
+.preset-card {
+  transition: all 0.3s ease;
+}
+
+.preset-card:hover {
+  transform: translateY(-3px);
+}
+
+.preset-card.active {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(4, 196, 213, 0.2);
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -119,6 +255,12 @@ body {
     font-family: 'Righteous', sans-serif !important;
     color:#000000 !important;
     font-size: 24px !important;
+  }
+
+  .text-2xl {
+    font-family: 'Righteous', sans-serif !important;
+    color:#000000 !important;
+    font-size: 20px !important;
   }
   
   /* Hide scrollbar utility class */

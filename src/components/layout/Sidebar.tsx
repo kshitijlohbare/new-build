@@ -32,7 +32,7 @@ const Sidebar = ({ onNavigate }: SidebarProps) => {
             `w-full py-2 px-2 flex md:flex-col items-center md:text-center font-medium lowercase ${
               isActive 
                 ? 'text-black border border-[#04C4D5] rounded-[10px] bg-white shadow-[1px_2px_4px_rgba(4,196,213,0.5)]' 
-                : 'text-gray-500 hover:text-[#148BAF]'
+                : 'text-[#148BAF] hover:text-[#0A7A9A]'
             }`
           }
         >

@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { useToast } from "@/hooks/useToast";
-import { usePractices } from "@/context/PracticeContext"; // Import usePractices
-
-// Updated interface to accept both number and string IDs for flexibility
+import { usePractices } from "@/context/PracticeContext";
+import { Share2 } from "lucide-react";
+                    // Updated interface to accept both number and string IDs for flexibility
 interface Delight {
   id: number | string;
   text: string;
@@ -17,6 +17,48 @@ interface Delight {
 interface EmojiObject {
   native: string;
 }
+
+// Context menu interface
+interface ContextMenu {
+  id: number | string;
+  x: number;
+  y: number;
+}
+
+// CSS animations for UI elements
+const successAnimation = `
+@keyframes shareSuccess {
+  0% { transform: scale(1); opacity: 0; }
+  25% { transform: scale(1.2); opacity: 1; }
+  50% { transform: scale(0.9); opacity: 1; }
+  75% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes pulseSubtle {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+.animate-success {
+  animation: shareSuccess 0.8s ease-out forwards;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 2s infinite ease-in-out;
+}
+`;
 
 // Helper function to get today's date in YYYY-MM-DD format
 const getTodayDateString = () => {
@@ -29,11 +71,22 @@ export const ShareDelights = () => {
   const [inputText, setInputText] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loading, setLoading] = useState(true);
+  // Track which delights have been shared successfully for visual feedback
+  const [sharedDelights, setSharedDelights] = useState<Set<string | number>>(new Set());
+  const [showShareSuccess, setShowShareSuccess] = useState<number | string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   const { addPointsForAction } = usePractices(); // Get the function from context
   // Define tempId at component level so it's accessible throughout the component
   const [tempId, setTempId] = useState<string | null>(null);
+  
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
+  
+  // Touch support for long-press
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
   // Fetch delights for today and current user
   useEffect(() => {
@@ -73,6 +126,20 @@ export const ShareDelights = () => {
 
     fetchDelights();
   }, [user, toast]);
+
+  // Add event listener to close context menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(event.target as Node)) {
+        setContextMenu(null);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleShare = async () => {
     if (!inputText.trim() || !user) {
@@ -174,14 +241,176 @@ export const ShareDelights = () => {
     setShowEmojiPicker(false);
   };
 
-  return (
-    <div className="px-2 sm:px-3 md:p-[20px] w-full flex flex-col items-center">
-      <div className="flex flex-col items-start p-3 sm:p-4 md:p-[20px_10px] gap-3 sm:gap-4 md:gap-5 w-full bg-[rgba(83,252,255,0.1)] rounded-[20px]">
-        <h2 className="text-xl sm:text-2xl md:text-3xl text-center text-black font-happy-monkey lowercase w-full">
-          share your delights
-        </h2>
+  // Context menu handler
+  const handleContextMenu = (e: React.MouseEvent, delight: Delight) => {
+    e.preventDefault();
+    
+    // Position the menu near the cursor but ensure it stays within viewport boundaries
+    const x = Math.min(e.clientX, window.innerWidth - 230); // Prevent overflow to the right
+    const y = Math.min(e.clientY, window.innerHeight - 150); // Prevent overflow at the bottom
+    
+    console.log("Opening context menu for delight:", { id: delight.id, text: delight.text });
+    
+    setContextMenu({
+      id: delight.id,
+      x: x,
+      y: y
+    });
+  };
 
-        <div className="flex flex-col sm:flex-row justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[10px] w-full bg-white border border-[#148BAF] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[10px]">
+  // Touch handlers for long press
+  const handleTouchStart = (event: React.TouchEvent, delight: Delight) => {
+    touchStartPosRef.current = { 
+      x: event.touches[0].clientX, 
+      y: event.touches[0].clientY 
+    };
+    
+    // Clear any existing timer
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+    }
+    
+    // Set new timer for long press
+    longPressTimerRef.current = setTimeout(() => {
+      // Show context menu for long press
+      if (touchStartPosRef.current) {
+        // For touch, we position the menu near the touch point
+        const x = touchStartPosRef.current.x;
+        const y = touchStartPosRef.current.y;
+        
+        setContextMenu({
+          id: delight.id,
+          x: Math.min(x, window.innerWidth - 230),
+          y: Math.min(y, window.innerHeight - 150)
+        });
+      }
+      longPressTimerRef.current = null;
+    }, 600); // 600ms for long press
+  };
+
+  const handleTouchMove = () => {
+    // Cancel long press if user moves finger
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    // Clean up on touch end
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    touchStartPosRef.current = null;
+  };
+
+  // Share to community function
+  const handleShareToCommunity = async (delight: Delight) => {
+    if (!user) return;
+    
+    try {
+      // Insert into community_delights table
+      console.log("Sharing delight to community:", delight);
+      
+      const { error } = await supabase
+        .from('community_delights')
+        .insert({
+          text: delight.text,
+          user_id: user.id,
+          username: user.email?.split('@')[0] || 'anonymous',
+        });
+      
+      if (error) {
+        console.error("Error sharing to community:", error);
+        
+        // Check if this is a "relation does not exist" error (table missing)
+        if (error.code === '42P01') {
+          toast({ 
+            title: "System Error", 
+            description: "The community feature is being set up. Please try again in a few moments.", 
+            variant: "destructive" 
+          });
+          
+          // Try to initialize the table
+          try {
+            // Import dynamically to avoid circular dependencies
+            const { checkCommunityDelightsTable } = await import('../../scripts/checkCommunityDelights');
+            await checkCommunityDelightsTable();
+            
+            // Retry the share operation after table creation
+            const { error: retryError } = await supabase
+              .from('community_delights')
+              .insert({
+                text: delight.text,
+                user_id: user.id,
+                username: user.email?.split('@')[0] || 'anonymous',
+              });
+              
+            if (!retryError) {
+              // Success after retry
+              toast({ 
+                title: "Shared to Community", 
+                description: "Your delight has been shared to the community!",
+                variant: "success"
+              });
+              
+              setSharedDelights(prev => new Set([...prev, delight.id]));
+              setShowShareSuccess(delight.id);
+              setTimeout(() => {
+                setShowShareSuccess(null);
+              }, 2000);
+              
+              addPointsForAction(3, 'Shared Delight to Community');
+              return; // Exit function after successful retry
+            }
+          } catch (initError) {
+            console.error("Failed to initialize community table:", initError);
+          }
+        }
+        
+        // For other errors or if retry failed
+        toast({ 
+          title: "Error", 
+          description: `Could not share to community: ${error.message}`, 
+          variant: "destructive" 
+        });
+      } else {
+        // Show visual success indicator and toast notification
+        toast({ 
+          title: "Shared to Community", 
+          description: "Your delight has been shared to the community!",
+          variant: "success"
+        });
+        
+        // Add to the set of shared delights for visual indication
+        setSharedDelights(prev => new Set([...prev, delight.id]));
+        
+        // Show temporary success animation
+        setShowShareSuccess(delight.id);
+        setTimeout(() => {
+          setShowShareSuccess(null);
+        }, 2000); // Hide after 2 seconds
+        
+        // Award extra points for sharing to community
+        addPointsForAction(3, 'Shared Delight to Community');
+      }
+    } catch (err) {
+      console.error("Unexpected error sharing to community:", err);
+      toast({ title: "Error", description: "An unexpected error occurred.", variant: "destructive" });
+    } finally {
+      // Close the context menu
+      setContextMenu(null);
+    }
+  };
+
+  return (
+    <div className="w-full flex flex-col items-center">
+      {/* Add CSS animation for success state */}
+      <style dangerouslySetInnerHTML={{ __html: successAnimation }} />
+      
+      <div className="flex flex-col items-start gap-3 sm:gap-4 md:gap-5 w-full">
+        <div className="flex flex-col sm:flex-row justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[10px] w-full bg-white border border-[rgba(4,196,213,0.3)] shadow-[0px_3px_6px_rgba(73,218,234,0.3)] rounded-[15px]">
           <input
             type="text"
             value={inputText}
@@ -213,13 +442,22 @@ export const ShareDelights = () => {
             </div>
             <button 
               onClick={handleShare}
-              className="bg-[#148BAF] rounded-[10px] text-white py-2 px-3 sm:py-2.5 sm:px-4 text-sm sm:text-base font-happy-monkey lowercase hover:bg-[#1279A0] transition-colors w-full sm:w-auto"
+              className="rounded-lg bg-[#148BAF] text-white py-2 px-3 sm:py-2.5 sm:px-4 text-sm sm:text-base font-happy-monkey lowercase border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] hover:bg-[#0A7A9C] transition-all w-full sm:w-auto"
               disabled={!user || !inputText.trim()}
             >
               post delight
             </button>
           </div>
         </div>
+
+        {/* Help text for sharing with subtle animation */}
+        {entries.length > 0 && (
+          <div className="w-full text-center mb-2">
+            <p className="text-xs text-[#148BAF] font-happy-monkey bg-[rgba(83,252,255,0.05)] py-1 px-2 rounded-md inline-block animate-pulse-subtle">
+              right-click or long-press on a delight to share it to community
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-[10px] w-full min-h-[50px]">
           {loading ? (
@@ -230,15 +468,27 @@ export const ShareDelights = () => {
             entries.map((entry) => (
               <div
                 key={entry.id}
-                className="p-2 bg-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)] border border-[#04C4D5] rounded-[10px] flex items-center justify-between relative"
+                className="p-3 bg-white shadow-[0px_3px_6px_rgba(73,218,234,0.3)] border border-[rgba(4,196,213,0.3)] rounded-[15px] flex items-center justify-between relative cursor-pointer hover:shadow-md hover:bg-[rgba(83,252,255,0.05)] hover:border-[#04C4D5] transition-all duration-300"
+                onContextMenu={(e) => handleContextMenu(e, entry)}
+                onTouchStart={(e) => handleTouchStart(e, entry)}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                title="Right-click or long-press to share to community"
               >
-                <span className="text-[#04C4D5] font-happy-monkey text-xs sm:text-sm lowercase flex-grow text-center pr-4">{entry.text}</span>
+                <div className="relative w-full flex-grow px-4 group">
+                  <span className="text-[#148BAF] font-happy-monkey text-xs sm:text-sm lowercase block text-center">
+                    {entry.text}
+                  </span>
+                  <div className="absolute right-0 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-70 transition-opacity">
+                    <Share2 size={14} className="text-[#04C4D5]" />
+                  </div>
+                </div>
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
                     deleteDelight(entry.id);
                   }}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-[#04C4D5] hover:text-red-500 transition-colors"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 flex items-center justify-center text-[#04C4D5] hover:text-red-500 transition-colors bg-white bg-opacity-70 rounded-full hover:bg-opacity-100 shadow-sm"
                   aria-label="Delete delight"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -246,10 +496,96 @@ export const ShareDelights = () => {
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
                 </button>
+                <div className="flex items-center gap-1 absolute left-2 top-2">
+                  {sharedDelights.has(entry.id) && (
+                    <div className="flex items-center gap-1 bg-[rgba(4,196,213,0.1)] rounded-full py-0.5 px-2">
+                      <Share2 size={10} className="text-[#04C4D5]" />
+                      <span className="text-[10px] font-happy-monkey text-[#148BAF] font-medium">
+                        Shared to community
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Success animation overlay */}
+                  {showShareSuccess === entry.id && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-10 rounded-[10px] animate-success">
+                      <div className="bg-white p-2 rounded-full shadow-lg">
+                        <svg
+                          width="36"
+                          height="36"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#04C4D5"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             ))
           )}
-        </div>
+        </div>                {/* Context menu - Improved design based on Learn Page styling */}
+        {contextMenu && (
+          <>
+            {/* Background overlay */}
+            <div
+              className="fixed inset-0 bg-black bg-opacity-20 z-40"
+              onClick={() => setContextMenu(null)}
+              style={{ animation: 'fadeIn 0.2s ease-out both' }}
+            ></div>
+            
+            {/* Menu */}
+            <div 
+              ref={contextMenuRef}
+              style={{ 
+                top: `${contextMenu.y}px`, 
+                left: `${contextMenu.x}px`,
+                maxWidth: '240px',
+                animation: 'scaleIn 0.2s ease-out both'
+              }}
+              className="fixed z-50 bg-white p-3 rounded-xl shadow-xl border border-[#04C4D5]"
+            >
+              <div className="flex flex-col">
+                <div className="text-xs font-happy-monkey lowercase text-gray-500 mb-2 px-2">Share this delight...</div>
+                <button 
+                  onClick={() => {
+                    const delight = entries.find(d => d.id === contextMenu.id);
+                    if (delight) {
+                      console.log("Clicked share to community for delight:", delight);
+                      handleShareToCommunity(delight);
+                    } else {
+                      console.error("Delight not found with id:", contextMenu.id);
+                      toast({ 
+                        title: "Error", 
+                        description: "Could not find the delight to share.", 
+                        variant: "destructive" 
+                      });
+                    }
+                  }}
+                  className="w-full px-4 py-2.5 text-sm font-happy-monkey text-[#148BAF] hover:bg-[#148BAF] hover:text-white rounded-lg flex items-center gap-2 transition-all border border-[#04C4D5] shadow-[0px_2px_4px_rgba(73,218,234,0.2)]"
+                >
+                  <Share2 size={16} />
+                  <span>Share to Community</span>
+                </button>
+                
+                <hr className="my-2 border-[rgba(4,196,213,0.1)]" />
+                
+                <button 
+                  onClick={() => setContextMenu(null)}
+                  className="px-4 py-2 text-xs text-gray-500 hover:text-[#148BAF] hover:bg-[rgba(4,196,213,0.05)] rounded-lg transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

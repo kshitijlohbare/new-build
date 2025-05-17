@@ -56,14 +56,8 @@ const practitioners: Practitioner[] = [
 
 const BookSession = () => {
   return (
-    <div className="flex flex-col items-start p-0 gap-5 w-full">
-      <div className="w-full flex justify-center mb-4">
-        <h2 className="text-3xl text-center text-black font-happy-monkey lowercase">
-          book your first free session
-        </h2>
-      </div>
-
-      <div className="flex flex-nowrap gap-2.5 w-full overflow-x-auto pb-6 max-w-full">
+    <div className="flex flex-col items-start gap-5 w-full">
+      <div className="flex flex-nowrap gap-2.5 w-full overflow-y-auto overflow-x-auto pb-4 max-w-full">
         {/* First banner with max-width 200px */}
         <div className="flex-shrink-0 w-full sm:w-auto max-w-[200px] bg-gradient-to-b from-[#49DADD] to-[rgba(195.50,253.79,255,0.20)] p-2.5 rounded-[10px] flex flex-col justify-between shadow-[1px_2px_4px_rgba(73,218,234,0.5)]">
           <p className="text-[#148BAF] font-happy-monkey lowercase">
@@ -81,7 +75,7 @@ const BookSession = () => {
         {practitioners.slice(0, 4).map((practitioner) => (
           <div 
             key={practitioner.id} 
-            className="flex-shrink-0 w-full sm:w-[calc(50%-5px)] md:w-[calc(33.33%-7px)] lg:w-[calc(25%-7.5px)] bg-[rgba(83,252,255,0.1)] p-2.5 rounded-[10px] shadow-[1px_2px_4px_rgba(73,218,234,0.5)]"
+            className="flex-shrink-0 w-full sm:w-[calc(50%-5px)] md:w-[calc(33.33%-7px)] lg:w-[calc(25%-7.5px)] bg-white p-2.5 rounded-[20px] border border-[rgba(4,196,213,0.3)] shadow-[1px_2px_4px_rgba(73,218,234,0.5)]"
           >
             <div className="h-[100px] bg-gray-200 relative rounded-[4px] mb-2.5">
               {practitioner.badge && (

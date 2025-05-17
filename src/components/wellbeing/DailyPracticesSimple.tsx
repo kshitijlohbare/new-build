@@ -58,6 +58,13 @@ const DailyPracticesSimple = () => {
   // Consume context
   const { practices, userProgress, togglePracticeCompletion, updatePracticeDuration, removePractice, isLoading } = usePractices();
   const { toast } = useToast();
+  
+  console.log("DailyPracticesSimple rendering:", { 
+    isLoading, 
+    practicesCount: practices?.length || 0,
+    dailyPracticesCount: practices?.filter(p => p.isDaily)?.length || 0,
+    dailyPractices: practices?.filter(p => p.isDaily) || []
+  });
 
   // Local state for UI interactions
   // Previously used for dropdown, keeping commented for reference
@@ -170,7 +177,16 @@ const DailyPracticesSimple = () => {
 
   // Context menu handlers
   const openContextMenu = (practiceId: number, x: number, y: number) => {
-    setContextMenu({ practiceId, x, y });
+    // Add a small offset to prevent menu from appearing directly under finger/cursor
+    const menuX = Math.min(x + 5, window.innerWidth - 200); // Prevent menu from going off right edge
+    const menuY = Math.min(y + 5, window.innerHeight - 100); // Prevent menu from going off bottom edge
+    
+    setContextMenu({ practiceId, x: menuX, y: menuY });
+    
+    // Add a subtle haptic feedback if supported
+    if (navigator.vibrate) {
+      navigator.vibrate(50); // Short vibration for tactile feedback
+    }
   };
 
   const handleContextMenu = (event: React.MouseEvent, practiceId: number) => {
@@ -189,34 +205,51 @@ const DailyPracticesSimple = () => {
       title: "Removed from Daily Practices", 
       description: practiceToRemove ? 
         `"${practiceToRemove.name}" has been removed from your daily practices.` : 
-        "Practice has been removed from your daily practices."
+        "Practice has been removed from your daily practices.",
+      variant: "default"
     });
   };
 
-  // Touch handlers for long press
+  // Touch handlers for long press with improved reliability
   const handleTouchStart = (event: React.TouchEvent, practiceId: number) => {
     // Prevent context menu if duration is being edited for this item
     if (editingDuration && editingDuration.practiceId === practiceId) return;
 
     touchStartPosRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    
+    // Clear any existing timer
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current);
     }
+    
+    // Set new timer
     longPressTimerRef.current = setTimeout(() => {
-      const touchMoveThreshold = 10; // pixels
-      if (touchStartPosRef.current && 
-          Math.abs(touchStartPosRef.current.x - event.touches[0].clientX) < touchMoveThreshold &&
-          Math.abs(touchStartPosRef.current.y - event.touches[0].clientY) < touchMoveThreshold) {
-        openContextMenu(practiceId, event.touches[0].clientX, event.touches[0].clientY);
+      // Verify the touch hasn't moved significantly
+      if (touchStartPosRef.current) {
+        const touchMoveThreshold = 15; // pixels - slightly more forgiving
+        const currentTouch = event.touches[0];
+        
+        if (Math.abs(touchStartPosRef.current.x - currentTouch.clientX) < touchMoveThreshold &&
+            Math.abs(touchStartPosRef.current.y - currentTouch.clientY) < touchMoveThreshold) {
+          // Show the context menu at the touch position
+          openContextMenu(practiceId, currentTouch.clientX, currentTouch.clientY);
+        }
       }
       longPressTimerRef.current = null;
-    }, 700); // 700ms for long press
+    }, 600); // Slightly shorter for better responsiveness
   };
 
-  const handleTouchMove = () => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
+  const handleTouchMove = (event: React.TouchEvent) => {
+    // Only cancel if movement is significant
+    if (longPressTimerRef.current && touchStartPosRef.current) {
+      const moveThreshold = 10;
+      const touch = event.touches[0];
+      
+      if (Math.abs(touchStartPosRef.current.x - touch.clientX) > moveThreshold ||
+          Math.abs(touchStartPosRef.current.y - touch.clientY) > moveThreshold) {
+        clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+      }
     }
   };
 
@@ -229,7 +262,39 @@ const DailyPracticesSimple = () => {
   };
 
   // Filter practices for display (show only daily practices)
-  const displayedPractices = practices.filter(p => p.isDaily);
+  const displayedPractices = practices.filter(practice => {
+    const isMarkedDaily = practice.isDaily === true;
+    
+    if (isMarkedDaily) {
+      console.log(`Practice "${practice.name}" (ID: ${practice.id}) IS marked as daily (isDaily=${practice.isDaily})`);
+    } else if (practice.name === "Cold Shower Exposure" || practice.name === "Gratitude Journal" || practice.name === "Focus Breathing (3:3:6)") {
+      // Log prominently for key practices that should be daily but aren't
+      console.warn(`KEY ISSUE: "${practice.name}" (ID: ${practice.id}) is NOT marked as daily (isDaily=${practice.isDaily})`);
+      
+      // If the practice is found but isDaily is undefined or null (instead of false),
+      // that might be the source of the filtering issue
+      if (practice.isDaily === undefined || practice.isDaily === null) {
+        console.error(`CRITICAL ERROR: "${practice.name}" has isDaily=${practice.isDaily} (undefined/null)`);
+      }
+    }
+    
+    return isMarkedDaily;
+  });
+  
+  // Add detailed debug info about all practices
+  console.log("ALL PRACTICES:", practices.map(p => ({ 
+    id: p.id, 
+    name: p.name, 
+    isDaily: p.isDaily,
+    isSystemPractice: p.isSystemPractice
+  })));
+  
+  console.log("DailyPracticesSimple displayedPractices:", {
+    totalPracticesCount: practices.length,
+    dailyPracticesCount: displayedPractices.length,
+    dailyPracticeIds: displayedPractices.map(p => p.id),
+    dailyPracticeNames: displayedPractices.map(p => p.name)
+  });
 
   // Split practices into left and right columns
   const leftPractices = displayedPractices.filter((_, index) => index % 2 === 0);
@@ -240,6 +305,29 @@ const DailyPracticesSimple = () => {
 
   if (isLoading) {
     return <div className="p-3 text-center">Loading practices...</div>; // Reduced padding
+  }
+  
+  // Check for empty daily practices and show a message
+  if (displayedPractices.length === 0) {
+    return (
+      <div className="w-full flex flex-col gap-3 md:gap-4 overflow-y-auto overflow-x-auto">
+        <div className="flex justify-between items-center h-auto py-1 md:py-2">
+          <div className="flex-1 mb-2 md:mb-0">
+            <h2 className="text-[#148BAF] text-xl md:text-2xl font-happy-monkey lowercase">Your Daily Practices</h2>
+          </div>
+        </div>
+        <div className="bg-white rounded-[15px] border border-[rgba(4,196,213,0.3)] shadow-[0px_3px_6px_rgba(73,218,234,0.3)] text-center p-8">
+          <p className="text-[#148BAF] font-happy-monkey lowercase mb-4">you don't have any daily practices yet.</p>
+          <p className="text-[#148BAF] font-happy-monkey lowercase mb-6">go to "browse all practices" below and add some practices to get started!</p>
+          <a 
+            href="/Practices"
+            className="inline-block bg-white hover:bg-[#F7FFFF] rounded-lg px-4 py-2 text-[#148BAF] font-happy-monkey text-sm md:text-base lowercase border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] transition-all flex items-center justify-center mx-auto w-auto"
+          >
+            add daily practice
+          </a>
+        </div>
+      </div>
+    );
   }
 
   // Custom text shadow style for white text on icons - refined for border effect
@@ -257,8 +345,8 @@ const DailyPracticesSimple = () => {
   const inputStyle = "w-16 px-1 md:px-2 py-0.5 border border-[#04C4D5] rounded text-center bg-white text-primary text-xs md:text-sm font-happy-monkey";
 
   return (
-    // Main container - matching the provided HTML structure's style with improved responsive design
-    <div className="w-full p-3 md:p-4 bg-[rgba(83,252,255,0.10)] rounded-[20px] flex flex-col gap-3 md:gap-4 overflow-hidden relative">
+    // Main container with updated styling to match Practices page
+    <div className="w-full flex flex-col gap-4 md:gap-6 relative">
       {/* Lottie animation container */}
       {showAnimation && animationData && (
         <div 
@@ -283,19 +371,19 @@ const DailyPracticesSimple = () => {
       {/* Title Section */}
       <div className="flex flex-wrap justify-between items-center h-auto py-1 md:py-2">
         {/* Centered Title */}
-        <div className="flex-1 text-center mb-2 md:mb-0">
-          <h2 className="text-black text-2xl md:text-3xl font-happy-monkey lowercase">Your Daily Practices</h2>
+        <div className="flex-1 mb-2 md:mb-0">
+          <h2 className="text-[#148BAF] text-xl md:text-2xl font-happy-monkey lowercase">Your Daily Practices</h2>
         </div>
 
         {/* Right-aligned Button */}
-        <div className="flex items-center gap-1 md:gap-2 w-full md:w-auto justify-center md:justify-end">
-          {/* Add new practice button */}
-          <button 
-            className="bg-white rounded-[10px] px-2 md:px-3 h-[35px] md:h-[39px] text-primary font-righteous text-sm md:text-base lowercase border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] transition-transform hover:scale-105 active:scale-95"
-            onClick={() => setIsAddPracticeDialogOpen(true)}
+        <div className="flex items-center gap-1 md:gap-2 w-full md:w-auto justify-end">
+          {/* Add daily practice button that redirects to Practices page */}
+          <a 
+            href="/Practices"
+            className="bg-white rounded-lg px-2 md:px-3 h-[35px] md:h-[39px] text-[#148BAF] font-happy-monkey text-sm md:text-base lowercase border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] transition-all hover:bg-[#F7FFFF] flex items-center justify-center"
           >
-            add new practice
-          </button>
+            add daily practice
+          </a>
         </div>
       </div>
 
@@ -355,16 +443,16 @@ const DailyPracticesSimple = () => {
 
 
       {/* Practice lists in two columns */}
-      <div className="flex flex-col md:flex-row gap-3">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6">
         {/* Left column */}
-        <div className="flex-1 flex flex-col gap-2">
+        <div className="flex-1 flex flex-col gap-4">
           {leftPractices.map((practice) => {
             const PracticeStreakIcon = getPracticeStreakIcon(practice.streak);
             const practicePoints = getPracticePoints(practice); // Use updated points logic
             return (
               <div 
                 key={practice.id}
-                className="flex items-center p-[6px_10px] md:p-[8px_15px] bg-white rounded-[10px] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] overflow-visible relative select-none"
+                className="flex items-center p-[8px_12px] md:p-[10px_16px] bg-white rounded-[15px] border border-[rgba(4,196,213,0.3)] shadow-[0_4px_10px_-2px_rgba(73,218,234,0.5)] hover:shadow-lg hover:shadow-[rgba(73,218,234,0.3)] transition-all duration-300 relative select-none"
                 onContextMenu={(e) => handleContextMenu(e, practice.id)}
                 onTouchStart={(e) => handleTouchStart(e, practice.id)}
                 onTouchMove={handleTouchMove}
@@ -384,7 +472,7 @@ const DailyPracticesSimple = () => {
                   <div className="flex items-center gap-2 mb-2 md:mb-0 flex-1">
                     {/* Practice Name (Clickable) */}
                     <span
-                      className="font-righteous inline-flex text-black text-sm md:text-base lowercase cursor-pointer hover:text-primary truncate max-w-full md:max-w-[200px]"
+                      className="font-righteous inline-flex text-[#148BAF] text-sm md:text-base lowercase cursor-pointer hover:text-primary truncate max-w-full md:max-w-[200px]"
                       onClick={() => handlePracticeNameClick(practice.id)}
                     >
                       {practice.name}
@@ -394,9 +482,9 @@ const DailyPracticesSimple = () => {
                   {/* Duration, Streak and Completion Button container - Right-aligned */}
                   <div className="flex items-center gap-1 md:gap-2 md:ml-auto">
                     {/* Practice Streak Icon - Now right-aligned with other controls */}
-                    <div className="relative px-1 py-0.5 rounded border border-[#04C4D5] flex items-center justify-start min-w-[24px] md:min-w-[30px]">
+                    <div className="relative px-1 py-0.5 rounded-lg border border-[#04C4D5] bg-[rgba(83,252,255,0.10)] flex items-center justify-start min-w-[24px] md:min-w-[30px]">
                       <img src={PracticeStreakIcon} alt="Practice Streak" className="w-3 h-3 md:w-4 md:h-4"/>
-                      <span className="text-[#04C4D5] font-happy-monkey text-xs md:text-sm lowercase">
+                      <span className="text-[#148BAF] font-happy-monkey text-xs md:text-sm lowercase">
                         {practice.streak || 0}
                       </span>
                     </div>
@@ -450,14 +538,14 @@ const DailyPracticesSimple = () => {
         </div>
 
         {/* Right column */}
-        <div className="flex-1 flex flex-col gap-2">
+        <div className="flex-1 flex flex-col gap-4">
           {rightPractices.map((practice) => {
             const PracticeStreakIcon = getPracticeStreakIcon(practice.streak);
             const practicePoints = getPracticePoints(practice); // Use updated points logic
             return (
               <div 
                 key={practice.id}
-                className="flex items-center p-[6px_10px] md:p-[8px_15px] bg-white rounded-[10px] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] overflow-visible relative select-none"
+                className="flex items-center p-[8px_12px] md:p-[10px_16px] bg-white rounded-[15px] border border-[rgba(4,196,213,0.3)] shadow-[0_4px_10px_-2px_rgba(73,218,234,0.5)] hover:shadow-lg hover:shadow-[rgba(73,218,234,0.3)] transition-all duration-300 relative select-none"
                 onContextMenu={(e) => handleContextMenu(e, practice.id)}
                 onTouchStart={(e) => handleTouchStart(e, practice.id)}
                 onTouchMove={handleTouchMove}
@@ -477,7 +565,7 @@ const DailyPracticesSimple = () => {
                   <div className="flex items-center gap-2 mb-2 md:mb-0 flex-1">
                     {/* Practice Name (Clickable) */}
                     <span
-                      className="font-righteous text-black text-sm md:text-base lowercase cursor-pointer hover:text-primary truncate max-w-[120px] md:max-w-[200px]"
+                      className="font-righteous inline-flex text-[#148BAF] text-sm md:text-base lowercase cursor-pointer hover:text-primary truncate max-w-full md:max-w-[200px]"
                       onClick={() => handlePracticeNameClick(practice.id)}
                     >
                       {practice.name}
@@ -487,9 +575,9 @@ const DailyPracticesSimple = () => {
                   {/* Duration, Streak and Completion Button container - Right-aligned */}
                   <div className="flex items-center gap-1 md:gap-2 md:ml-auto">
                     {/* Practice Streak Icon - Now right-aligned with other controls */}
-                    <div className="relative px-1 py-0.5 rounded border border-[#04C4D5] flex items-center justify-start gap-1 min-w-[24px] md:min-w-[30px]">
+                    <div className="relative px-1 py-0.5 rounded-lg border border-[#04C4D5] bg-[rgba(83,252,255,0.10)] flex items-center justify-start min-w-[24px] md:min-w-[30px]">
                       <img src={PracticeStreakIcon} alt="Practice Streak" className="w-3 h-3 md:w-4 md:h-4"/>
-                      <span className="text-[#04C4D5] font-happy-monkey text-xs md:text-sm lowercase">
+                      <span className="text-[#148BAF] font-happy-monkey text-xs md:text-sm lowercase">
                         {practice.streak || 0}
                       </span>
                     </div>
@@ -559,18 +647,33 @@ const DailyPracticesSimple = () => {
 
       {/* Context Menu for Remove */}
       {contextMenu && (
-        <div
-          ref={contextMenuRef}
-          style={{ top: contextMenu.y, left: contextMenu.x }}
-          className="absolute z-50 bg-white border border-[#04C4D5] rounded-[8px] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] py-1"
-        >
-          <button
-            onClick={() => handleRemovePractice(contextMenu.practiceId)}
-            className="block w-full text-left px-4 py-2 text-sm font-happy-monkey text-[#148BAF] hover:bg-[#E6F7F9] transition-colors lowercase"
+        <>
+          {/* Overlay to capture clicks outside menu */}
+          <div 
+            className="fixed inset-0 bg-black/20 z-40" 
+            onClick={() => setContextMenu(null)}
+          />
+          
+          {/* Actual Context Menu */}
+          <div
+            ref={contextMenuRef}
+            style={{ top: contextMenu.y, left: contextMenu.x }}
+            className="fixed z-50 bg-white border-2 border-[#04C4D5] rounded-[10px] shadow-[2px_4px_8px_rgba(73,218,234,0.5)] py-2 min-w-[220px]"
           >
-            Remove from daily practices
-          </button>
-        </div>
+            <div className="px-4 py-1 text-xs text-gray-500 font-happy-monkey lowercase border-b border-gray-100">
+              Practice Options
+            </div>
+            <button
+              onClick={() => handleRemovePractice(contextMenu.practiceId)}
+              className="block w-full text-left px-4 py-3 text-sm font-happy-monkey text-[#148BAF] hover:bg-[#E6F7F9] transition-colors lowercase flex items-center gap-2"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="#148BAF"/>
+              </svg>
+              Remove from daily practices
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

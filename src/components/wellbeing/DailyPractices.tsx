@@ -164,34 +164,39 @@ const DailyPractices = () => {
     setSelectedPracticeId(null); // Close the popup
   };
 
-  const handleAddToDailyPractices = (practice: Practice) => {
-    if (practice.isDaily) { // Prevent action if already daily
+  const handleAddOrRemoveDailyPractice = (practice: Practice) => {
+    if (practice.isDaily) { 
+      // If already in daily practices, remove it
+      removePractice(practice.id, true);
       toast({
-        title: 'Already Added!',
-        description: 'This practice is already in your daily practices.',
+        title: 'Removed from Daily Practices',
+        description: 'This practice has been removed from your daily practices.',
+        variant: 'default'
       });
-      return;
+    } else {
+      // Otherwise add it
+      addPractice({ ...practice, isDaily: true });
+      toast({
+        title: 'Added to Daily Practices!',
+        description: 'This practice has been added to your daily practices.',
+        variant: 'success',
+        action: (
+          <button
+            className="ml-2 px-3 py-1 bg-[#148BAF] text-white rounded font-happy-monkey text-sm hover:bg-[#0a7c9c] transition-colors"
+            onClick={() => {
+              navigate('/#daily-practices');
+              // Optionally, scroll into view after navigation
+              setTimeout(() => {
+                const el = document.getElementById('daily-practices');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 300);
+            }}
+          >
+            view
+          </button>
+        ),
+      });
     }
-    addPractice({ ...practice, isDaily: true });
-    toast({
-      title: 'Added to Daily Practices!',
-      description: 'This practice has been added to your daily practices.',
-      action: (
-        <button
-          className="ml-2 px-3 py-1 bg-[#148BAF] text-white rounded font-happy-monkey text-sm hover:bg-[#0a7c9c] transition-colors"
-          onClick={() => {
-            navigate('/#daily-practices');
-            // Optionally, scroll into view after navigation
-            setTimeout(() => {
-              const el = document.getElementById('daily-practices');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }, 300);
-          }}
-        >
-          view
-        </button>
-      ),
-    });
   };
 
   const openContextMenu = (practiceId: number, x: number, y: number) => {
@@ -325,8 +330,7 @@ const DailyPractices = () => {
         {filteredPractices.map((practice) => {
           const iconKey = (practice.icon as IconType) || 'default';
           const icon = icons[iconKey] || icons.default;
-          const isAlreadyDaily = practice.isDaily === true;
-
+          
           return (
             <div
               key={practice.id}
@@ -407,12 +411,15 @@ const DailyPractices = () => {
               {/* Button Section */}
               <div className="w-full flex flex-col gap-[10px]">
                 <button
-                  onClick={() => handleAddToDailyPractices(practice)}
-                  disabled={isAlreadyDaily}
-                  className={`w-full p-[8px] bg-white border border-[#49DADD] rounded-[8px] flex justify-center items-center cursor-pointer text-[#148BAF] hover:bg-[#E6F7F9] transition-colors font-happy-monkey text-base lowercase ${isAlreadyDaily ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  onClick={() => handleAddOrRemoveDailyPractice(practice)}
+                  className={`w-full p-[8px] rounded-[8px] flex justify-center items-center cursor-pointer transition-colors font-happy-monkey text-base lowercase ${
+                    practice.isDaily 
+                    ? 'bg-white text-[#148BAF] border border-[#49DADD] hover:bg-[#E6F7F9]' 
+                    : 'bg-[#148BAF] text-white border border-[#0A7C9C] hover:bg-[#0A7C9C]'
+                  }`}
                 >
                   <span className="text-center">
-                    {isAlreadyDaily ? "Added" : "add to daily practices"}
+                    {practice.isDaily ? "remove from daily practices" : "add to daily practices"}
                   </span>
                 </button>
                 <button 
