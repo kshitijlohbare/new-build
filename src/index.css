@@ -53,22 +53,25 @@ body {
 /* Custom styles for vertical slider in focus timer */
 .vertical-rotated-slider {
   -webkit-appearance: none;
-  width: 100%;
+  width: 130px; /* Set consistent width */
   height: 8px;
   border-radius: 5px;
   background: linear-gradient(to right, #04C4D5 var(--slider-percentage), #E5E7EB var(--slider-percentage));
   outline: none;
   transform: rotate(270deg);
-  transform-origin: center;
+  transform-origin: center center;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-left: -65px; /* Half of the width to center it */
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
 }
 
 .slider-container {
   position: relative;
-  height: 100%;
+  height: 130px; /* Fixed height to match slider width when rotated */
+  width: 60px; /* Fixed width to match design */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -87,6 +90,7 @@ body {
   border: 2px solid #04C4D5;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-top: 0; /* Ensure consistent positioning */
 }
 
 .vertical-rotated-slider::-moz-range-thumb {

@@ -195,7 +195,7 @@ const FocusTimer = () => {
                   </div>
                   
                   {/* Middle Section - Slider */}
-                  <div className="w-[60px] h-[130px] flex flex-col justify-center items-center relative slider-container">
+                  <div className="slider-container">
                     <input
                       type="range"
                       min={5}
@@ -204,9 +204,7 @@ const FocusTimer = () => {
                       onChange={e => setWorkTime(Number(e.target.value))}
                       className="vertical-rotated-slider"
                       style={{ 
-                        '--slider-percentage': `${workPercentage}%`,
-                        height: '8px', 
-                        width: '130px'
+                        '--slider-percentage': `${workPercentage}%`
                       } as React.CSSProperties}
                     />
                   </div>
@@ -227,7 +225,7 @@ const FocusTimer = () => {
                   </div>
                   
                   {/* Middle Section - Slider */}
-                  <div className="w-[60px] h-[130px] flex flex-col justify-center items-center relative slider-container">
+                  <div className="slider-container">
                     <input
                       type="range"
                       min={1}
@@ -236,9 +234,7 @@ const FocusTimer = () => {
                       onChange={e => setBreakTime(Number(e.target.value))}
                       className="vertical-rotated-slider"
                       style={{ 
-                        '--slider-percentage': `${breakPercentage}%`,
-                        height: '8px', 
-                        width: '130px'
+                        '--slider-percentage': `${breakPercentage}%`
                       } as React.CSSProperties}
                     />
                   </div>
@@ -371,7 +367,7 @@ const FocusTimer = () => {
                 </div>
                 
                 {/* Slider container with fixed dimensions */}
-                <div className="w-[60px] h-[130px] flex flex-col justify-center items-center relative slider-container">
+                <div className="slider-container">
                   <input
                     id="volume"
                     type="range"
@@ -381,9 +377,7 @@ const FocusTimer = () => {
                     onChange={(e) => setVolume(Number(e.target.value))}
                     className="vertical-rotated-slider"
                     style={{ 
-                      '--slider-percentage': `${volumePercentage}%`,
-                      height: '8px',
-                      width: '130px'
+                      '--slider-percentage': `${volumePercentage}%`
                     } as React.CSSProperties}
                   />
                 </div>
