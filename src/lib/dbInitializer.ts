@@ -1,7 +1,5 @@
 import { supabase } from '@/lib/supabase';
 import { checkRequiredTables, generateDatabaseSetupSQL } from '@/context/practiceUtils.enhanced';
-import fs from 'fs';
-import path from 'path';
 
 /**
  * Initialize the database tables required for the wellbeing application

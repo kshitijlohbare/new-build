@@ -58,18 +58,28 @@ function loadFromLocalStorage(userId: string) {
 // This function handles updating a user's practices and progress data
 export async function savePracticeData(userId: string, practices: Practice[], userProgress: UserProgress) {
   try {
+    // Make sure we're working with boolean values for isDaily
+    const normalizedPractices = practices.map(practice => ({
+      ...practice,
+      isDaily: practice.isDaily === true, // Explicitly convert to boolean
+      completed: practice.completed === true // Explicitly convert to boolean
+    }));
+    
     // Log information about daily practices
-    const dailyPractices = practices.filter(p => p.isDaily === true);
-    console.log(`Saving data for user ${userId}: ${dailyPractices.length} daily practices out of ${practices.length} total`);
+    const dailyPractices = normalizedPractices.filter(p => p.isDaily === true);
+    const dailyPracticeIds = dailyPractices.map(p => p.id);
+    const dailyPoints = dailyPractices.reduce((sum, p) => sum + (p.completed ? (p.points || 1) : 0), 0);
+    const streaks = userProgress.streakDays || 0;
+    console.log(`Saving data for user ${userId}: ${dailyPractices.length} daily practices out of ${normalizedPractices.length} total`);
     dailyPractices.forEach(p => console.log(`Daily practice being saved: "${p.name}" (ID: ${p.id})`));
     
     // Extract the completion status and daily status of system practices
-    const systemPracticesStatus = practices
+    const systemPracticesStatus = normalizedPractices
       .filter(p => p.isSystemPractice)
       .map(p => ({
         id: p.id,
         isDaily: p.isDaily === true, // Make sure to explicitly use boolean comparison
-        completed: p.completed,
+        completed: p.completed === true, // Make sure to explicitly use boolean comparison
         streak: p.streak || 0
       }));
       
@@ -107,6 +117,9 @@ export async function savePracticeData(userId: string, practices: Practice[], us
               ...systemPracticesStatus // Just the status info for system practices
             ],
             progress: userProgress,
+            daily_practices: dailyPracticeIds,
+            daily_points: dailyPoints,
+            streaks: streaks,
             updated_at: new Date().toISOString()
           })
           .eq('user_id', userId);
@@ -129,6 +142,9 @@ export async function savePracticeData(userId: string, practices: Practice[], us
               ...systemPracticesStatus // Just the status info for system practices
             ],
             progress: userProgress,
+            daily_practices: dailyPracticeIds,
+            daily_points: dailyPoints,
+            streaks: streaks,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });
@@ -166,67 +182,137 @@ async function updateUserDailyPractices(userId: string, practices: Practice[]) {
     });
     
     // Filter practices that are explicitly marked as daily (using strict equality)
-    const dailyPractices = practices.filter(p => p.isDaily === true);
+    // Extra explicit normalization to ensure boolean values
+    const normalizedPractices = practices.map(p => ({
+      ...p,
+      isDaily: p.isDaily === true
+    }));
+    
+    const dailyPractices = normalizedPractices.filter(p => p.isDaily === true);
     const dailyPracticeIds = dailyPractices.map(p => p.id);
     
     console.log(`updateUserDailyPractices: Found ${dailyPracticeIds.length} daily practices to save`);
     dailyPractices.forEach(p => console.log(`Daily practice to be saved: "${p.name}" (ID: ${p.id})`));
     
     try {
-      // Delete existing daily practices for this user (we'll re-insert the current ones)
-      const { error: deleteError } = await supabase
+      // Get current daily practices to compare with what we want to save
+      const { data: currentDailyPractices, error: checkError } = await supabase
         .from('user_daily_practices')
-        .delete()
+        .select('practice_id')
         .eq('user_id', userId);
+      
+      if (checkError) {
+        console.error('Error checking existing daily practices:', checkError);
+        // Continue with our best effort approach
+      }
+      
+      // Current IDs in the database
+      const currentIds = (currentDailyPractices || []).map((p: any) => p.practice_id as number);
+      console.log(`Current daily practice IDs in database: ${currentIds.join(', ')}`);
+      console.log(`Desired daily practice IDs: ${dailyPracticeIds.join(', ')}`);
+      
+      // Check if the lists are identical (no changes needed)
+      const identical = 
+        currentIds.length === dailyPracticeIds.length && 
+        currentIds.every((id: number) => dailyPracticeIds.includes(id)) &&
+        dailyPracticeIds.every(id => currentIds.includes(id));
+      
+      if (identical) {
+        console.log('Daily practices already up to date in database, skipping update');
+        return; // Skip the update if no changes needed
+      }
+      
+      // Calculate differences to minimize database operations
+      const idsToAdd = dailyPracticeIds.filter((id: number) => !currentIds.includes(id));
+      const idsToRemove = currentIds.filter((id: number) => !dailyPracticeIds.includes(id));
+      
+      console.log(`Differences detected: ${idsToAdd.length} practices to add, ${idsToRemove.length} to remove`);
+      
+      // Handle additions - more efficient than recreating the entire list
+      if (idsToAdd.length > 0) {
+        const practicesDataToAdd = idsToAdd.map(practiceId => ({
+          user_id: userId,
+          practice_id: practiceId,
+          added_at: new Date().toISOString()
+        }));
         
-      if (deleteError) {
-        if (deleteError.code === '404' || deleteError.code === 'PGRST301') {
-          console.error('The user_daily_practices table does not exist. This will cause daily practices to not persist.');
-        } else {
-          console.error('Error deleting existing daily practices:', deleteError);
+        console.log(`Adding ${idsToAdd.length} practices to daily list: ${idsToAdd.join(', ')}`);
+        
+        const { error: addError, data: addedData } = await supabase
+          .from('user_daily_practices')
+          .insert(practicesDataToAdd)
+          .select();
+        
+        if (addError) {
+          console.error('Error adding new daily practices:', addError);
+          
+          // If there's a constraint error, try inserting one by one 
+          if (addError.code === '23505') {
+            console.log('Trying to insert daily practices one by one');
+            
+            for (const practice of practicesDataToAdd) {
+              const { error: individualError } = await supabase
+                .from('user_daily_practices')
+                .insert(practice);
+                
+              if (individualError) {
+                console.error(`Failed to insert practice ID ${practice.practice_id}:`, individualError);
+              } else {
+                console.log(`Successfully inserted practice ID ${practice.practice_id}`);
+              }
+            }
+          }
+        } else if (addedData) {
+          console.log(`Successfully added ${addedData.length} practices to daily list`);
         }
-        return; // Exit early but don't throw - allow app to continue working in memory
       }
-    } catch (deleteErr) {
-      console.error('Exception when deleting existing daily practices:', deleteErr);
-      // Continue execution to try insert anyway
-    }
-    
-    // If there are no daily practices, we're done
-    if (dailyPracticeIds.length === 0) {
-      console.log('No daily practices to save');
-      return;
-    }
-    
-    try {
-      // Insert all current daily practices
-      const dailyPracticesData = dailyPracticeIds.map(practiceId => ({
-        user_id: userId,
-        practice_id: practiceId,
-        added_at: new Date().toISOString()
-      }));
       
-      const { error, data } = await supabase
+      // Handle removals
+      if (idsToRemove.length > 0) {
+        console.log(`Removing ${idsToRemove.length} practices from daily list: ${idsToRemove.join(', ')}`);
+        
+        for (const idToRemove of idsToRemove) {
+          const { error: removeError } = await supabase
+            .from('user_daily_practices')
+            .delete()
+            .eq('user_id', userId)
+            .eq('practice_id', idToRemove);
+          
+          if (removeError) {
+            console.error(`Error removing practice ID ${idToRemove}:`, removeError);
+          } else {
+            console.log(`Successfully removed practice ID ${idToRemove} from daily list`);
+          }
+        }
+      }
+      
+      // Verify final state if needed
+      const { data: verifyData } = await supabase
         .from('user_daily_practices')
-        .insert(dailyPracticesData)
-        .select();
+        .select('practice_id')
+        .eq('user_id', userId);
       
-      if (error) {
-        if (error.code === '404' || error.code === 'PGRST301') {
-          console.error('The user_daily_practices table does not exist. This will cause daily practices to not persist.');
+      if (verifyData) {
+        const finalIds = verifyData.map(p => p.practice_id).sort();
+        console.log(`Final daily practices in database: ${finalIds.join(', ')}`);
+        
+        // Check if our operation was successful
+        const expectedIds = [...dailyPracticeIds].sort();
+        const successful = 
+          finalIds.length === expectedIds.length && 
+          finalIds.every((id, idx) => id === expectedIds[idx]);
+        
+        if (successful) {
+          console.log('✅ Daily practices successfully synchronized with database');
         } else {
-          console.error('Error inserting daily practices:', error);
+          console.warn('⚠️ Daily practices may not be fully synchronized with database');
+          console.log(`Expected: ${expectedIds.join(', ')}`);
+          console.log(`Actual: ${finalIds.join(', ')}`);
         }
-        return; // Exit early but don't throw - allow app to continue working in memory
       }
-      
-      console.log(`Successfully updated ${dailyPracticeIds.length} daily practices for user ${userId}`);
-      if (data) {
-        console.log(`Saved ${data.length} daily practices to database`);
-      }
-    } catch (insertErr) {
-      console.error('Exception when inserting daily practices:', insertErr);
-      // Don't throw error to allow app to continue working in memory
+    } catch (err) {
+      console.error('Exception updating daily practices:', err);
+      // Don't throw to caller - allow app to continue working even if DB operations fail
     }
   } catch (error) {
     console.error('Error in updateUserDailyPractices:', error);
@@ -245,17 +331,28 @@ export async function loadPracticeData(userId: string) {
     console.log('loadPracticeData: Starting data load for user', userId);
     
     // Check if database tables exist
+    let tablesExist = false;
     try {
-      const tablesExist = await checkRequiredTables();
+      tablesExist = await checkRequiredTables();
       if (!tablesExist) {
         console.error('Required database tables are missing. Daily practices will not persist.');
-        // Continue execution to allow at least in-memory functionality
+        console.log('Will attempt to load data from localStorage instead');
+        
+        // Try to load from localStorage as a fallback
+        const localStorageData = loadFromLocalStorage(userId);
+        if (localStorageData) {
+          console.log('Successfully loaded data from localStorage fallback');
+          return localStorageData;
+        } else {
+          console.log('No localStorage data found, will continue to initialize with defaults');
+        }
       } else {
-        console.log('All required database tables exist');
+        console.log('All required database tables exist, proceeding with database operations');
       }
     } catch (tableCheckError) {
       console.error('Error checking for required tables:', tableCheckError);
-      // Continue with function despite table check error
+      // Continue with function despite table check error, but assume tables don't exist
+      tablesExist = false;
     }
     
     // 1. Get system/default practices
@@ -272,10 +369,10 @@ export async function loadPracticeData(userId: string) {
       throw systemError;
     }
     
-    // 2. Get user-created practices
+    // 2. Get user-created practices and user-specific data
     const { data: userData, error: userError } = await supabase
       .from('user_practices')
-      .select('practices, progress')
+      .select('practices, progress, daily_practices, daily_points, streaks')
       .eq('user_id', userId)
       .single();
     
@@ -292,26 +389,57 @@ export async function loadPracticeData(userId: string) {
     }
     
     // 3. Get user's daily practice IDs
-    const { data: dailyPractices, error: dailyError } = await supabase
-      .from('user_daily_practices')
-      .select('practice_id')
-      .eq('user_id', userId);
+    let dailyPractices: Array<{practice_id: number}> = [];
+    let dailyError = null;
     
-    if (dailyError) {
-      console.error('Error loading daily practices:', dailyError);
-      if (dailyError.code === '404' || dailyError.code === 'PGRST301') {
-        console.error('The user_daily_practices table does not exist in the database.');
+    // Only try to fetch daily practices if tables exist
+    if (tablesExist) {
+      const dailyPracticesResult = await supabase
+        .from('user_daily_practices')
+        .select('practice_id')
+        .eq('user_id', userId);
+      
+      dailyPractices = (dailyPracticesResult.data || []).map((p: any) => ({ practice_id: Number(p.practice_id) }));
+      dailyError = dailyPracticesResult.error;
+      
+      if (dailyError) {
+        console.error('Error loading daily practices:', dailyError);
+        if (dailyError.code === '404' || dailyError.code === 'PGRST301') {
+          console.error('The user_daily_practices table does not exist in the database.');
+          console.error('Will fall back to using isDaily flags from localStorage or memory');
+        }
+        // Don't throw - continue with empty daily practices list
+        dailyPractices = [];
       }
-      throw dailyError;
+    } else {
+      console.log('Tables do not exist, skipping dailyPractices fetch');
     }
     
-    // Extract daily practice IDs
-    const dailyPracticeIds = (dailyPractices || []).map(row => row.practice_id);
+    // Use daily_practices from userData if available
+    let dailyPracticeIds: number[] = [];
+    if (userData && userData.daily_practices && Array.isArray(userData.daily_practices)) {
+      dailyPracticeIds = userData.daily_practices;
+    } else if (dailyPractices && Array.isArray(dailyPractices)) {
+      dailyPracticeIds = dailyPractices.map(row => row.practice_id);
+    }
+    
+    console.log(`Loaded ${dailyPracticeIds.length} daily practice IDs from user_daily_practices table:`, dailyPracticeIds);
+    
+    // Key practices information (not auto-added to daily by default anymore)
+    const keyPracticeNames = ["Cold Shower Exposure", "Gratitude Journal", "Focus Breathing (3:3:6)"];
+    
+    // No warnings about missing key practices since they're not meant to be auto-added
     
     // Convert system practices to our Practice interface format
-    const formattedSystemPractices = systemPractices ? systemPractices.map(p => {
-      const isDaily = dailyPracticeIds.includes(p.id);
-      console.log(`System practice "${p.name}" (ID: ${p.id}) isDaily: ${isDaily}, in dailyPracticeIds: ${dailyPracticeIds.includes(p.id)}`);
+    const formattedSystemPractices = systemPractices ? systemPractices.map((p: any) => {
+      const isInDailyTable = dailyPracticeIds.includes(p.id as number);
+      const isKeyPractice = keyPracticeNames.includes(p.name as string);
+      
+      // Only mark practices as daily if they're explicitly in the daily table
+      const isDaily = isInDailyTable;
+      
+      console.log(`System practice "${p.name}" (ID: ${p.id}): isDaily=${isDaily}, isKeyPractice=${isKeyPractice}, inDailyTable=${isInDailyTable}`);
+      
       
       return {
         id: p.id,
@@ -327,14 +455,14 @@ export async function loadPracticeData(userId: string) {
         steps: p.steps,
         source: p.source,
         isSystemPractice: true,
-        isDaily: isDaily // Mark as daily if in the user's daily list
+        isDaily: isDaily // Mark as daily if in the user's daily list or if it's a key practice
       };
     }) : [];
     
     console.log(`Loaded ${formattedSystemPractices.length} system practices. Daily practice IDs: ${dailyPracticeIds.join(', ')}`);
     
     // Extract user-created practices and system practice status from userData
-    const userPracticesData = userData?.practices || [];
+    const userPracticesData = (userData?.practices || []) as any[];
     
     // Separate user-created practices from system practice status info
     const userCreatedPractices = userPracticesData.filter((p: any) => p.userCreated === true);
@@ -380,15 +508,23 @@ export async function loadPracticeData(userId: string) {
       ...formattedUserPractices
     ];
     
+    // We no longer automatically add key practices to daily practices
+    // All practices (including key ones) must be explicitly added by the user
+    console.log(`Loaded ${allPractices.length} total practices, none automatically added to daily practices`);
+    
     // Validate and return data
     if (allPractices.length > 0) {
       console.log('Successfully loaded user practices data');
       return {
         practices: allPractices,
-        progress: userData?.progress || {
+        progress: userData?.progress ? {
+          ...(userData.progress as any),
+          dailyPoints: userData?.daily_points || 0,
+          streaks: userData?.streaks || 0
+        } : {
           totalPoints: 0,
           level: 1,
-          nextLevelPoints: 50,
+          nextLevelPoints: 100,
           streakDays: 0,
           totalCompleted: 0,
           achievements: []
@@ -499,6 +635,9 @@ CREATE TABLE IF NOT EXISTS user_practices (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   practices JSONB DEFAULT '[]'::jsonb, -- Stores user-created custom practices
   progress JSONB DEFAULT '{}'::jsonb,  -- Stores user progress data
+  daily_practices INTEGER[] DEFAULT '{}', -- Stores IDs of daily practices
+  daily_points INTEGER DEFAULT 0,        -- Stores total points from daily practices
+  streaks INTEGER DEFAULT 0,            -- Stores current streak
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(user_id)
@@ -554,16 +693,20 @@ export async function checkRequiredTables() {
     const allTablesExist = results.every(result => result.exists);
     
     if (!allTablesExist) {
-      console.error('Some required database tables are missing:', 
-        results.filter(r => !r.exists).map(r => r.table).join(', '));
+      const missingTables = results.filter(r => !r.exists).map(r => r.table);
+      console.error('Some required database tables are missing:', missingTables.join(', '));
       console.log('Application will use localStorage for data persistence instead of Supabase');
+      
+      if (missingTables.includes('user_daily_practices')) {
+        console.error('CRITICAL: user_daily_practices table is missing - daily practices will not be properly persisted');
+        console.error('To fix this issue, run: npm run setup-db');
+      }
     } else {
       console.log('All required tables exist');
     }
     
-    // Even if tables don't exist, return true to allow the app to run in offline mode
-    // with localStorage fallback
-    return true;
+    // Return the actual status - this helps calling code know if it should rely on the database
+    return allTablesExist;
   } catch (error) {
     console.error('Error checking required tables:', error);
     console.log('Application will use localStorage for data persistence due to database connection error');

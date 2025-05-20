@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import BadgeAnimation from '@/components/ui/badge-animation';
+import { BadgeAnimation } from '@/components/ui/badge-animation';
 import { usePractices } from './PracticeContext';
+import { useAuth } from '@/context/AuthContext';
 
 // Types
 interface Achievement {
@@ -12,6 +13,7 @@ interface Achievement {
 
 interface AchievementContextType {
   showAchievementPopup: (achievement: Achievement) => void;
+  getAllUserAchievements: () => Achievement[];
 }
 
 // Create context
@@ -22,14 +24,36 @@ interface AchievementProviderProps {
   children: ReactNode;
 }
 
+// Local storage key for seen achievements
+const SEEN_ACHIEVEMENTS_KEY = 'wellbeing_seen_achievements';
+
 export const AchievementProvider: React.FC<AchievementProviderProps> = ({ children }) => {
   const [currentAchievement, setCurrentAchievement] = useState<Achievement | null>(null);
   const [previousAchievements, setPreviousAchievements] = useState<string[]>([]);
   const [achievementQueue, setAchievementQueue] = useState<Achievement[]>([]);
   const { userProgress, newAchievements } = usePractices();
+  const { user } = useAuth();
+  
+  // Load previously seen achievements from localStorage on mount
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    try {
+      const storedAchievements = localStorage.getItem(`${SEEN_ACHIEVEMENTS_KEY}_${user.id}`);
+      if (storedAchievements) {
+        const parsedAchievements = JSON.parse(storedAchievements);
+        setPreviousAchievements(parsedAchievements);
+        console.log("Loaded previously seen achievements:", parsedAchievements.length);
+      }
+    } catch (error) {
+      console.error("Error loading seen achievements:", error);
+    }
+  }, [user?.id]);
 
   // Unified effect to process achievements from both sources
   useEffect(() => {
+    if (!user?.id) return;
+    
     // Create an array to hold new achievements from both sources
     let newlyDetectedAchievements: Achievement[] = [];
     
@@ -57,15 +81,20 @@ export const AchievementProvider: React.FC<AchievementProviderProps> = ({ childr
       setAchievementQueue(prev => [...prev, ...newlyDetectedAchievements]);
       
       // Record as seen
-      setPreviousAchievements(prev => [
-        ...prev,
+      const updatedSeenAchievements = [
+        ...previousAchievements,
         ...newlyDetectedAchievements.map(a => a.id)
-      ]);
+      ];
+      
+      setPreviousAchievements(updatedSeenAchievements);
+      
+      // Save to localStorage to persist between sessions
+      localStorage.setItem(`${SEEN_ACHIEVEMENTS_KEY}_${user.id}`, JSON.stringify(updatedSeenAchievements));
       
       console.log("New achievements detected:", 
         newlyDetectedAchievements.map(a => a.name).join(', '));
     }
-  }, [newAchievements, userProgress?.achievements]);
+  }, [newAchievements, userProgress?.achievements, previousAchievements, user?.id]);
 
   // Display achievements from the queue one at a time
   useEffect(() => {
@@ -95,8 +124,12 @@ export const AchievementProvider: React.FC<AchievementProviderProps> = ({ childr
       setCurrentAchievement(achievement);
       
       // Only add to previousAchievements if it's not a test/manual achievement
-      if (!achievement.id.includes('test') && !achievement.id.includes('manual')) {
-        setPreviousAchievements(prev => [...prev, achievement.id]);
+      if (!achievement.id.includes('test') && !achievement.id.includes('manual') && user?.id) {
+        const updatedSeenAchievements = [...previousAchievements, achievement.id];
+        setPreviousAchievements(updatedSeenAchievements);
+        
+        // Save to localStorage to persist between sessions
+        localStorage.setItem(`${SEEN_ACHIEVEMENTS_KEY}_${user.id}`, JSON.stringify(updatedSeenAchievements));
       }
     }
   };
@@ -105,9 +138,15 @@ export const AchievementProvider: React.FC<AchievementProviderProps> = ({ childr
   const handleClosePopup = () => {
     setCurrentAchievement(null);
   };
+  
+  // Function to get all user achievements for display in UI components
+  const getAllUserAchievements = (): Achievement[] => {
+    if (!userProgress?.achievements) return [];
+    return userProgress.achievements;
+  };
 
   return (
-    <AchievementContext.Provider value={{ showAchievementPopup }}>
+    <AchievementContext.Provider value={{ showAchievementPopup, getAllUserAchievements }}>
       {children}
       
       {/* Render the badge animation popup when an achievement is available */}

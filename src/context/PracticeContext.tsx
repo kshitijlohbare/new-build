@@ -1,7 +1,8 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { savePracticeData } from './practiceUtils.enhanced';
+import { savePracticeData, addToDailyPractices, removeFromDailyPractices } from './practiceUtils.fixed';
 import { savePracticeDataToLocalStorage, loadPracticeDataFromLocalStorage } from './practiceUtils.localStorage';
+import { supabase } from '@/lib/supabase';
 
 // --- Interfaces (Consider moving to a types file) ---
 export interface Practice { // Export the interface
@@ -45,6 +46,7 @@ interface UserProgress {
   totalCompleted: number;
   lastCompletionDate?: string; // Track the last completion date for streak calculation
   achievements: Achievement[];
+  userId?: string; // Store the user ID to ensure data is user-specific
 }
 
 // --- Achievement Definitions (Consider moving to a constants file) ---
@@ -98,7 +100,7 @@ const INITIAL_PRACTICE_DATA: Practice[] = [
     duration: 3, 
     completed: false, 
     streak: 0,
-    isDaily: true, // Mark key practices as daily by default
+    isDaily: false, // No practices are daily by default (was: true)
     isSystemPractice: true, // Ensure system practice flag is set
     source: "Andrew Huberman",
     steps: [
@@ -179,7 +181,7 @@ const INITIAL_PRACTICE_DATA: Practice[] = [
     duration: 5, 
     completed: false, 
     streak: 0,
-    isDaily: true, // Mark key practices as daily by default
+    isDaily: false, // No practices are daily by default (was: true)
     isSystemPractice: true, // Ensure system practice flag is set
     source: "Andrew Huberman",
     steps: [
@@ -221,7 +223,7 @@ const INITIAL_PRACTICE_DATA: Practice[] = [
     duration: 10, 
     completed: false, 
     streak: 0,
-    isDaily: true, // Mark key practices as daily by default
+    isDaily: false, // No practices are daily by default (was: true)
     isSystemPractice: true, // Ensure system practice flag is set
     source: "Naval Ravikant",
     steps: [
@@ -433,10 +435,22 @@ interface PracticeProviderProps {
 const initializeStepsCompletion = (practices: Practice[]): Practice[] => {
   return practices.map(practice => {
     if (practice.steps && practice.steps.length > 0) {
+      // Only set completed to false if it's not already defined
+      const updatedSteps = practice.steps.map(step => ({
+        ...step,
+        completed: step.completed !== undefined ? step.completed : false
+      }));
+      
+      // Calculate step progress based on completion status
+      const completedSteps = updatedSteps.filter(step => step.completed).length;
+      const stepProgress = updatedSteps.length > 0 
+        ? (completedSteps / updatedSteps.length) * 100 
+        : 0;
+      
       return {
         ...practice,
-        steps: practice.steps.map(step => ({ ...step, completed: false })),
-        stepProgress: 0
+        steps: updatedSteps,
+        stepProgress
       };
     }
     return practice;
@@ -445,7 +459,7 @@ const initializeStepsCompletion = (practices: Practice[]): Practice[] => {
 
 export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) => {
   const { user } = useAuth();
-  const [practices, setPractices] = useState<Practice[]>(initializeStepsCompletion(INITIAL_PRACTICE_DATA));
+  const [practices, setPractices] = useState<Practice[]>([]); // Initialize empty, will load from database
   const [userProgress, setUserProgress] = useState<UserProgress>({
     totalPoints: 0,
     level: 1,
@@ -460,53 +474,139 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
   // Status for potential UI feedback in the future
   const [, setSaveStatus] = useState<'idle' | 'saving' | 'error' | 'success'>('idle');
 
-  // --- Effect for Data Loading from localStorage with Supabase backup ---
+  // --- Effect for Data Loading from database with localStorage backup ---
   useEffect(() => {
+    // This effect is used for data loading
+    // Note: Removed unused syncDailyPracticesWithDatabase function
+    
+    // Main function to load user data
     const loadUserData = async () => {
       console.log("PracticeContext - loadUserData starting", { userId: user?.id });
       setIsLoading(true);
       
       if (user?.id) {
         try {
-          // Try to load data from localStorage first as the preferred source
-          let userData = loadPracticeDataFromLocalStorage(user.id);
+          // First try to load data from Supabase database
+          let practicesFromDb: Practice[] = [];
+          let dbFetchSuccessful = false;
+          let timeStarted = Date.now();
           
-          if (userData) {
-            console.log("Successfully loaded data from localStorage");
-          } else {
-            console.log("No localStorage data, this might be expected for first-time users or after clearing browser data");
+          try {
+            console.log("Attempting to fetch practices from Supabase...");
+            
+            // Set a timeout in case the database query takes too long
+            const timeoutPromise = new Promise<{data: null, error: any}>((resolve) => {
+              setTimeout(() => {
+                resolve({
+                  data: null, 
+                  error: { message: "Database query timed out after 3 seconds" }
+                });
+              }, 3000);
+            });
+            
+            // Race the database query against the timeout
+            const { data: practicesData, error } = await Promise.race([
+              supabase.from('practices').select('*'),
+              timeoutPromise
+            ]);
+              
+            if (error) {
+              console.error("Error fetching practices from Supabase:", error);
+            } else if (practicesData && practicesData.length > 0) {
+              console.log(`Fetched ${practicesData.length} practices from Supabase database in ${Date.now() - timeStarted}ms`);
+              dbFetchSuccessful = true;
+              
+              // Transform data to match Practice interface
+              practicesFromDb = practicesData.map((p: any) => ({
+                id: Number(p.id),
+                icon: p.icon,
+                name: String(p.name),
+                description: String(p.description),
+                benefits: Array.isArray(p.benefits) ? p.benefits : [],
+                duration: p.duration !== undefined ? Number(p.duration) : undefined,
+                points: p.points !== undefined ? Number(p.points) : undefined,
+                completed: Boolean(p.completed),
+                streak: p.streak !== undefined ? Number(p.streak) : 0,
+                tags: Array.isArray(p.tags) ? p.tags : [],
+                steps: Array.isArray(p.steps) ? p.steps : [],
+                source: p.source,
+                stepProgress: p.step_progress !== undefined ? Number(p.step_progress) : undefined,
+                isDaily: p.is_daily === true,
+                userCreated: p.user_created === true,
+                createdByUserId: p.created_by_user_id,
+                isSystemPractice: p.is_system_practice === true
+              }));
+              
+              // Debug log for isDaily status
+              const dailyPractices = practicesFromDb.filter(p => p.isDaily === true);
+              console.log(`Found ${dailyPractices.length} practices marked as daily in the database`);
+              dailyPractices.forEach(p => console.log(`- Daily practice: ${p.name} (ID: ${p.id})`));
+              
+            } else {
+              console.log("No practices found in database or empty response");
+            }
+          } catch (dbError) {
+            console.error("Exception fetching practices from Supabase:", dbError);
           }
           
-          if (userData) {
-            // We have saved user data - initialize with it
-            if (userData.practices) {
-              const dailyPracticesCount = userData.practices.filter((p: Practice) => p.isDaily === true).length;
-              console.log(`Loaded ${userData.practices.length} user practices, including ${dailyPracticesCount} daily practices`);
+          // Try to load data from localStorage as a fallback or for personal preferences
+          let userData = loadPracticeDataFromLocalStorage(user.id);
+          
+          if (dbFetchSuccessful && practicesFromDb.length > 0) {
+            console.log("Using database practices as primary source");
+            
+            // Start with database practices
+            const mergedPractices = [...practicesFromDb];
+            
+            // If we also have user data in localStorage, merge the user-specific fields
+            if (userData && userData.practices && userData.practices.length > 0) {
+              console.log("Merging with user preferences from localStorage");
               
-              // Log the daily practices
-              userData.practices
-                .filter((p: Practice) => p.isDaily)
-                .forEach((p: Practice) => console.log(`Daily practice from DB: "${p.name}" (ID: ${p.id})`));
-                
-              setPractices(initializeStepsCompletion(userData.practices));
-            } else {
-              console.log("No practices found in user data, initializing with defaults");
-              // No practices data - initialize with default practices but mark none as daily by default
-              const defaultPractices = INITIAL_PRACTICE_DATA.map(p => ({
-                ...p,
-                // Preserve isDaily for key practices, reset others
-                isDaily: p.name === "Cold Shower Exposure" || 
-                         p.name === "Gratitude Journal" || 
-                         p.name === "Focus Breathing (3:3:6)" ? true : false,
-                completed: false, // Ensure nothing is marked completed for new user
-                streak: 0 // Reset streaks
-              }));
-              setPractices(initializeStepsCompletion(defaultPractices));
+              // Update with user's completion status, streaks, etc. from localStorage
+              userData.practices.forEach((localPractice: Practice) => {
+                const index = mergedPractices.findIndex(p => p.id === localPractice.id);
+                if (index !== -1) {
+                  // Debug step completion status
+                  if (localPractice.steps && localPractice.steps.length > 0) {
+                    console.log(`Practice "${localPractice.name}" has ${localPractice.steps.length} steps with completion status:`, 
+                      localPractice.steps.map(s => s.completed));
+                  }
+                  
+                  // Update existing practice with user data
+                  mergedPractices[index] = {
+                    ...mergedPractices[index],
+                    completed: localPractice.completed,
+                    streak: localPractice.streak,
+                    steps: localPractice.steps, // Preserve steps with their completion status
+                    stepProgress: localPractice.stepProgress,
+                    // Preserve other user-specific fields
+                  };
+                } else {
+                  // If not in DB but exists in localStorage, it might be a user-created practice
+                  if (localPractice.userCreated) {
+                    mergedPractices.push(localPractice);
+                  }
+                }
+              });
             }
+            
+            const dailyPracticesCount = mergedPractices.filter(p => p.isDaily === true).length;
+            console.log(`Using ${mergedPractices.length} practices with ${dailyPracticesCount} daily practices`);
+            
+            setPractices(initializeStepsCompletion(mergedPractices));
+            
+            // Set user progress from localStorage if available
+            if (userData && userData.progress) {
+              setUserProgress(userData.progress);
+            }
+          } else if (userData && userData.practices && userData.practices.length > 0) {
+            // Database fetch failed or no data, use localStorage
+            console.log("Using localStorage practices as fallback");
+            
+            setPractices(initializeStepsCompletion(userData.practices));
             
             if (userData.progress) {
               setUserProgress(userData.progress);
-              console.log("Loaded user progress:", userData.progress);
             } else {
               // Initialize basic progress
               setUserProgress({
@@ -521,15 +621,15 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
           } else {
             // No saved data at all - initialize with default practices
             console.log("No user data found, initializing with defaults");
+            
             const defaultPractices = INITIAL_PRACTICE_DATA.map(p => ({
               ...p,
-              // Preserve isDaily for key practices, reset others
-              isDaily: p.name === "Cold Shower Exposure" || 
-                       p.name === "Gratitude Journal" || 
-                       p.name === "Focus Breathing (3:3:6)" ? true : false,
+              // All practices start with isDaily = false for new users
+              isDaily: false, // No practices are daily by default
               completed: false, // Ensure nothing is marked completed
               streak: 0 // Reset streaks
             }));
+            
             setPractices(initializeStepsCompletion(defaultPractices));
             
             // Initialize basic progress
@@ -542,7 +642,7 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
               achievements: [],
             });
             
-            // Save this initial data both to localStorage and Supabase
+            // Save this initial data
             try {
               // Always save to localStorage first as a backup
               savePracticeDataToLocalStorage(user.id, defaultPractices, {
@@ -553,18 +653,21 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
                 totalCompleted: 0,
                 achievements: [],
               });
+              
               console.log("Saved initial user data to localStorage");
               
-              // Then try Supabase
-              await savePracticeData(user.id, defaultPractices, {
-                totalPoints: 0,
-                level: 1,
-                nextLevelPoints: 50,
-                streakDays: 0,
-                totalCompleted: 0,
-                achievements: [],
-              });
-              console.log("Saved initial user data to database");
+              // Then try to save to database if it's working
+              if (dbFetchSuccessful) {
+                await savePracticeData(user.id, defaultPractices, {
+                  totalPoints: 0,
+                  level: 1,
+                  nextLevelPoints: 50,
+                  streakDays: 0,
+                  totalCompleted: 0,
+                  achievements: [],
+                });
+                console.log("Saved initial user data to database");
+              }
             } catch (saveError) {
               console.error("Error saving initial user data:", saveError);
               // We still have localStorage backup at this point
@@ -580,10 +683,8 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
         console.log("No user logged in, using demo mode");
         const demoPractices = INITIAL_PRACTICE_DATA.map(p => ({
           ...p,
-          // Preserve isDaily for key practices, reset others
-          isDaily: p.name === "Cold Shower Exposure" || 
-                   p.name === "Gratitude Journal" || 
-                   p.name === "Focus Breathing (3:3:6)" ? true : false,
+          // All practices start with isDaily = false for demo mode
+          isDaily: false, // No practices are daily by default
           completed: false,
           streak: 0
         }));
@@ -750,21 +851,15 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
     });
     
     // Special handling for our key practices - ensure they're always properly marked
-    const isKeyPractice = (name: string) => {
-      return name === "Cold Shower Exposure" || 
-             name === "Gratitude Journal" || 
-             name === "Focus Breathing (3:3:6)";
-    };
-    
     // Make a copy with proper handling for isDaily
     let practiceToAdd = {...practiceToUpdate};
     
-    // If this is one of our key practices, override to ensure it's marked as daily
-    // (unless explicitly told to unmark it)
-    if (isKeyPractice(practiceToAdd.name) && practiceToAdd.isDaily !== false) {
-      practiceToAdd.isDaily = true;
-      console.log(`Ensuring key practice "${practiceToAdd.name}" is marked as daily`);
-    }
+    // No special treatment for key practices - they should only be daily if explicitly marked
+    // by the user through the UI
+    
+    // Track if we're adding a practice to daily that wasn't daily before
+    let wasAddedToDaily = false;
+    let practiceId = practiceToAdd.id;
     
     setPractices(prevPractices => {
       const existingPracticeIndex = prevPractices.findIndex(p => p.id === practiceToAdd.id);
@@ -773,6 +868,11 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
         // Practice exists, update it (e.g., setting isDaily)
         const updatedPractices = [...prevPractices];
         const existingPractice = updatedPractices[existingPracticeIndex];
+        
+        // Check if we're newly adding this to daily practices
+        const wasDaily = existingPractice.isDaily === true;
+        const willBeDaily = practiceToAdd.isDaily === true;
+        wasAddedToDaily = !wasDaily && willBeDaily;
         
         // Ensure isDaily is explicitly set as a boolean with the value from practiceToAdd, defaulting to the existing value
         const updatedPractice = {
@@ -784,24 +884,14 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
                   (existingPractice.isDaily === true))
         };
         
-        // One more safety check for key practices
-        if (isKeyPractice(updatedPractice.name) && updatedPractice.isDaily !== false) {
-          updatedPractice.isDaily = true;
-        }
+        // No special treatment for key practices anymore - they should 
+        // only be marked as daily if explicitly done by the user
         
         updatedPractices[existingPracticeIndex] = updatedPractice;
-        
-        console.log("Practice update details:", {
-          name: updatedPractice.name,
-          beforeUpdate: {
-            isDaily: existingPractice.isDaily,
-            id: existingPractice.id
-          },
-          afterUpdate: {
-            isDaily: updatedPractice.isDaily,
-            id: updatedPractice.id
-          }
-        });
+        // Immediately persist to backend after local state update
+        if (user?.id) {
+          savePracticeData(user.id, updatedPractices, userProgress);
+        }
         return updatedPractices;
       } else {
         // Practice does not exist, add it as a new practice
@@ -826,15 +916,44 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
           isSystemPractice: practiceToUpdate.isSystemPractice || false, // Default to not a system practice
           createdByUserId: user?.id || undefined, // Set the creator's user ID
         };
+        
+        // Check if this new practice should be added to daily
+        wasAddedToDaily = practiceWithDefaults.isDaily === true;
+        
         console.log("Added new practice:", practiceWithDefaults.name, "by user:", practiceWithDefaults.createdByUserId);
+        // Immediately persist to backend after local state update
+        if (user?.id) {
+          savePracticeData(user.id, [...prevPractices, practiceWithDefaults], userProgress);
+        }
         return [...prevPractices, practiceWithDefaults];
       }
     });
+    
+    // If the practice was added to daily practices, immediately update the database relation
+    // instead of waiting for the next auto-save cycle
+    if (wasAddedToDaily && user?.id && practiceId !== undefined) {
+      console.log(`Direct database update: Adding practice ID ${practiceId} to daily practices for user ${user.id}`);
+      addToDailyPractices(user.id, practiceId)
+        .then((success: boolean) => {
+          if (success) {
+            console.log(`Successfully added practice ID ${practiceId} to user_daily_practices table`);
+          } else {
+            console.error(`Failed to add practice ID ${practiceId} to user_daily_practices table`);
+          }
+        })
+        .catch((err: Error) => {
+          console.error('Error in direct daily practice update:', err);
+        });
+    }
+    
     return practiceToUpdate.id; // Return the ID for reference
-  }, [user?.id]);
+  }, [user?.id, userProgress]);
 
   // Function to remove a practice from the user's list or just remove from daily practices
   const removePractice = useCallback((practiceId: number, removeFromDaily = true) => {
+    // Track if we're removing from daily
+    let wasRemovedFromDaily = false;
+    
     setPractices(prevPractices => {
       const practiceToUpdate = prevPractices.find(p => p.id === practiceId);
       
@@ -846,32 +965,76 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
       
       // If removeFromDaily is true, just update isDaily flag, otherwise completely remove the practice
       if (removeFromDaily) {
-        return prevPractices.map(p => {
+        // Check if it was marked as daily before
+        wasRemovedFromDaily = practiceToUpdate.isDaily === true;
+        
+        // Create a new array with the practice's isDaily set to false
+        const updatedPractices = prevPractices.map(p => {
           if (p.id === practiceId) {
-            return { ...p, isDaily: false }; // Remove from daily practices
+            return { ...p, isDaily: false }; // Explicitly set to false, not undefined
           }
           return p;
         });
+
+        // Immediately persist to database to ensure sync between states
+        if (user?.id) {
+          console.log(`Saving updated practices after removing practice ${practiceId} from daily`);
+          savePracticeData(user.id, updatedPractices, userProgress);
+        }
+        
+        return updatedPractices;
       } else {
         // Only completely remove if it's a user-created practice, otherwise just remove from daily
         if (practiceToUpdate.userCreated) {
+          // Check if it was daily before removal
+          wasRemovedFromDaily = practiceToUpdate.isDaily === true;
+          
           const updatedPractices = prevPractices.filter(p => p.id !== practiceId);
           console.log("Removed user-created practice with ID:", practiceId);
+          
+          // Immediately persist to backend after local state update
+          if (user?.id) {
+            savePracticeData(user.id, updatedPractices, userProgress);
+          }
           return updatedPractices;
         } else {
           // For built-in practices, just mark as not daily
+          // Check if it was daily before removal
+          wasRemovedFromDaily = practiceToUpdate.isDaily === true;
+          
           console.log("Built-in practice removed from daily list:", practiceId);
-          return prevPractices.map(p => {
+          const updated = prevPractices.map(p => {
             if (p.id === practiceId) {
-              return { ...p, isDaily: false };
+              return { ...p, isDaily: false }; // Explicitly set to false
             }
             return p;
           });
+          
+          // Immediately persist to backend after local state update
+          if (user?.id) {
+            savePracticeData(user.id, updated, userProgress);
+          }
+          return updated;
         }
       }
     });
-    // The useEffect for saving will persist this change.
-  }, []);
+    
+    // If the practice was removed from daily, immediately update the database relation
+    if (wasRemovedFromDaily && user?.id) {
+      console.log(`Direct database update: Removing practice ID ${practiceId} from daily practices for user ${user.id}`);
+      removeFromDailyPractices(user.id, practiceId)
+        .then((success: boolean) => {
+          if (success) {
+            console.log(`Successfully removed practice ID ${practiceId} from user_daily_practices table`);
+          } else {
+            console.error(`Failed to remove practice ID ${practiceId} from user_daily_practices table`);
+          }
+        })
+        .catch((err: Error) => {
+          console.error('Error in direct daily practice removal:', err);
+        });
+    }
+  }, [user?.id, userProgress]);
 
   const togglePracticeCompletion = useCallback((id: number) => {
     let pointsChange = 0;

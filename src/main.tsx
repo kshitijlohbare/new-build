@@ -1,3 +1,6 @@
+// Import SSL workaround first to ensure it's applied before any Supabase imports
+import './lib/ssl-workaround.ts'
+
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'

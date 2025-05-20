@@ -103,13 +103,21 @@ const Appointments = () => {
 
   // Handle cancel appointment
   const handleCancel = async (appointmentId: number, practitionerName: string) => {
+    if (!user || !user.id) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to cancel an appointment.",
+        variant: "destructive"
+      });
+      return;
+    }
     try {
       // Update the appointment status to 'cancelled' in the database
       const { error } = await supabase
         .from("appointments")
         .update({ status: "cancelled" })
         .eq("id", appointmentId)
-        .eq("user_id", user?.id); // Ensure user can only cancel their own appointments
+        .eq("user_id", user.id); // user.id is now guaranteed to be a string
 
       if (error) {
         console.error("Error cancelling appointment:", error);

@@ -67,7 +67,20 @@ const TherapyBooking = () => {
           console.error("Error fetching practitioners:", error);
           setPractitioners([]);
         } else {
-          setPractitioners(data || []);
+          setPractitioners((data || []).map((p: any) => ({
+            id: Number(p.id),
+            name: String(p.name),
+            specialty: String(p.specialty),
+            reviews: Number(p.reviews),
+            rating: Number(p.rating),
+            price: Number(p.price),
+            image_url: String(p.image_url),
+            badge: p.badge as 'top rated' | 'new' | 'experienced' | null,
+            education: String(p.education),
+            degree: String(p.degree),
+            location_type: String(p.location_type),
+            conditions: Array.isArray(p.conditions) ? p.conditions.map(String) : [],
+          })));
         }
       } catch (err) {
         console.error("Unexpected error:", err);

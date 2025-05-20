@@ -17,17 +17,6 @@ interface Practitioner {
   conditions: string[];
 }
 
-// Define keyframes for fade-in animation
-const fadeInAnimation = `
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out forwards;
-}
-`;
-
 // Utility constants
 const therapyConditions = [
   { id: "depression", label: "depression", active: false },
@@ -100,7 +89,20 @@ const TherapistListing = () => {
       }
       const { data, error } = await query;
       if (!error && data) {
-        setPractitioners(data);
+        setPractitioners(data.map((p: any) => ({
+          id: Number(p.id),
+          name: String(p.name),
+          specialty: String(p.specialty),
+          reviews: Number(p.reviews),
+          rating: Number(p.rating),
+          price: Number(p.price),
+          image_url: String(p.image_url),
+          badge: p.badge as 'top rated' | 'new' | 'experienced' | null,
+          education: String(p.education),
+          degree: String(p.degree),
+          location_type: String(p.location_type),
+          conditions: Array.isArray(p.conditions) ? p.conditions.map(String) : [],
+        })));
       } else {
         setPractitioners([]);
       }

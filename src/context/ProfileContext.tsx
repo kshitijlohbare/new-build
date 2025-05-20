@@ -64,7 +64,21 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       const profile = await ensureUserProfile(user.id, user.email);
       
       if (profile) {
-        setUserProfile(profile);
+        // Map to UserProfile interface with explicit type casting
+        const userProfileData: UserProfile = {
+          id: String(profile.id),
+          username: String(profile.username),
+          display_name: String(profile.display_name),
+          avatar_url: profile.avatar_url ? String(profile.avatar_url) : undefined,
+          bio: profile.bio ? String(profile.bio) : undefined,
+          website: profile.website ? String(profile.website) : undefined,
+          location: profile.location ? String(profile.location) : undefined,
+          followers_count: Number(profile.followers_count),
+          following_count: Number(profile.following_count),
+          created_at: String(profile.created_at),
+          updated_at: String(profile.updated_at),
+        };
+        setUserProfile(userProfileData);
       } else {
         // Try to fetch existing profile if ensureUserProfile failed
         const { data, error } = await supabase
@@ -76,7 +90,20 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         if (error) {
           console.error('Error fetching user profile:', error);
         } else if (data) {
-          setUserProfile(data);
+          const userProfileData: UserProfile = {
+            id: String(data.id),
+            username: String(data.username),
+            display_name: String(data.display_name),
+            avatar_url: data.avatar_url ? String(data.avatar_url) : undefined,
+            bio: data.bio ? String(data.bio) : undefined,
+            website: data.website ? String(data.website) : undefined,
+            location: data.location ? String(data.location) : undefined,
+            followers_count: Number(data.followers_count),
+            following_count: Number(data.following_count),
+            created_at: String(data.created_at),
+            updated_at: String(data.updated_at),
+          };
+          setUserProfile(userProfileData);
         }
       }
     } catch (error) {
@@ -99,7 +126,20 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       if (error) {
         console.error('Error refreshing user profile:', error);
       } else if (data) {
-        setUserProfile(data);
+        const userProfileData: UserProfile = {
+          id: String(data.id),
+          username: String(data.username),
+          display_name: String(data.display_name),
+          avatar_url: data.avatar_url ? String(data.avatar_url) : undefined,
+          bio: data.bio ? String(data.bio) : undefined,
+          website: data.website ? String(data.website) : undefined,
+          location: data.location ? String(data.location) : undefined,
+          followers_count: Number(data.followers_count),
+          following_count: Number(data.following_count),
+          created_at: String(data.created_at),
+          updated_at: String(data.updated_at),
+        };
+        setUserProfile(userProfileData);
       }
     } catch (error) {
       console.error('Error in refreshProfile:', error);
@@ -229,22 +269,46 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       // Also exclude the current user
       followingIds.push(user.id);
       
-      // Get users with most followers that the current user is not following
-      const { data: suggested, error: suggestedError } = await supabase
+      // The error shows that 'followers_count' doesn't exist as a column
+      // Let's query without trying to order by that non-existent column
+      let query = supabase
         .from('user_profiles')
         .select('*')
-        .not('id', 'in', `(${followingIds.join(',')})`)
-        .order('followers_count', { ascending: false })
-        .limit(5);
-        
+        .limit(10);  // Get more results since we can't sort by popularity
+      
+      // Only apply the "not in" filter if there are IDs to exclude
+      // This avoids the SQL syntax error with empty parentheses
+      if (followingIds.length > 0) {
+        query = query.not('id', 'in', `(${followingIds.join(',')})`);
+      } else {
+        // If no IDs to exclude, just exclude the current user
+        query = query.neq('id', user.id);
+      }
+      
+      // Execute the query
+      const { data: suggested, error: suggestedError } = await query;
+      
       if (suggestedError) {
         console.error('Error getting suggested users:', suggestedError);
         return;
       }
       
-      setSuggestedUsers(suggested || []);
+      setSuggestedUsers((suggested || []).map((u: any) => ({
+        id: String(u.id),
+        username: String(u.username),
+        display_name: String(u.display_name),
+        avatar_url: u.avatar_url ? String(u.avatar_url) : undefined,
+        bio: u.bio ? String(u.bio) : undefined,
+        website: u.website ? String(u.website) : undefined,
+        location: u.location ? String(u.location) : undefined,
+        followers_count: Number(u.followers_count),
+        following_count: Number(u.following_count),
+        created_at: String(u.created_at),
+        updated_at: String(u.updated_at),
+      })));
     } catch (error) {
       console.error('Error in getSuggestedUsers:', error);
+      console.error('Request details:', { followingIds: user ? [user.id] : [] });
     }
   };
   
@@ -252,10 +316,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('user_followers')
-        .select(`
-          follower_id,
-          followers:user_profiles!user_followers_follower_id_fkey(*)
-        `)
+        .select('follower_id')
         .eq('following_id', userId);
         
       if (error) {
@@ -263,14 +324,32 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         return [];
       }
       
-      // Extract and transform the profiles from the joined data
-      const followerProfiles: UserProfile[] = [];
+      // Fetch user profiles for followers separately
+      const followerIds = data ? data.map(item => item.follower_id) : [];
+      let followerProfiles: UserProfile[] = [];
       
-      if (data) {
-        for (const item of data) {
-          if (item.followers) {
-            followerProfiles.push(item.followers as unknown as UserProfile);
-          }
+      if (followerIds.length > 0) {
+        const { data: profiles, error: profilesError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .in('id', followerIds);
+          
+        if (profilesError) {
+          console.error('Error getting follower profiles:', profilesError);
+        } else {
+          followerProfiles = (profiles || []).map((u: any) => ({
+            id: String(u.id),
+            username: String(u.username),
+            display_name: String(u.display_name),
+            avatar_url: u.avatar_url ? String(u.avatar_url) : undefined,
+            bio: u.bio ? String(u.bio) : undefined,
+            website: u.website ? String(u.website) : undefined,
+            location: u.location ? String(u.location) : undefined,
+            followers_count: Number(u.followers_count),
+            following_count: Number(u.following_count),
+            created_at: String(u.created_at),
+            updated_at: String(u.updated_at),
+          }));
         }
       }
       
@@ -316,7 +395,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     }
   };
   
-  const getUserProfile = async (userId: string) => {
+  const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
     try {
       const { data, error } = await supabase
         .from('user_profiles')
@@ -328,42 +407,44 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         console.error('Error getting user profile:', error);
         return null;
       }
-      
-      return data;
+      if (!data) return null;
+      const userProfileData: UserProfile = {
+        id: String(data.id),
+        username: String(data.username),
+        display_name: String(data.display_name),
+        avatar_url: data.avatar_url ? String(data.avatar_url) : undefined,
+        bio: data.bio ? String(data.bio) : undefined,
+        website: data.website ? String(data.website) : undefined,
+        location: data.location ? String(data.location) : undefined,
+        followers_count: Number(data.followers_count),
+        following_count: Number(data.following_count),
+        created_at: String(data.created_at),
+        updated_at: String(data.updated_at),
+      };
+      return userProfileData;
     } catch (error) {
       console.error('Error in getUserProfile:', error);
       return null;
     }
   };
-
-  // Initial load
-  useEffect(() => {
-    if (user) {
-      getSuggestedUsers();
-      getFollowing(user.id);
-      getFollowers(user.id);
-    }
-  }, [user]);
-
-  const value = {
-    userProfile,
-    loading,
-    updateProfile,
-    followUser,
-    unfollowUser,
-    isFollowingUser,
-    refreshProfile,
-    suggestedUsers,
-    getSuggestedUsers,
-    followingList,
-    followersList,
-    getFollowers,
-    getFollowing,
-    getUserProfile
-  };
-
+  
   return (
-    <ProfileContext.Provider value={value}>
+    <ProfileContext.Provider value={{
+      userProfile,
+      loading,
+      updateProfile,
+      followUser,
+      unfollowUser,
+      isFollowingUser,
+      refreshProfile,
+      suggestedUsers,
+      getSuggestedUsers,
+      followingList,
+      followersList,
+      getFollowers,
+      getFollowing,
+      getUserProfile,
+    }}>
       {children}
     </ProfileContext.Provider>
   );

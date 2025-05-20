@@ -9,13 +9,13 @@ export const checkUserProfileTables = async () => {
     console.log('Checking for user_profiles and related tables...');
     
     // Check if the user_profiles table exists
-    const { data: userProfilesExists, error: userProfilesError } = await supabase
+    const { error: userProfilesError } = await supabase
       .from('user_profiles')
       .select('id')
       .limit(1);
       
     // Check if the user_followers table exists
-    const { data: userFollowersExists, error: userFollowersError } = await supabase
+    const { error: userFollowersError } = await supabase
       .from('user_followers')
       .select('id')
       .limit(1);

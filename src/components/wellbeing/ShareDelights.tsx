@@ -113,7 +113,13 @@ export const ShareDelights = () => {
           toast({ title: "Error", description: "Could not fetch today's delights.", variant: "destructive" });
           setEntries([]);
         } else {
-          setEntries(delights || []);
+          // Map delights to Delight interface with explicit type casting
+          setEntries((delights || []).map((d: any) => ({
+            id: typeof d.id === 'string' || typeof d.id === 'number' ? d.id : String(d.id),
+            text: String(d.text),
+            user_id: String(d.user_id),
+            created_at: String(d.created_at),
+          })));
         }
       } catch (err) {
         console.error("Unexpected error fetching delights:", err);
@@ -179,7 +185,13 @@ export const ShareDelights = () => {
         setInputText(newDelightText);
       } else if (data) {
          // Replace optimistic entry with actual data from DB
-         setEntries(prev => prev.map(entry => entry.id === newTempId ? data : entry));
+         const delightData: Delight = {
+           id: typeof data.id === 'string' || typeof data.id === 'number' ? data.id : String(data.id),
+           text: String(data.text),
+           user_id: String(data.user_id),
+           created_at: String(data.created_at),
+         };
+         setEntries(prev => prev.map(entry => entry.id === newTempId ? delightData : entry));
          // Add points for sharing the delight
          addPointsForAction(5, 'Shared a Delight'); // Add 5 points
          toast({ title: "Success", description: "Delight shared and points added!" }); // Optional: Update toast message

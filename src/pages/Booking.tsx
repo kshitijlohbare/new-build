@@ -110,15 +110,30 @@ const Booking = () => {
           return;
         }
         
-        // Enhance practitioner data with additional dummy information if needed
-        const enhancedData = {
-          ...data,
-          bio: data.bio || "A compassionate and dedicated therapist with a strong commitment to helping clients achieve their goals.",
-          years_experience: data.years_experience || 8,
-          languages: data.languages || ["English"],
+        // Map/cast to Practitioner interface directly from Supabase data
+        const practitionerData: Practitioner = {
+          id: Number(data.id),
+          name: String(data.name),
+          specialty: String(data.specialty),
+          reviews: Number(data.reviews),
+          rating: Number(data.rating),
+          price: Number(data.price),
+          image_url: String(data.image_url),
+          badge: data.badge as 'top rated' | 'new' | 'experienced' | null,
+          education: String(data.education),
+          degree: String(data.degree),
+          location_type: String(data.location_type),
+          conditions: Array.isArray(data.conditions) ? data.conditions.map(String) : [],
+          bio: data.bio ? String(data.bio) : "A compassionate and dedicated therapist with a strong commitment to helping clients achieve their goals.",
+          years_experience: data.years_experience ? Number(data.years_experience) : 8,
+          approach: data.approach ? String(data.approach) : undefined,
+          languages: Array.isArray(data.languages) ? data.languages.map(String) : ["English"],
+          certifications: Array.isArray(data.certifications) ? data.certifications.map(String) : undefined,
+          availability: data.availability ? String(data.availability) : undefined,
+          insurance_accepted: Array.isArray(data.insurance_accepted) ? data.insurance_accepted.map(String) : undefined,
+          session_format: Array.isArray(data.session_format) ? data.session_format.map(String) : undefined,
         };
-        
-        setPractitioner(enhancedData);
+        setPractitioner(practitionerData);
         
         // If rescheduleId is present, fetch the existing appointment
         if (rescheduleParam) {
@@ -164,7 +179,9 @@ const Booking = () => {
       
       if (data) {
         // Set existing appointment type
-        setSelectedType(data.session_type);
+        if (data.session_type !== undefined) {
+          setSelectedType(String(data.session_type));
+        }
         
         // Show a message that we're rescheduling
         toast({

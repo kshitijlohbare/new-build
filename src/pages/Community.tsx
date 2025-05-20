@@ -307,7 +307,15 @@ export default function Community() {
         if (error) {
           console.error("Error fetching community delights:", error);
         } else {
-          setCommunityDelights(data || []);
+          setCommunityDelights((data || []).map((d: any) => ({
+            id: Number(d.id),
+            text: String(d.text),
+            user_id: String(d.user_id),
+            username: String(d.username),
+            created_at: String(d.created_at),
+            cheers: d.cheers !== undefined ? Number(d.cheers) : undefined,
+            comments: Array.isArray(d.comments) ? d.comments : undefined,
+          })));
         }
       } catch (err) {
         console.error("Error in community delights fetch:", err);
@@ -460,12 +468,14 @@ export default function Community() {
                   onClick={() => setActiveTab(tab.id as typeof activeTab)}
                   className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all font-happy-monkey lowercase ${
                     isActive 
-                      ? `bg-gradient-to-r from-[${tab.color}] to-[${tab.color}] text-white shadow-sm` 
-                      : `text-[${tab.color}] border border-[rgba(4,196,213,0.3)] hover:bg-[rgba(4,196,213,0.1)]`
+                      ? `text-white shadow-sm` 
+                      : `border border-[rgba(4,196,213,0.3)] hover:bg-[rgba(4,196,213,0.1)]`
                   }`}
                   style={{ 
                     boxShadow: isActive ? '0 3px 8px rgba(4, 196, 213, 0.2)' : 'none',
-                    minWidth: '140px'
+                    minWidth: '140px',
+                    background: isActive ? `linear-gradient(to right, ${tab.color}, ${tab.color})` : undefined,
+                    color: !isActive ? tab.color : undefined,
                   }}
                 >
                   <span className="flex items-center justify-center gap-2">

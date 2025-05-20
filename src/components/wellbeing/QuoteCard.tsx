@@ -46,7 +46,13 @@ export const QuoteCard = () => {
           throw fetchError;
         }
         
-        setQuote(data);
+        // Map data to Quote interface with explicit type casting
+        const quoteData: Quote = {
+          id: Number(data.id),
+          text: String(data.text),
+          author: String(data.author),
+        };
+        setQuote(quoteData);
       } catch (err) {
         console.error("Error fetching quote:", err);
         setError("Failed to fetch quote");

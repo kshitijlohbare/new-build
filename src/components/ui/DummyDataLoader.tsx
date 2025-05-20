@@ -1,5 +1,5 @@
 // Dummy data loader utility for development
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/useToast";
 

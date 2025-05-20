@@ -8,7 +8,7 @@ export const checkCommunityDelightsTable = async () => {
     console.log('Checking for community_delights table...');
     
     // First, check if the table exists
-    const { data: tableExists, error: checkError } = await supabase
+    const { error: checkError } = await supabase
       .from('community_delights')
       .select('id')
       .limit(1);

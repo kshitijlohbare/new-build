@@ -179,9 +179,9 @@ const FocusTimer = () => {
                 </div>
               </div>
               
-              <div className="flex justify-around h-[250px] gap-8 w-full">
+              <div className="flex flex-wrap justify-center h-auto md:h-[250px] gap-8 md:gap-16 w-full">
                 {/* Work Slider */}
-                <div className="flex flex-col items-center h-full">
+                <div className="flex flex-col items-center h-full mb-6 md:mb-0">
                   {/* Top Section */}
                   <div className="flex flex-col items-center">
                     {/* Work label at top */}
@@ -203,9 +203,7 @@ const FocusTimer = () => {
                       value={workTime}
                       onChange={e => setWorkTime(Number(e.target.value))}
                       className="vertical-rotated-slider"
-                      style={{ 
-                        '--slider-percentage': `${workPercentage}%`
-                      } as React.CSSProperties}
+                      style={{ '--slider-percentage': `${workPercentage}%` } as React.CSSProperties}
                     />
                   </div>
                 </div>
@@ -233,8 +231,7 @@ const FocusTimer = () => {
                       value={breakTime}
                       onChange={e => setBreakTime(Number(e.target.value))}
                       className="vertical-rotated-slider"
-                      style={{ 
-                        '--slider-percentage': `${breakPercentage}%`
+                      style={{ '--slider-percentage': `${breakPercentage}%`
                       } as React.CSSProperties}
                     />
                   </div>
@@ -339,9 +336,9 @@ const FocusTimer = () => {
               </div>
             </div>
             
-            <div className="flex w-full justify-between gap-4 flex-grow h-[200px]">
+            <div className="flex flex-col md:flex-row w-full justify-between gap-4 flex-grow h-auto md:h-[200px]">
               {/* Music Options List */}
-              <div className="flex flex-col gap-2 w-3/4 h-full overflow-y-auto pr-2 scrollbar-hide">
+              <div className="flex flex-col gap-2 w-full md:w-3/4 h-[150px] md:h-full overflow-y-auto pr-2 scrollbar-hide">
                 {musicOptions.map((music) => (
                   <div
                     key={music.name}
@@ -360,7 +357,7 @@ const FocusTimer = () => {
               </div>
               
               {/* Vertical Volume Slider Column */}
-              <div className="flex flex-col items-center h-full w-1/4">
+              <div className="flex flex-col items-center h-full w-full md:w-1/4">
                 {/* Volume number display */}
                 <div className="bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white border-2 border-[#04C4D5] rounded-xl px-3 py-1 font-happy-monkey text-sm w-[45px] text-center shadow-[1px_2px_6px_rgba(73,218,234,0.3)] mb-2">
                   {volume}
@@ -376,9 +373,7 @@ const FocusTimer = () => {
                     value={volume}
                     onChange={(e) => setVolume(Number(e.target.value))}
                     className="vertical-rotated-slider"
-                    style={{ 
-                      '--slider-percentage': `${volumePercentage}%`
-                    } as React.CSSProperties}
+                    style={{ '--slider-percentage': `${volumePercentage}%` } as React.CSSProperties}
                   />
                 </div>
                 

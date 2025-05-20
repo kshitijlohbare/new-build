@@ -12,5 +12,19 @@ export default defineConfig({
   },
   css: {
     postcss: './postcss.config.cjs'
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'vendor-react';
+            if (id.includes('lottie-web')) return 'vendor-lottie';
+            // Add more libraries as needed
+            return 'vendor';
+          }
+        }
+      }
+    }
   }
 })

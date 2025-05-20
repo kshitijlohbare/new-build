@@ -4,6 +4,7 @@ import WeeklyPointsChart from '@/components/wellbeing/WeeklyPointsChart';
 import { useToast } from '@/hooks/useToast';
 import AddPracticeDialog from "@/components/wellbeing/AddPracticeDialog";
 import PracticeDetailPopup from '@/components/wellbeing/PracticeDetailPopup';
+import BadgeCarousel from '@/components/wellbeing/BadgeCarousel';
 
 // Import icons
 import StreakLesserThan10 from "../assets/icons/Streak_lesser_than_10.svg";
@@ -60,14 +61,18 @@ const Practices = () => {
       // Filter by tab
       switch (activeTab) {
         case 'meditation':
-          return practice.icon === 'sparkles' || practice.name.toLowerCase().includes('meditation') || 
+          return practice.icon === 'sparkles' || practice.icon === 'meditation' || practice.icon === 'breathing' ||
+                 practice.name.toLowerCase().includes('meditation') || practice.name.toLowerCase().includes('mindfulness') ||
                  practice.name.toLowerCase().includes('breathe') || practice.name.toLowerCase().includes('breathing');
         case 'physical':
-          return practice.icon === 'shower' || practice.name.toLowerCase().includes('exercise') || 
-                 practice.name.toLowerCase().includes('shower') || practice.name.toLowerCase().includes('cold');
+          return practice.icon === 'shower' || practice.icon === 'yoga' ||
+                 practice.name.toLowerCase().includes('exercise') || practice.name.toLowerCase().includes('stretching') ||
+                 practice.name.toLowerCase().includes('shower') || practice.name.toLowerCase().includes('cold') ||
+                 practice.name.toLowerCase().includes('yoga');
         case 'journal':
-          return practice.icon === 'moleskine' || practice.name.toLowerCase().includes('journal') || 
-                 practice.name.toLowerCase().includes('write') || practice.name.toLowerCase().includes('gratitude');
+          return practice.icon === 'moleskine' || practice.icon === 'journal' ||
+                 practice.name.toLowerCase().includes('journal') || practice.name.toLowerCase().includes('write') || 
+                 practice.name.toLowerCase().includes('gratitude');
         case 'huberman':
           return practice.source?.toLowerCase().includes('huberman') || 
                  practice.source?.toLowerCase().includes('andrew');
@@ -76,7 +81,15 @@ const Practices = () => {
                  practice.source?.toLowerCase().includes('ravikant');
         case 'neuroscience':
           return practice.source?.toLowerCase().includes('neuroscience') || 
-                 (practice.tags && practice.tags.some(tag => tag.toLowerCase() === 'neuroscience')); // Ensure correct tag check
+                 practice.source?.toLowerCase().includes('stress reduction') ||
+                 (practice.tags && practice.tags.some(tag => 
+                   tag.toLowerCase() === 'neuroscience' || 
+                   tag.toLowerCase() === 'stress' || 
+                   tag.toLowerCase() === 'anxiety' || 
+                   tag.toLowerCase() === 'focus'
+                 )) || 
+                 practice.name.toLowerCase().includes('breathing') || 
+                 practice.name.toLowerCase().includes('mindfulness');
         case 'all':
         default:
           return true;
@@ -109,11 +122,6 @@ const Practices = () => {
   const calculatePoints = (duration?: number): number => {
     // Simple calculation: 1 point per minute, minimum 1 point
     return Math.max(1, duration || 1);
-  };
-
-  // Helper function to get points for a practice (uses fixed points if available)
-  const getPracticePoints = (practice: Practice): number => {
-    return practice.points ?? calculatePoints(practice.duration);
   };
   
   // Handler to add/remove from daily practices
@@ -169,6 +177,11 @@ const Practices = () => {
       <div className="mb-8">
         <h2 className="text-2xl md:text-3xl font-happy-monkey text-black lowercase mb-4 pl-2">Your Progress</h2>
         <WeeklyPointsChart />
+      </div>
+      
+      {/* Badge Carousel Section */}
+      <div className="mb-8">
+        <BadgeCarousel />
       </div>
       
       {/* Section divider */}
@@ -371,6 +384,25 @@ const Practices = () => {
                             {practice.icon === 'sparkles' && '✨'}
                             {practice.icon === 'brain' && '🧠'} 
                             {practice.icon === 'anchor' && '⚓'}
+                            {practice.icon === 'breathing' && '💨'}
+                            {practice.icon === 'meditation' && '🧘'}
+                            {practice.icon === 'journal' && '📔'}
+                            {practice.icon === 'phone' && '📱'}
+                            {practice.icon === 'yoga' && '🧘‍♀️'}
+                            {/* New wellness practice icons */}
+                            {practice.icon === 'water' && '💧'}
+                            {practice.icon === 'food' && '🥗'}
+                            {practice.icon === 'sleep' && '😴'}
+                            {practice.icon === 'sunrise' && '🌅'}
+                            {practice.icon === 'focus' && '🎯'}
+                            {practice.icon === 'book' && '📚'}
+                            {practice.icon === 'relax' && '😌'}
+                            {practice.icon === 'tree' && '🌳'}
+                            {practice.icon === 'calendar' && '📅'}
+                            {practice.icon === 'review' && '📋'}
+                            {practice.icon === 'disconnect' && '🔌'}
+                            {practice.icon === 'screen' && '📱'}
+                            {practice.icon === 'caffeine' && '☕'}
                           </span>
                         </div>
                       )}

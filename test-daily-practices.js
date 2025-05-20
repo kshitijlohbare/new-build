@@ -1,5 +1,5 @@
 // Daily practices test script
-import { supabase } from './src/lib/supabase.js';
+import { supabase } from './src/lib/supabase.mjs';
 
 async function testDailyPractices() {
   try {

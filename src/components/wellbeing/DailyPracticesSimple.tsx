@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { usePractices, Practice } from "../../context/PracticeContext"; // Import Practice type
 import PracticeDetailPopup from "./PracticeDetailPopup";
 import AddPracticeDialog from "./AddPracticeDialog";
+import DailyPracticeStatusIndicator from "./DailyPracticeStatusIndicator"; // Import the new component
 import Lottie from "lottie-react"; // Import Lottie
 import { useToast } from "@/hooks/useToast"; // Import toast hook
 
@@ -81,24 +82,30 @@ const DailyPracticesSimple = () => {
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+  
+  // Status indicator for daily practice operations
+  const [practiceStatus, setPracticeStatus] = useState<{
+    status: 'idle' | 'adding' | 'added' | 'removing' | 'removed' | 'error';
+    message?: string;
+    practiceName?: string;
+  }>({ status: 'idle' });
 
-  // Available durations for dropdown selection (in minutes) - commented out since we're using inline editing now
-  // const availableDurations = [1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120];
-
-  // Fetch Lottie animation data
+  // Use local Lottie animation data to avoid CORS issues
   useEffect(() => {
-    const fetchLottieAnimation = async () => {
+    const loadLocalAnimation = async () => {
       try {
-        const response = await fetch("https://lottie.host/embed/96222c6b-796d-4ec4-91fe-9f0bbeb643d5/5vTj9ZfQ0v.json");
-        const data = await response.json();
-        setAnimationData(data);
+        // Import the local animation directly
+        const { celebrationAnimation } = await import('../../assets/lottie-animations');
+        console.log("Successfully loaded local animation:", !!celebrationAnimation);
+        setAnimationData(celebrationAnimation);
       } catch (error) {
-        console.error("Failed to load Lottie animation:", error);
+        console.error("Failed to load local Lottie animation:", error);
+        // Try the fallback if the local animation couldn't be loaded
         setShowAnimation(false);
       }
     };
     
-    fetchLottieAnimation();
+    loadLocalAnimation();
   }, []);
 
   // Lottie animation state
@@ -197,8 +204,28 @@ const DailyPracticesSimple = () => {
   const handleRemovePractice = (practiceId: number) => {
     // Remove from daily practices (without completely deleting)
     const practiceToRemove = practices.find(p => p.id === practiceId);
+    
+    // Show status indicator
+    setPracticeStatus({
+      status: 'removing',
+      message: practiceToRemove ? 
+        `Removing "${practiceToRemove.name}" from daily practices...` : 
+        "Removing from daily practices...",
+      practiceName: practiceToRemove?.name
+    });
+    
+    // Remove from daily practices
     removePractice(practiceId, true);
     setContextMenu(null);
+    
+    // Update status indicator
+    setPracticeStatus({
+      status: 'removed',
+      message: practiceToRemove ? 
+        `"${practiceToRemove.name}" removed from daily practices` : 
+        "Practice removed from daily practices",
+      practiceName: practiceToRemove?.name
+    });
     
     // Show toast notification
     toast({ 
@@ -674,6 +701,17 @@ const DailyPracticesSimple = () => {
             </button>
           </div>
         </>
+      )}
+      
+      {/* Status Indicator */}
+      {practiceStatus.status !== 'idle' && (
+        <DailyPracticeStatusIndicator
+          status={practiceStatus.status}
+          message={practiceStatus.message}
+          onDismiss={() => setPracticeStatus({ status: 'idle' })}
+          autoDismiss={true}
+          autoDismissTime={3000}
+        />
       )}
     </div>
   );

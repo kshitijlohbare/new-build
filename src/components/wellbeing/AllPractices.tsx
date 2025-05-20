@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { usePractices, Practice } from '../../context/PracticeContext';
 import { useToast } from '@/hooks/useToast';
 import AddPracticeDialog from './AddPracticeDialog';
+import DailyPracticeStatusIndicator from './DailyPracticeStatusIndicator'; // Add the status indicator component
 
 // Import the icons from DailyPractices or create a common icons file
 const icons = {
@@ -58,6 +59,13 @@ const AllPractices = () => {
   const [userPractices, setUserPractices] = useState<Practice[]>([]);
   const { toast } = useToast();
   
+  // Status indicator for daily practice operations
+  const [practiceStatus, setPracticeStatus] = useState<{
+    status: 'idle' | 'adding' | 'added' | 'removing' | 'removed' | 'error';
+    message?: string;
+    practiceName?: string;
+  }>({ status: 'idle' });
+  
   console.log("AllPractices rendering:", { 
     isLoading,
     practicesCount: practices?.length || 0,
@@ -94,6 +102,14 @@ const AllPractices = () => {
     }
     
     console.log("Adding practice to daily practices:", practice.name);
+    
+    // Show status indicator for adding operation
+    setPracticeStatus({
+      status: 'adding',
+      message: `Adding "${practice.name}" to daily practices...`,
+      practiceName: practice.name
+    });
+    
     // Create a new practice object with isDaily explicitly set to true
     const dailyPractice = { 
       ...practice, 
@@ -106,8 +122,26 @@ const AllPractices = () => {
       isDaily: dailyPractice.isDaily
     });
     
-    // Call addPractice with the updated practice
-    addPractice(dailyPractice);
+    // Call addPractice with the updated practice and handle potential errors
+    try {
+      addPractice(dailyPractice);
+      
+      // Update status indicator to show added status
+      setPracticeStatus({
+        status: 'added',
+        message: `"${practice.name}" added to daily practices`,
+        practiceName: practice.name
+      });
+    } catch (error) {
+      console.error("Error adding practice to daily practices:", error);
+      
+      // Update status indicator to show error
+      setPracticeStatus({
+        status: 'error',
+        message: `Error adding "${practice.name}" to daily practices`,
+        practiceName: practice.name
+      });
+    }
     
     // Show success message
     toast({
@@ -279,6 +313,15 @@ const AllPractices = () => {
 
       {/* Add Practice Dialog */}
       <AddPracticeDialog isOpen={isAddDialogOpen} onClose={() => setIsAddDialogOpen(false)} />
+      
+      {/* Status Indicator for Adding/Removing Daily Practices */}
+      <DailyPracticeStatusIndicator 
+        status={practiceStatus.status}
+        message={practiceStatus.message}
+        onDismiss={() => setPracticeStatus({ status: 'idle' })}
+        autoDismiss={true}
+        autoDismissTime={3000}
+      />
     </div>
   );
 };
