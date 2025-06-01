@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practitioner Onboarding Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #4b6cb7;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="url"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 5px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      background-color: #f0f0f0;
+      padding: 5px 10px;
+      border-radius: 4px;
+    }
+    .checkbox-item input {
+      margin-right: 5px;
+    }
+    .btn {
+      background-color: #4b6cb7;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+    }
+    .btn:hover {
+      background-color: #3a5a9e;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+    .success-message {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+    .validation-info {
+      font-size: 12px;
+      color: #666;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Practitioner Onboarding</h1>
+    
+    <form id="practitionerForm">
+      <div class="form-group">
+        <label for="bio">Professional Bio*</label>
+        <textarea id="bio" rows="4" required></textarea>
+        <div class="validation-info">Between 50-500 characters</div>
+        <div id="bio-error" class="error"></div>
+      </div>
+      
+      <div class="form-group">
+        <label for="conditions">Conditions Treated*</label>
+        <select id="conditions" multiple required>
+          <option value="anxiety">Anxiety</option>
+          <option value="depression">Depression</option>
+          <option value="stress">Stress</option>
+          <option value="trauma">Trauma</option>
+          <option value="grief">Grief</option>
+          <option value="relationships">Relationship Issues</option>
+        </select>
+        <div class="validation-info">Select at least one condition</div>
+        <div id="conditions-error" class="error"></div>
+      </div>
+      
+      <div class="form-group">
+        <label>Session Formats*</label>
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            <input type="checkbox" id="format-video" name="session_format" value="video">
+            <label for="format-video">Video</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="format-phone" name="session_format" value="phone">
+            <label for="format-phone">Phone</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="format-inperson" name="session_format" value="inperson">
+            <label for="format-inperson">In Person</label>
+          </div>
+        </div>
+        <div id="session-format-error" class="error"></div>
+      </div>
+      
+      <div class="form-group">
+        <label for="price-range-min">Price Range*</label>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <span>$</span>
+          <input type="number" id="price-range-min" placeholder="Min" min="0" required>
+          <span>to</span>
+          <span>$</span>
+          <input type="number" id="price-range-max" placeholder="Max" min="0" required>
+        </div>
+        <div id="price-range-error" class="error"></div>
+      </div>
+      
+      <div class="form-group">
+        <label for="availability">Availability Schedule*</label>
+        <textarea id="availability" rows="3" required></textarea>
+        <div class="validation-info">Between 10-200 characters</div>
+        <div id="availability-error" class="error"></div>
+      </div>
+      
+      <div class="form-group">
+        <label for="calendly">Calendly Link (Optional)</label>
+        <input type="url" id="calendly" placeholder="https://calendly.com/yourname">
+        <div class="validation-info">Must be a valid Calendly URL (https://calendly.com/...)</div>
+        <div id="calendly-error" class="error"></div>
+      </div>
+      
+      <button type="submit" class="btn">Submit</button>
+    </form>
+    
+    <div id="success-message" class="success-message">
+      <h3>Profile Submitted Successfully!</h3>
+      <p>Your practitioner profile has been updated.</p>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('practitionerForm');
+      const successMessage = document.getElementById('success-message');
+      
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let isValid = true;
+        
+        // Bio validation
+        const bio = document.getElementById('bio').value;
+        if (bio.length < 50 || bio.length > 500) {
+          document.getElementById('bio-error').textContent = 'Bio must be between 50 and 500 characters';
+          isValid = false;
+        } else {
+          document.getElementById('bio-error').textContent = '';
+        }
+        
+        // Conditions validation
+        const conditions = document.getElementById('conditions');
+        const selectedConditions = Array.from(conditions.selectedOptions).map(option => option.value);
+        if (selectedConditions.length === 0) {
+          document.getElementById('conditions-error').textContent = 'Please select at least one condition';
+          isValid = false;
+        } else {
+          document.getElementById('conditions-error').textContent = '';
+        }
+        
+        // Session format validation
+        const sessionFormats = document.querySelectorAll('input[name="session_format"]:checked');
+        if (sessionFormats.length === 0) {
+          document.getElementById('session-format-error').textContent = 'Please select at least one session format';
+          isValid = false;
+        } else {
+          document.getElementById('session-format-error').textContent = '';
+        }
+        
+        // Price range validation
+        const minPrice = parseInt(document.getElementById('price-range-min').value);
+        const maxPrice = parseInt(document.getElementById('price-range-max').value);
+        if (isNaN(minPrice) || isNaN(maxPrice) || minPrice < 0 || maxPrice < 0 || minPrice > maxPrice) {
+          document.getElementById('price-range-error').textContent = 'Please enter a valid price range (min must be less than max)';
+          isValid = false;
+        } else {
+          document.getElementById('price-range-error').textContent = '';
+        }
+        
+        // Availability validation
+        const availability = document.getElementById('availability').value;
+        if (availability.length < 10 || availability.length > 200) {
+          document.getElementById('availability-error').textContent = 'Availability must be between 10 and 200 characters';
+          isValid = false;
+        } else {
+          document.getElementById('availability-error').textContent = '';
+        }
+        
+        // Calendly link validation (optional)
+        const calendlyLink = document.getElementById('calendly').value;
+        if (calendlyLink && !calendlyLink.startsWith('https://calendly.com/')) {
+          document.getElementById('calendly-error').textContent = 'Please enter a valid Calendly URL (https://calendly.com/...)';
+          isValid = false;
+        } else {
+          document.getElementById('calendly-error').textContent = '';
+        }
+        
+        // Submit if valid
+        if (isValid) {
+          // Here we would normally send data to the server
+          console.log('Form submitted with data:', {
+            bio,
+            conditions: selectedConditions,
+            session_format: Array.from(sessionFormats).map(cb => cb.value),
+            price_range: { min: minPrice, max: maxPrice },
+            availability,
+            calendly_link: calendlyLink || null
+          });
+          
+          // Show success message
+          form.style.display = 'none';
+          successMessage.style.display = 'block';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

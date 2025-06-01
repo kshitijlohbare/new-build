@@ -31,7 +31,7 @@ const Toast = React.forwardRef<
     <ToastPrimitives.Root
       ref={ref}
       className={cn(
-        "bg-white p-6 shadow-lg rounded-md border",
+        "group bg-white p-6 shadow-lg rounded-md border relative",
         {
           "border-gray-300": variant === "default",
           "border-red-500 bg-red-50": variant === "destructive",
@@ -55,7 +55,7 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "absolute right-2 top-2 rounded-md p-1 text-moody-primary/50 opacity-0 transition-opacity hover:text-moody-primary focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100",
+      "absolute right-2 top-2 rounded-md p-1 text-moody-primary/70 opacity-70 transition-all hover:text-moody-primary hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100",
       className
     )}
     toast-close=""
@@ -94,16 +94,17 @@ ToastDescription.displayName = ToastPrimitives.Description.displayName
 export function Toaster() {
   const { open, setOpen, title, description, action } = useToastState();
 
-  if (!open) { // If not open, render nothing.
-    return null;
-  }
-
   return (
-    <Toast open={open} onOpenChange={setOpen} action={action}>
-      {title && <ToastTitle>{title}</ToastTitle>}
-      {description && <ToastDescription>{description}</ToastDescription>}
-      <ToastClose />
-    </Toast>
+    <ToastProvider>
+      <ToastViewport />
+      {open && (
+        <Toast open={open} onOpenChange={setOpen} action={action}>
+          {title && <ToastTitle>{title}</ToastTitle>}
+          {description && <ToastDescription>{description}</ToastDescription>}
+          <ToastClose />
+        </Toast>
+      )}
+    </ToastProvider>
   );
 }
 

@@ -1,0 +1,130 @@
+
+    <ErrorBoundary>
+      <Card className="max-w-4xl mx-auto p-6">
+        <Dialog open={true} onOpenChange={() => {}}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Practitioner Onboarding</DialogTitle>
+              <DialogDescription>
+                Please complete the following steps to onboard as a practitioner.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              <FormErrorDisplay errors={formErrors} />
+              {step === 1 && (
+                <StepBasicInfo
+                  formData={formData}
+                  formErrors={formErrors}
+                  handleInputChange={handleInputChange}
+                  handleFileChange={handleFileChange}
+                  imagePreview={imagePreview}
+                />
+              )}
+              {step === 2 && (
+                <StepProfessionalDetails
+                  formData={formData}
+                  formErrors={formErrors}
+                  handleInputChange={handleInputChange}
+                  handleSingleSelectChange={handleSingleSelectChange}
+                  handleSelectChange={handleSelectChange}
+                  handleLanguagesChange={handleLanguagesChange}
+                  approachOptions={approachOptions}
+                  conditionOptions={conditionOptions}
+                  languageOptions={languageOptions}
+                />
+              )}
+              {step === 3 && (
+                <StepSessionDetails
+                  formData={formData}
+                  formErrors={formErrors}
+                  handleInputChange={handleInputChange}
+                  handleSelectChange={handleSelectChange}
+                  handleNumberSelectChange={handleNumberSelectChange}
+                  sessionFormatOptions={sessionFormatOptions}
+                  priceRangeOptions={priceRangeOptions}
+                  experienceOptions={experienceOptions}
+                  insuranceOptions={insuranceOptions}
+                />
+              )}
+
+  // Load saved form data and step
+  useEffect(() => {
+    if (user) {
+      const savedData = localStorage.getItem(`practitioner-form-${user.id}`);
+      if (savedData) setFormData(JSON.parse(savedData));
+      const savedStep = localStorage.getItem(`practitioner-step-${user.id}`);
+      if (savedStep) setStep(parseInt(savedStep, 10));
+    }
+  }, [user]);
+
+  const [formData, setFormData] = useState<PractitionerFormData>({
+    name: user?.user_metadata?.name || '',
+    specialty: '',
+    education: '',
+    degree: '',
+    bio: '',
+    location_type: 'online',
+    price: 1500,
+    years_experience: 1,
+    languages: ['English'],
+    approach: '',
+    certifications: '',
+    conditions: [],
+    insurance_accepted: [],
+    session_format: ['Individual Therapy'],
+    availability: 'Weekdays 9am-5pm',
+    calendly_link: '',
+  });
+
+  // Save form data and step to localStorage
+  useEffect(() => {
+    if (user) localStorage.setItem(`practitioner-form-${user.id}`, JSON.stringify(formData));
+  }, [formData, user]);
+  useEffect(() => {
+    if (user) localStorage.setItem(`practitioner-step-${user.id}`, step.toString());
+  }, [step, user]);
+
+  // ...existing code for select options, handlers, validation, etc...
+
+  // Modified handleSubmit to show confirmation dialog
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3)) {
+      toast({ title: "Validation Error", description: "Please fill all required fields correctly before submitting.", variant: "destructive" });
+      return;
+    }
+    setShowConfirmDialog(true);
+  };
+
+  // Confirmed submit logic
+  const handleConfirmedSubmit = async () => {
+    setShowConfirmDialog(false);
+    setIsSubmitting(true);
+    try {
+      if (!user) {
+        toast({ title: "Authentication error", description: "Please login before submitting your profile", variant: "destructive" });
+        setIsSubmitting(false);
+        return;
+      }
+      // Prepare data to match practitioners table schema
+      const practitionerData = {
+        user_id: user.id,
+        name: formData.name,
+        specialty: formData.specialty,
+        education: formData.education,
+        degree: formData.degree,
+        bio: formData.bio,
+        location_type: formData.location_type,
+        price: formData.price,
+        years_experience: formData.years_experience,
+        languages: formData.languages,
+        approach: formData.approach,
+        certifications: formData.certifications,
+        conditions_treated: formData.conditions,
+        insurance_accepted: formData.insurance_accepted,
+        session_formats: formData.session_format,
+        availability_schedule: formData.availability,
+        calendly_link: formData.calendly_link,
+      };
+      const { error } = await supabase.from('practitioners').insert([practitionerData]);
+      if (error) throw new Error(error.message);

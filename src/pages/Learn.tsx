@@ -504,20 +504,24 @@ export default function Learn() {
   };
 
   return (
-    <div className="py-8 mx-auto">
+    <div className="py-4 sm:py-8 mx-auto px-2 sm:px-4">
       <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
       
-      <div className="mx-auto px-8">
+      <div className="mx-auto max-w-6xl">
         {/* Header with title and search */}
-        <div className="mb-8 px-8">
-          <h1 className="text-3xl text-center font-bold text-[#148BAF] font-happy-monkey lowercase mb-2">psychology, neuroscience & wisdom</h1>
-          <p className="text-black text-center font-happy-monkey lowercase mb-6">explore key concepts to understand yourself and the world</p>
+        <div className="mb-6 sm:mb-8 px-2 sm:px-8">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl text-center font-bold text-[#148BAF] font-happy-monkey lowercase mb-2">
+            psychology, neuroscience & wisdom
+          </h1>
+          <p className="text-black text-center font-happy-monkey lowercase mb-4 sm:mb-6 text-sm sm:text-base">
+            explore key concepts to understand yourself and the world
+          </p>
           
-          {/* Search input - styled to match "share your delights" */}
+          {/* Search input - Mobile responsive */}
           <div className="flex align-center flex-col sm:flex-row justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[10px] max-w-3xl mx-auto bg-white border border-[rgba(4,196,213,0.3)] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[10px]">
             <input
               type="text"
-              className={`flex-1 bg-transparent border-none text-center ${searchQuery ? 'text-[#148BAF]' : 'text-[#43D3E0]'} placeholder-[#43D3E0] font-happy-monkey lowercase focus:outline-none w-full sm:w-auto mb-2 sm:mb-0`}
+              className={`flex-1 bg-transparent border-none text-center text-sm sm:text-base ${searchQuery ? 'text-[#148BAF]' : 'text-[#43D3E0]'} placeholder-[#43D3E0] font-happy-monkey lowercase focus:outline-none w-full sm:w-auto mb-2 sm:mb-0`}
               placeholder="search concepts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -528,11 +532,11 @@ export default function Learn() {
           </div>
         </div>
         
-        {/* Category filters - horizontal scrolling for mobile */}
-        <div className="mb-6 px-3">
-          <div className="flex gap-2 overflow-x-auto pb-2">
+        {/* Category filters - Enhanced mobile scrolling */}
+        <div className="mb-4 sm:mb-6 px-1 sm:px-3">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <button 
-              className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all font-happy-monkey lowercase ${
+              className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
                 activeCategory === null 
                   ? 'bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white shadow-sm' 
                   : 'text-[#148BAF] border border-[rgba(4,196,213,0.3)] hover:bg-[rgba(4,196,213,0.1)]'
@@ -544,7 +548,7 @@ export default function Learn() {
           
           {/* Featured categories */}
           <button 
-            className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all font-happy-monkey lowercase ${
+            className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
               activeCategory === 'Neuroscience' 
                 ? 'bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white shadow-sm' 
                 : 'text-[#F97316] border border-[rgba(249,115,22,0.3)] hover:bg-[rgba(249,115,22,0.1)]'
@@ -552,13 +556,13 @@ export default function Learn() {
             onClick={() => setActiveCategory('Neuroscience')}
           >
             <span className="flex items-center gap-1">
-              <Zap size={14} />
+              <Zap size={12} className="sm:w-3.5 sm:h-3.5" />
               neuroscience
             </span>
           </button>
           
           <button 
-            className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all font-happy-monkey lowercase ${
+            className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
               activeCategory === 'Naval Philosophy' 
                 ? 'bg-gradient-to-r from-[#10B981] to-[#059669] text-white shadow-sm' 
                 : 'text-[#059669] border border-[rgba(16,185,129,0.3)] hover:bg-[rgba(16,185,129,0.1)]'
@@ -566,7 +570,7 @@ export default function Learn() {
             onClick={() => setActiveCategory('Naval Philosophy')}
           >
             <span className="flex items-center gap-1">
-              <Anchor size={14} />
+              <Anchor size={12} className="sm:w-3.5 sm:h-3.5" />
               naval philosophy
             </span>
           </button>
@@ -577,7 +581,7 @@ export default function Learn() {
             .map((category) => (
             <button 
               key={category}
-              className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all font-happy-monkey lowercase ${
+              className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
                 activeCategory === category 
                   ? 'bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white shadow-sm' 
                   : 'text-[#148BAF] border border-[rgba(4,196,213,0.3)] hover:bg-[rgba(4,196,213,0.1)]'
@@ -658,12 +662,12 @@ export default function Learn() {
                   borderColor: borderColor
                 }}>
                   {/* Header row with columns: Icon+Name | Tag | CTA Button */}
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-start sm:items-center justify-between mb-1 gap-2">
                     {/* Column 1: Icon + Concept Name */}
-                    <div className="flex items-center gap-2 flex-grow">
+                    <div className="flex items-center gap-2 flex-grow min-w-0">
                       {/* Icon */}
                       <div className="flex-shrink-0">
-                        <span className="flex items-center justify-center h-10 w-10 rounded-full shadow-sm" style={{
+                        <span className="flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-full shadow-sm" style={{
                           background: `linear-gradient(135deg, rgba(4, 196, 213, 0.15), ${shadowColor} 120%)`,
                           boxShadow: `0 2px 8px ${shadowColor}`
                         }}>
@@ -672,14 +676,14 @@ export default function Learn() {
                       </div>
                       
                       {/* Term title */}
-                      <h3 className="text-xl font-bold text-[#148BAF] font-happy-monkey lowercase">
+                      <h3 className="text-lg sm:text-xl font-bold text-[#148BAF] font-happy-monkey lowercase truncate">
                         {term.term.toLowerCase()}
                       </h3>
                       
-                      {/* Source label for special categories */}
+                      {/* Source label for special categories - hidden on mobile */}
                       {(term.icon === "naval" || term.icon === "neuroscience") && (
                         <span 
-                          className="text-xs px-2 py-0.5 rounded-md font-happy-monkey lowercase ml-1" 
+                          className="hidden sm:inline-block text-xs px-2 py-0.5 rounded-md font-happy-monkey lowercase ml-1" 
                           style={{ backgroundColor: labelBg, color: labelColor }}
                         >
                           {labelText}
@@ -687,8 +691,8 @@ export default function Learn() {
                       )}
                     </div>
                     
-                    {/* Column 2: Category Tag */}
-                    <div className="flex-shrink-0 mx-1">
+                    {/* Column 2: Category Tag - mobile responsive */}
+                    <div className="flex-shrink-0 hidden sm:block">
                       <span className="inline-block px-2 py-0.5 text-xs font-happy-monkey lowercase rounded-full bg-[rgba(4,196,213,0.1)] text-[#148BAF] whitespace-nowrap">
                         {term.category.toLowerCase()}
                       </span>
@@ -696,20 +700,36 @@ export default function Learn() {
                     
                     {/* Column 3: CTA Button */}
                     <button
-                      className={`flex-shrink-0 px-3 py-0.5 rounded-full text-xs font-happy-monkey lowercase font-medium transition-all ${
+                      className={`flex-shrink-0 px-2 sm:px-3 py-1 sm:py-0.5 rounded-full text-xs font-happy-monkey lowercase font-medium transition-all ${
                         selected === idx 
                           ? 'bg-[#148BAF] text-white border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.20)]' 
                           : 'bg-[#f7ffff] text-[#148BAF] border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.10)]'
                       }`}
-                      style={{ minHeight: 'unset', height: '24px', minWidth: '80px', textAlign: 'center' }}
+                      style={{ minHeight: 'unset', height: 'auto', minWidth: '70px', textAlign: 'center' }}
                       onClick={() => setSelected(selected === idx ? null : idx)}
                     >
                       {selected === idx ? "collapse" : "learn more"}
                     </button>
                   </div>
                   
+                  {/* Mobile category tag - shown below title on mobile */}
+                  <div className="sm:hidden mb-2">
+                    <span className="inline-block px-2 py-0.5 text-xs font-happy-monkey lowercase rounded-full bg-[rgba(4,196,213,0.1)] text-[#148BAF]">
+                      {term.category.toLowerCase()}
+                    </span>
+                    {/* Source label for special categories on mobile */}
+                    {(term.icon === "naval" || term.icon === "neuroscience") && (
+                      <span 
+                        className="inline-block text-xs px-2 py-0.5 rounded-md font-happy-monkey lowercase ml-2" 
+                        style={{ backgroundColor: labelBg, color: labelColor }}
+                      >
+                        {labelText}
+                      </span>
+                    )}
+                  </div>
+                  
                   {/* Content section */}
-                  <div className="ml-[50px]"> {/* Indent content to align with title */}
+                  <div className="ml-0 sm:ml-[50px]"> {/* Remove left margin on mobile */}
                     {/* Summary text for collapsed state */}
                     {selected !== idx && (
                       <p className="text-[#148BAF] text-sm font-happy-monkey font-medium italic">
@@ -733,7 +753,7 @@ export default function Learn() {
                   >
                     <div 
                       ref={el => storyRefs.current[idx] = el}
-                      className={`ml-[50px] ${selected === idx ? 'animate-slide-down' : ''}`}
+                      className={`ml-0 sm:ml-[50px] ${selected === idx ? 'animate-slide-down' : ''}`}
                     >
                       <div className="rounded-lg p-3 text-sm text-black leading-relaxed border transition-all" 
                            style={{ 
@@ -743,10 +763,10 @@ export default function Learn() {
                              opacity: 0.9
                            }}>
                         <p className="mb-2 font-medium text-[#148BAF] font-happy-monkey lowercase">example:</p>
-                        <p className="font-happy-monkey leading-tight">{term.story}</p>
+                        <p className="font-happy-monkey leading-tight text-xs sm:text-sm">{term.story}</p>
                       </div>
                       
-                      <div className="mt-3 flex justify-end">
+                      <div className="mt-3 flex justify-center sm:justify-end">
                         <button 
                           onClick={goToPractices}
                           className="text-white text-xs font-happy-monkey lowercase font-medium flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#04C4D5] to-[#148BAF] rounded-full hover:shadow-md transition-all hover:translate-y-[-2px]"

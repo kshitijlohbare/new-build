@@ -1,0 +1,56 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    {
+      name: 'spa-fallback',
+      configureServer(server) {
+        return () => {
+          server.middlewares.use(async (req, res, next) => {
+            if (req.url && req.url.includes('.')) {
+              // Skip static assets
+              return next();
+            }
+            
+            try {
+              const indexHtml = await server.ssrLoadModule('/index.html');
+              const transformedHtml = await server.transformIndexHtml(req.originalUrl || req.url, indexHtml);
+              res.statusCode = 200;
+              res.setHeader('Content-Type', 'text/html');
+              res.end(transformedHtml);
+            } catch (e) {
+              console.error('SPA fallback error:', e);
+              next(e);
+            }
+          });
+        };
+      }
+    }
+  ],
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src')
+    }
+  },
+  server: {
+    port: 5173,
+    fs: {
+      strict: true,
+    }
+  },
+  preview: {
+    port: 5173,
+  },
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html')
+      }
+    }
+  }
+})

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { usePractices, Practice } from "@/context/PracticeContext";
+import { usePractices, Practice, getPracticePoints } from "@/context/PracticeContext";
 import WeeklyPointsChart from '@/components/wellbeing/WeeklyPointsChart';
 import { useToast } from '@/hooks/useToast';
 import AddPracticeDialog from "@/components/wellbeing/AddPracticeDialog";
@@ -118,12 +118,6 @@ const Practices = () => {
     return StreakLesserThan10;
   };
 
-  // Helper function to calculate points for a practice
-  const calculatePoints = (duration?: number): number => {
-    // Simple calculation: 1 point per minute, minimum 1 point
-    return Math.max(1, duration || 1);
-  };
-  
   // Handler to add/remove from daily practices
   const handleToggleDailyPractice = (practice: Practice) => {
     if (practice.isDaily) {
@@ -173,142 +167,153 @@ const Practices = () => {
   
   return (
     <div>
-      {/* Weekly Points Chart - Styled consistently with the page */}
-      <div className="mb-8">
-        <h2 className="text-2xl md:text-3xl font-happy-monkey text-black lowercase mb-4 pl-2">Your Progress</h2>
-        <WeeklyPointsChart />
-      </div>
-      
-      {/* Badge Carousel Section */}
-      <div className="mb-8">
-        <BadgeCarousel />
+      {/* Combined Progress Section */}
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-happy-monkey text-black lowercase mb-3 sm:mb-4 pl-2">Your Progress</h2>
+        <div className="flex flex-col md:flex-row gap-3 sm:gap-4">
+          {/* Badge Carousel - 25% width */}
+          <div className="w-full md:w-1/4">
+            <BadgeCarousel />
+          </div>
+          {/* Weekly Points Chart - 75% width */}
+          <div className="w-full md:w-3/4">
+            <WeeklyPointsChart />
+          </div>
+        </div>
       </div>
       
       {/* Section divider */}
-      <div className="relative my-10">
+      <div className="relative my-6 sm:my-8 md:my-10">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-[rgba(4,196,213,0.3)]"></div>
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-white px-4 text-xl font-happy-monkey text-[#148BAF] lowercase">
+          <span className="bg-white px-3 sm:px-4 text-lg sm:text-xl font-happy-monkey text-[#148BAF] lowercase">
             Your Practices
           </span>
         </div>
       </div>
       
       {/* Main Practices Section - Redesigned */}
-      <div className="bg-[rgba(83,252,255,0.10)] rounded-2xl shadow-lg overflow-hidden">
+      <div className="bg-[rgba(83,252,255,0.10)] rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
         {/* Header with filter tabs */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-[rgba(4,196,213,0.2)] px-4 md:px-6 py-4">
-          <div className="flex space-x-2 mb-4 md:mb-0 overflow-x-auto pb-2">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-[rgba(4,196,213,0.2)] px-3 sm:px-4 md:px-6 py-3 sm:py-4">
+          <div className="flex space-x-1 sm:space-x-2 mb-3 sm:mb-4 md:mb-0 overflow-x-auto pb-2 scrollbar-hide"
+               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <style dangerouslySetInnerHTML={{ __html: `
+              .scrollbar-hide::-webkit-scrollbar { display: none; }
+            ` }} />
             <button
               onClick={() => setActiveTab('all')}
-              className={`py-2 px-4 text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1.5 ${
+              className={`py-2 px-2 sm:px-3 md:px-4 text-xs sm:text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1 sm:gap-1.5 flex-shrink-0 ${
                 activeTab === 'all'
                   ? 'text-[#148BAF] border-b-2 border-[#148BAF]'
                   : 'text-gray-500 hover:text-[#148BAF]'
               }`}
             >
-              All Practices
-              <span className="bg-[rgba(4,196,213,0.15)] px-1.5 py-0.5 rounded-full text-xs">
+              <span className="hidden sm:inline">All Practices</span>
+              <span className="sm:hidden">All</span>
+              <span className="bg-[rgba(4,196,213,0.15)] px-1 sm:px-1.5 py-0.5 rounded-full text-xs">
                 {practices.length}
               </span>
             </button>
             
             <button
               onClick={() => setActiveTab('meditation')}
-              className={`py-2 px-4 text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1.5 ${
+              className={`py-2 px-2 sm:px-3 md:px-4 text-xs sm:text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1 sm:gap-1.5 flex-shrink-0 ${
                 activeTab === 'meditation'
                   ? 'text-[#148BAF] border-b-2 border-[#148BAF]'
                   : 'text-gray-500 hover:text-[#148BAF]'
               }`}
             >
               Meditation
-              <span className="bg-[rgba(4,196,213,0.15)] px-1.5 py-0.5 rounded-full text-xs">
+              <span className="bg-[rgba(4,196,213,0.15)] px-1 sm:px-1.5 py-0.5 rounded-full text-xs">
                 {meditationCount}
               </span>
             </button>
             
             <button
               onClick={() => setActiveTab('physical')}
-              className={`py-2 px-4 text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1.5 ${
+              className={`py-2 px-2 sm:px-3 md:px-4 text-xs sm:text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1 sm:gap-1.5 flex-shrink-0 ${
                 activeTab === 'physical'
                   ? 'text-[#148BAF] border-b-2 border-[#148BAF]'
                   : 'text-gray-500 hover:text-[#148BAF]'
               }`}
             >
               Physical
-              <span className="bg-[rgba(4,196,213,0.15)] px-1.5 py-0.5 rounded-full text-xs">
+              <span className="bg-[rgba(4,196,213,0.15)] px-1 sm:px-1.5 py-0.5 rounded-full text-xs">
                 {physicalCount}
               </span>
             </button>
             
             <button
               onClick={() => setActiveTab('journal')}
-              className={`py-2 px-4 text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1.5 ${
+              className={`py-2 px-2 sm:px-3 md:px-4 text-xs sm:text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1 sm:gap-1.5 flex-shrink-0 ${
                 activeTab === 'journal'
                   ? 'text-[#148BAF] border-b-2 border-[#148BAF]'
                   : 'text-gray-500 hover:text-[#148BAF]'
               }`}
             >
-              Journaling
-              <span className="bg-[rgba(4,196,213,0.15)] px-1.5 py-0.5 rounded-full text-xs">
+              <span className="hidden sm:inline">Journaling</span>
+              <span className="sm:hidden">Journal</span>
+              <span className="bg-[rgba(4,196,213,0.15)] px-1 sm:px-1.5 py-0.5 rounded-full text-xs">
                 {journalCount}
               </span>
             </button>
             
             <button
               onClick={() => setActiveTab('huberman')}
-              className={`py-2 px-4 text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1.5 ${
+              className={`py-2 px-2 sm:px-3 md:px-4 text-xs sm:text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1 sm:gap-1.5 flex-shrink-0 ${
                 activeTab === 'huberman'
                   ? 'text-[#148BAF] border-b-2 border-[#148BAF]'
                   : 'text-gray-500 hover:text-[#148BAF]'
               }`}
             >
               Huberman
-              <span className="bg-[rgba(4,196,213,0.15)] px-1.5 py-0.5 rounded-full text-xs">
+              <span className="bg-[rgba(4,196,213,0.15)] px-1 sm:px-1.5 py-0.5 rounded-full text-xs">
                 {hubermanCount}
               </span>
             </button>
             
             <button
               onClick={() => setActiveTab('naval')}
-              className={`py-2 px-4 text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1.5 ${
+              className={`py-2 px-2 sm:px-3 md:px-4 text-xs sm:text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1 sm:gap-1.5 flex-shrink-0 ${
                 activeTab === 'naval'
                   ? 'text-[#148BAF] border-b-2 border-[#148BAF]'
                   : 'text-gray-500 hover:text-[#148BAF]'
               }`}
             >
               Naval
-              <span className="bg-[rgba(4,196,213,0.15)] px-1.5 py-0.5 rounded-full text-xs">
+              <span className="bg-[rgba(4,196,213,0.15)] px-1 sm:px-1.5 py-0.5 rounded-full text-xs">
                 {navalCount}
               </span>
             </button>
 
             <button
               onClick={() => setActiveTab('neuroscience')}
-              className={`py-2 px-4 text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1.5 ${
+              className={`py-2 px-2 sm:px-3 md:px-4 text-xs sm:text-sm whitespace-nowrap font-happy-monkey lowercase transition-all flex items-center gap-1 sm:gap-1.5 flex-shrink-0 ${
                 activeTab === 'neuroscience'
                   ? 'text-[#148BAF] border-b-2 border-[#148BAF]'
                   : 'text-gray-500 hover:text-[#148BAF]'
               }`}
             >
-              Neuroscience
-              <span className="bg-[rgba(4,196,213,0.15)] px-1.5 py-0.5 rounded-full text-xs">
+              <span className="hidden sm:inline">Neuroscience</span>
+              <span className="sm:hidden">Neuro</span>
+              <span className="bg-[rgba(4,196,213,0.15)] px-1 sm:px-1.5 py-0.5 rounded-full text-xs">
                 {neuroscienceCount}
               </span>
             </button>
           </div>
           
-          <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             {/* Search input */}
-            <div className="relative">
+            <div className="relative flex-1 sm:flex-initial">
               <input
                 type="text"
                 placeholder="Search practices..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full md:w-auto pl-3 pr-10 py-2 border border-[#04C4D5] rounded-lg focus:ring-[#04C4D5] focus:border-[#04C4D5] text-sm bg-white"
+                className="w-full sm:w-auto pl-3 pr-10 py-2 border border-[#04C4D5] rounded-lg focus:ring-[#04C4D5] focus:border-[#04C4D5] text-sm bg-white"
               />
               <svg
                 className="absolute right-3 top-2.5 h-4 w-4 text-[#148BAF]"
@@ -346,10 +351,10 @@ const Practices = () => {
         </div>
         
         {/* Practices grid layout */}
-        <div className="p-4 md:p-6">
+        <div className="p-3 sm:p-4 md:p-6">
           {filteredPractices.length === 0 ? (
-            <div className="text-center py-12">
-              <h3 className="text-xl font-happy-monkey text-[#148BAF]">
+            <div className="text-center py-8 sm:py-12">
+              <h3 className="text-lg sm:text-xl font-happy-monkey text-[#148BAF]">
                 {searchQuery 
                   ? "No matching practices found" 
                   : activeTab === 'all'
@@ -357,26 +362,25 @@ const Practices = () => {
                     : `No ${activeTab} practices found`
                 }
               </h3>
-              <p className="mt-2 text-black font-happy-monkey lowercase">
+              <p className="mt-2 text-sm sm:text-base text-black font-happy-monkey lowercase">
                 {activeTab !== 'all' && "Try selecting a different category or adding new practices"}
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
               {filteredPractices.map(practice => (
                 <div 
                   key={practice.id} 
-                  className="bg-white rounded-[20px] p-4 relative hover:shadow-md transition-all duration-300 border border-[rgba(4,196,213,0.3)]"
+                  className={`bg-white rounded-2xl sm:rounded-[20px] p-4 sm:p-5 relative hover:shadow-md transition-all duration-300 border border-[rgba(4,196,213,0.3)]${practice.isDaily ? ' ring-2 ring-[#04C4D5] ring-offset-2' : ''}`}
+                  onClick={() => handlePracticeNameClick(practice.id)}
+                  style={{ cursor: 'pointer' }}
                 >
                   {/* Practice Icon and Header */}
-                  <div className="flex justify-between items-start mb-3">
-                    <div 
-                      className="flex items-start gap-3 cursor-pointer" 
-                      onClick={() => handlePracticeNameClick(practice.id)}
-                    >
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 space-y-3 sm:space-y-0">
+                    <div className="flex items-start gap-3 flex-1">
                       {practice.icon && (
-                        <div className="w-10 h-10 flex-shrink-0 bg-[rgba(83,252,255,0.15)] rounded-lg flex items-center justify-center">
-                          <span className="text-[#148BAF] text-lg">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 bg-[rgba(83,252,255,0.15)] rounded-lg flex items-center justify-center">
+                          <span className="text-[#148BAF] text-lg sm:text-xl">
                             {practice.icon === 'shower' && '🚿'}
                             {practice.icon === 'sun' && '☀️'}
                             {practice.icon === 'moleskine' && '📓'}
@@ -406,9 +410,11 @@ const Practices = () => {
                           </span>
                         </div>
                       )}
-                      <div>
-                        <h3 className="font-happy-monkey text-lg text-[#148BAF] lowercase">{practice.name}</h3>
-                        <p className="text-gray-600 text-sm truncate max-w-[200px]">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-happy-monkey text-base sm:text-lg text-[#148BAF] lowercase truncate">
+                          {practice.name}
+                        </h3>
+                        <p className="text-gray-600 text-sm line-clamp-2 mt-1">
                           {practice.description}
                         </p>
                       </div>
@@ -416,11 +422,11 @@ const Practices = () => {
                     
                     {/* Only show badges for daily practices */}
                     {practice.isDaily && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap">
                         {/* Points Badge */}
                         <div className="flex items-center space-x-1 bg-[rgba(83,252,255,0.10)] rounded-lg px-2 py-1 border border-[#04C4D5]">
-                          <span className="text-[#148BAF] font-happy-monkey text-sm">
-                            {practice.points ?? calculatePoints(practice.duration)} pts
+                          <span className="text-[#148BAF] font-happy-monkey text-xs sm:text-sm">
+                            {getPracticePoints(practice)} pts
                           </span>
                         </div>
                         
@@ -429,9 +435,9 @@ const Practices = () => {
                           <img 
                             src={getStreakIcon(practice.streak || 0)} 
                             alt="streak" 
-                            className="h-4 w-4" 
+                            className="h-3 w-3 sm:h-4 sm:w-4" 
                           />
-                          <span className="text-[#148BAF] font-happy-monkey text-sm">
+                          <span className="text-[#148BAF] font-happy-monkey text-xs sm:text-sm">
                             {practice.streak || 0}
                           </span>
                         </div>
@@ -441,11 +447,12 @@ const Practices = () => {
                   
                   {/* Benefits tags */}
                   {practice.benefits && practice.benefits.length > 0 && (
-                    <div className="mb-3 flex flex-wrap gap-2">
+                    <div className="mb-3 flex flex-wrap gap-1.5 sm:gap-2">
                       {practice.benefits.slice(0, 2).map((benefit, index) => (
                         <span 
                           key={index} 
-                          className="bg-[rgba(4,196,213,0.15)] text-[#148BAF] text-xs px-2 py-1 rounded-full"
+                          className="bg-[rgba(4,196,213,0.15)] text-[#148BAF] text-xs px-2 py-1 rounded-full truncate max-w-[120px] sm:max-w-none"
+                          title={benefit}
                         >
                           {benefit}
                         </span>
@@ -459,37 +466,40 @@ const Practices = () => {
                   {/* Source tag for Huberman and Naval */}
                   {practice.source && (
                     <div className="mb-3">
-                      <span className="bg-[rgba(4,196,213,0.25)] text-[#148BAF] text-xs px-2 py-1 rounded-md font-medium">
+                      <span className="bg-[rgba(4,196,213,0.25)] text-[#148BAF] text-xs px-2 py-1 rounded-md font-medium inline-block truncate max-w-full">
                         Source: {practice.source}
                       </span>
                     </div>
                   )}
                   
                   {/* Action buttons */}
-                  <div className="flex flex-wrap justify-between items-center mt-4 gap-2">
-                    {/* Removed duration/points display here as requested */}
-                    <div className="flex flex-wrap gap-2 ml-auto">
-                      {/* Add to Daily Practices button */}
-                      <button 
-                        onClick={() => handleToggleDailyPractice(practice)}
-                        className={`${practice.isDaily 
-                          ? 'bg-white hover:bg-gray-100 text-[#148BAF] border border-[#04C4D5]' 
-                          : 'bg-[#148BAF] hover:bg-[#0A7C9C] text-white border border-[#0A7C9C]'
-                        } px-3 py-1 rounded-md text-xs font-happy-monkey lowercase shadow-[1px_1px_2px_rgba(73,218,234,0.3)] flex items-center gap-1 transition-all`}
+                  <div className="flex justify-center sm:justify-end items-center mt-4">
+                    {/* Add to Daily Practices button */}
+                    <button 
+                      onClick={e => { e.stopPropagation(); handleToggleDailyPractice(practice); }}
+                      className={`${practice.isDaily 
+                        ? 'bg-white hover:bg-gray-100 text-[#148BAF] border border-[#04C4D5]' 
+                        : 'bg-[#148BAF] hover:bg-[#0A7C9C] text-white border border-[#0A7C9C]'
+                      } px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-happy-monkey lowercase shadow-[1px_1px_2px_rgba(73,218,234,0.3)] flex items-center gap-1 sm:gap-1.5 transition-all`}
+                    >
+                      <svg 
+                        width="12" 
+                        height="12" 
+                        viewBox="0 0 24 24" 
+                        fill={practice.isDaily ? "#148BAF" : "#ffffff"}
+                        stroke={practice.isDaily ? "#148BAF" : "#ffffff"}
+                        strokeWidth="2"
+                        className="flex-shrink-0"
                       >
-                        <svg 
-                          width="12" 
-                          height="12" 
-                          viewBox="0 0 24 24" 
-                          fill={practice.isDaily ? "#148BAF" : "#ffffff"}
-                          stroke={practice.isDaily ? "#148BAF" : "#ffffff"}
-                          strokeWidth="2"
-                        >
-                          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                        </svg>
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                      <span className="hidden sm:inline">
                         {practice.isDaily ? 'in daily practices' : 'add to daily practices'}
-                      </button>
-                    </div>
+                      </span>
+                      <span className="sm:hidden">
+                        {practice.isDaily ? 'daily' : 'add daily'}
+                      </span>
+                    </button>
                   </div>
                 </div>
               ))}

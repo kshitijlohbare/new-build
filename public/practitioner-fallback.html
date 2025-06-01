@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practitioner Details</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Happy+Monkey&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #148BAF;
+      --secondary-color: #04C4D5;
+      --light-bg: #E6F9FA;
+      --border-color: rgba(4,196,213,0.3);
+    }
+    body {
+      font-family: 'Happy Monkey', cursive, system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9fdfe;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+      border: 1px solid var(--border-color);
+    }
+    .hero {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    @media (min-width: 768px) {
+      .hero {
+        flex-direction: row;
+      }
+    }
+    .hero-image {
+      flex: 1;
+      min-width: 200px;
+      max-width: 300px;
+    }
+    .hero-image img {
+      width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .hero-content {
+      flex: 2;
+    }
+    h1 {
+      color: var(--primary-color);
+      margin-top: 0;
+      font-size: 2.2rem;
+    }
+    .badge {
+      background: var(--light-bg);
+      color: var(--primary-color);
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: inline-block;
+      margin-right: 10px;
+      border: 1px solid var(--border-color);
+    }
+    .price {
+      background: rgba(83,252,255,0.1);
+      color: var(--primary-color);
+      padding: 8px 15px;
+      border-radius: 10px;
+      display: inline-block;
+      font-size: 1.2rem;
+      border: 1px solid var(--secondary-color);
+      margin-top: 10px;
+    }
+    .rating {
+      color: var(--secondary-color);
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .stars {
+      display: inline-block;
+    }
+    .star {
+      color: var(--secondary-color);
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+      margin-top: 20px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(4,196,213,0.3);
+    }
+    .info-section {
+      margin-bottom: 20px;
+    }
+    .info-section h2 {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--light-bg);
+      padding-bottom: 10px;
+      margin-top: 30px;
+    }
+    .conditions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .condition-tag {
+      background: var(--light-bg);
+      color: var(--primary-color);
+      padding: 8px 15px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      border: 1px solid var(--border-color);
+    }
+    .certifications {
+      margin: 20px 0;
+    }
+    .certification {
+      background: white;
+      border: 1px solid var(--border-color);
+      padding: 10px 15px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      display: inline-block;
+      margin-right: 10px;
+    }
+    .back-link {
+      display: inline-block;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .debug-info {
+      background: #fffbea;
+      border: 1px solid #ffdfaa;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      color: #725200;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/therapist-listing" class="back-link">
+      ← Back to Therapist Listing
+    </a>
+
+    <div class="debug-info">
+      <h3>Static Fallback Page</h3>
+      <p>This is a static page that's shown when the dynamic React version has issues loading. It displays basic practitioner information.</p>
+      <p><button onclick="window.location.reload()" class="btn">Try Reloading</button></p>
+    </div>
+
+    <div class="card">
+      <div class="hero">
+        <div class="hero-image">
+          <img id="practitioner-image" src="https://randomuser.me/api/portraits/women/22.jpg" alt="Dr. Sarah Johnson">
+        </div>
+        <div class="hero-content">
+          <span id="practitioner-badge" class="badge">top rated</span>
+          <h1 id="practitioner-name">Dr. Sarah Johnson</h1>
+          <p id="practitioner-specialty">Clinical Psychologist specializing in anxiety disorders</p>
+          
+          <div class="rating">
+            <div class="stars">
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+            </div>
+            <span id="practitioner-rating">4.8</span>
+            <span>(<span id="practitioner-reviews">124</span> reviews)</span>
+          </div>
+          
+          <div id="practitioner-price" class="price">$1200/session</div>
+          
+          <p><strong>Education:</strong> <span id="practitioner-education">PhD in Clinical Psychology, Stanford University</span></p>
+          <p><strong>Location:</strong> <span id="practitioner-location">Online & In-person</span></p>
+          
+          <a href="#book" class="btn">Book Free Session</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card info-section">
+      <h2>About</h2>
+      <p id="practitioner-bio">Dr. Sarah Johnson is a compassionate clinical psychologist with over 10 years of experience helping clients overcome anxiety and trauma. She creates a safe and supportive environment for clients to explore their challenges and develop effective coping strategies.</p>
+      
+      <h2>Specialties</h2>
+      <div class="conditions">
+        <span class="condition-tag">anxiety</span>
+        <span class="condition-tag">depression</span>
+        <span class="condition-tag">trauma</span>
+        <span class="condition-tag">stress</span>
+      </div>
+      
+      <h2>Approach</h2>
+      <p id="practitioner-approach">Cognitive Behavioral Therapy (CBT) and Trauma-focused therapy</p>
+      
+      <h2>Professional Details</h2>
+      <p><strong>Years of Experience:</strong> <span id="practitioner-experience">10</span></p>
+      <p><strong>Languages:</strong> <span id="practitioner-languages">English, Spanish</span></p>
+      
+      <h2>Certifications</h2>
+      <div class="certifications">
+        <div class="certification">Licensed Clinical Psychologist</div>
+        <div class="certification">Trauma Specialist</div>
+      </div>
+      
+      <h2>Appointment Information</h2>
+      <p><strong>Availability:</strong> <span id="practitioner-availability">Monday - Friday, 9 AM - 6 PM</span></p>
+      <p><strong>Insurance Accepted:</strong> <span id="practitioner-insurance">Blue Cross, Aetna, Cigna</span></p>
+      <p><strong>Session Format:</strong> <span id="practitioner-session-format">Video, In-person</span></p>
+    </div>
+    
+    <div id="book" class="card info-section">
+      <h2>Book a Session</h2>
+      <p>Select a session type and time that works for you:</p>
+      
+      <div style="margin: 30px 0;">
+        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid var(--border-color); border-radius: 10px;">
+          <h3 style="margin-top: 0;">Initial Consultation</h3>
+          <p style="margin-bottom: 5px;">50 minutes • Free</p>
+          <p style="margin: 0;">First session to understand your needs and goals</p>
+        </div>
+        
+        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid var(--border-color); border-radius: 10px;">
+          <h3 style="margin-top: 0;">Therapy Session</h3>
+          <p style="margin-bottom: 5px;">50 minutes • $1200</p>
+          <p style="margin: 0;">Standard therapy session focused on your treatment plan</p>
+        </div>
+        
+        <div style="padding: 15px; border: 1px solid var(--border-color); border-radius: 10px;">
+          <h3 style="margin-top: 0;">Follow-up Session</h3>
+          <p style="margin-bottom: 5px;">30 minutes • $800</p>
+          <p style="margin: 0;">Check-in session to review progress and adjust treatment</p>
+        </div>
+      </div>
+      
+      <a href="/therapist-listing" class="btn">Back to Therapist Listing</a>
+    </div>
+  </div>
+  
+  <script>
+    // Simple script to check URL parameters and update content
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get the ID from the URL
+      const path = window.location.pathname;
+      const id = path.split('/').pop();
+      
+      // Update the document title
+      document.title = `Practitioner ${id} - Details`;
+      
+      // Set the content based on ID
+      if (id === '2') {
+        document.getElementById('practitioner-name').textContent = 'Dr. Michael Chen';
+        document.getElementById('practitioner-specialty').textContent = 'Psychiatrist focusing on depression and mood disorders';
+        document.getElementById('practitioner-badge').textContent = 'experienced';
+        document.getElementById('practitioner-image').src = 'https://randomuser.me/api/portraits/men/32.jpg';
+        document.getElementById('practitioner-rating').textContent = '4.7';
+        document.getElementById('practitioner-reviews').textContent = '98';
+        document.getElementById('practitioner-price').textContent = '$1500/session';
+        document.getElementById('practitioner-education').textContent = 'MD in Psychiatry, Johns Hopkins University';
+        document.getElementById('practitioner-location').textContent = 'Online only';
+        document.getElementById('practitioner-bio').textContent = 'Dr. Michael Chen specializes in mood disorders with a focus on medication management and therapy integration.';
+        document.getElementById('practitioner-approach').textContent = 'Psychopharmacology combined with Cognitive Behavioral Therapy';
+        document.getElementById('practitioner-experience').textContent = '15';
+        document.getElementById('practitioner-languages').textContent = 'English, Mandarin';
+        document.getElementById('practitioner-availability').textContent = 'Monday - Thursday, 10 AM - 4 PM';
+        document.getElementById('practitioner-insurance').textContent = 'United Healthcare, Humana, Medicare';
+        document.getElementById('practitioner-session-format').textContent = 'Video, Phone';
+      } else if (id === '3') {
+        document.getElementById('practitioner-name').textContent = 'Dr. Emily Rodriguez';
+        document.getElementById('practitioner-specialty').textContent = 'Licensed Therapist specializing in relationships';
+        document.getElementById('practitioner-badge').textContent = 'new';
+        document.getElementById('practitioner-image').src = 'https://randomuser.me/api/portraits/women/45.jpg';
+        document.getElementById('practitioner-rating').textContent = '4.9';
+        document.getElementById('practitioner-reviews').textContent = '76';
+        document.getElementById('practitioner-price').textContent = '$1100/session';
+        document.getElementById('practitioner-education').textContent = 'MS in Marriage and Family Therapy, UCLA';
+        document.getElementById('practitioner-location').textContent = 'In-person only';
+        document.getElementById('practitioner-bio').textContent = 'Dr. Emily Rodriguez helps couples and families build stronger relationships through evidence-based therapeutic approaches.';
+        document.getElementById('practitioner-approach').textContent = 'Emotionally Focused Therapy (EFT) and Family Systems';
+        document.getElementById('practitioner-experience').textContent = '6';
+        document.getElementById('practitioner-languages').textContent = 'English, Spanish';
+        document.getElementById('practitioner-availability').textContent = 'Tuesday - Saturday, 11 AM - 7 PM';
+        document.getElementById('practitioner-insurance').textContent = 'Kaiser Permanente, Blue Shield';
+        document.getElementById('practitioner-session-format').textContent = 'In-person, Video';
+      }
+      
+      // Log page load
+      console.log(`Loaded practitioner detail fallback page for ID: ${id}`);
+    });
+  </script>
+</body>
+</html>

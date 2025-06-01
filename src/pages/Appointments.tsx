@@ -146,11 +146,11 @@ const Appointments = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-happy-monkey text-[#148BAF]">My Appointments</h1>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+        <h1 className="text-2xl sm:text-3xl font-happy-monkey text-[#148BAF]">My Appointments</h1>
         <Button 
-          className="bg-[#148BAF] text-white font-happy-monkey"
+          className="bg-[#148BAF] text-white font-happy-monkey w-full sm:w-auto"
           onClick={handleBookNewAppointment}
         >
           Book New Appointment
@@ -164,9 +164,9 @@ const Appointments = () => {
           </Card>
         ) : appointments.length > 0 ? (
           appointments.map((appointment) => (
-            <Card key={appointment.id} className="p-6">
-              <div className="flex justify-between items-start">
-                <div>
+            <Card key={appointment.id} className="p-4 sm:p-6">
+              <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-start sm:space-y-0">
+                <div className="flex-1">
                   <h3 className="font-happy-monkey text-[#148BAF] text-lg mb-2">
                     {appointment.session_type}
                   </h3>
@@ -175,17 +175,17 @@ const Appointments = () => {
                     {new Date(appointment.date).toLocaleDateString()} at {appointment.time}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
                   <Button 
                     variant="outline" 
-                    className="font-happy-monkey text-[#148BAF] border-[#148BAF]"
+                    className="font-happy-monkey text-[#148BAF] border-[#148BAF] w-full sm:w-auto"
                     onClick={() => handleReschedule(appointment)}
                   >
                     Reschedule
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="font-happy-monkey text-red-500 border-red-500"
+                    className="font-happy-monkey text-red-500 border-red-500 w-full sm:w-auto"
                     onClick={() => initiateCancel(appointment.id, appointment.practitioner_name)}
                   >
                     Cancel

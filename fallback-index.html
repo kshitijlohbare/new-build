@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency Fallback Page</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #f5af19, #f12711);
+      color: white;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    pre {
+      background: rgba(0,0,0,0.2);
+      padding: 1rem;
+      border-radius: 4px;
+      overflow: auto;
+      max-width: 100%;
+      text-align: left;
+    }
+    .nav {
+      margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      background: white;
+      color: #f12711;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>😅 Emergency Fallback Page</h1>
+    <p>This is a static HTML page that bypasses the React application.</p>
+    <p>Since you're seeing this page, the server is running but there might be issues with the React application.</p>
+    
+    <div class="nav">
+      <a href="/static-test.html" class="btn">Static Test Page</a>
+      <a href="/react-test.html" class="btn">React Test Page</a>
+      <a href="/" class="btn">Try Main App</a>
+    </div>
+    
+    <div id="diagnostics" style="margin-top: 2rem;">
+      <h3>Browser Diagnostics</h3>
+      <pre id="diagnostic-output">Running diagnostics...</pre>
+    </div>
+  </div>
+
+  <script>
+    // Basic diagnostics
+    const diagOutput = document.getElementById('diagnostic-output');
+    
+    try {
+      const diagnostics = {
+        userAgent: navigator.userAgent,
+        viewport: {
+          width: window.innerWidth,
+          height: window.innerHeight
+        },
+        documentReady: document.readyState,
+        timestamp: new Date().toISOString()
+      };
+      
+      diagOutput.textContent = JSON.stringify(diagnostics, null, 2);
+    } catch (err) {
+      diagOutput.textContent = "Error running diagnostics: " + err.message;
+    }
+  </script>
+</body>
+</html>

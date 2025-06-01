@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Achievement {
@@ -71,6 +72,15 @@ export function BadgeAnimation({
           <div className="badge-confetti"></div>
         </div>
         
+        {/* Close button (X icon) - Always visible */}
+        <button
+          onClick={handleClose}
+          className="absolute right-3 top-3 p-1.5 rounded-full bg-white/40 hover:bg-white/60 transition-colors text-[#148BAF] active:scale-95 z-10 shadow-sm border border-white/30"
+          aria-label="Close"
+        >
+          <X size={20} />
+        </button>
+        
         <div className="p-6 bg-gradient-to-b from-[#E6F9FA] to-white">
           <div className="flex flex-col items-center">
             <div className="w-24 h-24 rounded-full bg-[rgba(83,252,255,0.20)] flex items-center justify-center mb-4 animate-pulse">
@@ -87,12 +97,20 @@ export function BadgeAnimation({
               <p className="text-base text-gray-600 mb-4">
                 {achievement.description}
               </p>
-              <button 
-                onClick={handleClose}
-                className="px-5 py-2 bg-[#148BAF] text-white rounded-full font-happy-monkey lowercase hover:bg-[#04C4D5] transition-colors"
-              >
-                awesome!
-              </button>
+              <div className="flex gap-3">
+                <button 
+                  onClick={handleClose}
+                  className="px-5 py-2 bg-[#148BAF] text-white rounded-full font-happy-monkey lowercase hover:bg-[#04C4D5] transition-colors"
+                >
+                  awesome!
+                </button>
+                <button 
+                  onClick={handleClose}
+                  className="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-[#148BAF] rounded-full font-happy-monkey lowercase transition-colors"
+                >
+                  close
+                </button>
+              </div>
             </div>
           </div>
         </div>

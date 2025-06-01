@@ -124,14 +124,46 @@ const TherapistRegistration = () => {
       </h2>
       
       {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          <p className="font-happy-monkey">Registration successful! Your profile will be reviewed by our team.</p>
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 relative">
+          <button
+            onClick={() => setSuccess(false)}
+            className="absolute right-3 top-3 p-1 rounded-full bg-green-200 hover:bg-green-300 transition-colors text-green-600 active:scale-95"
+            aria-label="Dismiss success message"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <p className="font-happy-monkey pr-8">Registration successful! Your profile will be reviewed by our team.</p>
         </div>
       )}
       
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          <p className="font-happy-monkey">{error}</p>
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 relative">
+          <button
+            onClick={() => setError(null)}
+            className="absolute right-3 top-3 p-1 rounded-full bg-red-200 hover:bg-red-300 transition-colors text-red-600 active:scale-95"
+            aria-label="Dismiss error"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div className="pr-8">
+            <p className="font-happy-monkey mb-2">{error}</p>
+            <button 
+              onClick={() => {
+                // Scroll to form to help user retry
+                const form = document.querySelector('form');
+                if (form) {
+                  form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }}
+              className="text-sm text-red-800 underline hover:text-red-900 transition-colors font-happy-monkey"
+            >
+              Try again
+            </button>
+          </div>
         </div>
       )}
       

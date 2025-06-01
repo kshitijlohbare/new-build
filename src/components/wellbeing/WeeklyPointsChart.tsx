@@ -35,7 +35,7 @@ const COLORS = ['#148BAF', '#04C4D5', '#53FCFF', '#87CEEB']; // Add more if need
 
 const WeeklyPointsChart: React.FC = () => {
   return (
-    <div className="bg-[#53FCFF1A] rounded-lg flex flex-col items-center gap-5 p-5 w-full mt-6 max-w-4xl mx-auto">
+    <div className="bg-[#53FCFF1A] rounded-lg flex flex-col items-center gap-5 p-5 w-full mt-6 max-w-4xl mx-auto" style={{ minHeight: '320px', height: '100%' }}>
       <div className="text-[#148BAF] font-happy-monkey text-base lowercase w-full text-center">
         YOUR WEEKLY POINTS
       </div>

@@ -325,19 +325,42 @@ const Booking = () => {
   if (!practitioner) {
     return (
       <div className="max-w-5xl mx-auto p-6">
-        <Card className="p-6">
-          <h2 className="text-2xl font-happy-monkey text-[#148BAF] mb-4">
+        <Card className="p-6 relative">
+          <button
+            onClick={() => navigate("/therapist-listing")}
+            className="absolute right-4 top-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-gray-600 active:scale-95"
+            aria-label="Close and go back"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <h2 className="text-2xl font-happy-monkey text-[#148BAF] mb-4 pr-12">
             Practitioner Not Found
           </h2>
           <p className="mb-6 text-gray-700">
-            We couldn't find the practitioner you're looking for. Please try again.
+            We couldn't find the practitioner you're looking for. This might be because:
           </p>
-          <Button 
-            onClick={() => navigate("/therapist-listing")}
-            className="bg-[#148BAF] text-white"
-          >
-            Back to Therapist Listing
-          </Button>
+          <ul className="mb-6 text-gray-700 list-disc pl-5 space-y-1">
+            <li>The practitioner profile has been removed</li>
+            <li>The link you followed is outdated</li>
+            <li>There was a temporary issue loading the data</li>
+          </ul>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button 
+              onClick={() => navigate("/therapist-listing")}
+              className="bg-[#148BAF] text-white"
+            >
+              Browse All Practitioners
+            </Button>
+            <Button 
+              onClick={() => window.location.reload()}
+              variant="outline"
+              className="border-[#148BAF] text-[#148BAF] hover:bg-[#148BAF] hover:text-white"
+            >
+              Try Again
+            </Button>
+          </div>
         </Card>
       </div>
     );
@@ -362,34 +385,34 @@ const Booking = () => {
   });
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6">
       <Button
         onClick={() => navigate("/therapist-listing")}
-        className="text-[#148BAF] mb-6"
+        className="text-[#148BAF] mb-4 sm:mb-6"
         variant="outline"
       >
         ← Back to Therapists
       </Button>
       
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
         {/* Practitioner Information - Left Column */}
         <div className="lg:col-span-2">
-          <Card className="p-6">
-            <div className="flex items-center mb-4">
+          <Card className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center mb-4">
               <div 
-                className="w-20 h-20 rounded-full bg-gray-200 mr-4"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gray-200 mx-auto sm:mx-0 sm:mr-4 mb-3 sm:mb-0"
                 style={{ 
                   backgroundImage: practitioner.image_url ? `url(${practitioner.image_url})` : undefined,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center'
                 }}
               />
-              <div>
-                <h2 className="text-xl font-happy-monkey text-[#148BAF]">
+              <div className="text-center sm:text-left">
+                <h2 className="text-lg sm:text-xl font-happy-monkey text-[#148BAF]">
                   {practitioner.name}
                 </h2>
                 <p className="text-sm text-gray-600">{practitioner.specialty}</p>
-                <div className="flex items-center mt-1">
+                <div className="flex items-center justify-center sm:justify-start mt-1">
                   <span className="text-amber-500">★★★★★</span>
                   <span className="text-sm text-gray-600 ml-1">
                     {practitioner.rating} ({practitioner.reviews} reviews)
@@ -435,26 +458,26 @@ const Booking = () => {
             {/* Session Type Selection */}
             <div className="mb-6">
               <h3 className="font-semibold mb-3">Select Session Type</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {sessionTypes.map((type) => (
                   <div
                     key={type.id}
-                    className={`p-4 border rounded-md cursor-pointer ${
+                    className={`p-3 sm:p-4 border rounded-md cursor-pointer transition-colors ${
                       selectedType === type.id 
                         ? "border-[#148BAF] bg-blue-50" 
-                        : "border-gray-200"
+                        : "border-gray-200 hover:border-gray-300"
                     }`}
                     onClick={() => handleTypeSelect(type.id)}
                   >
-                    <div className="flex justify-between">
-                      <h4 className="font-medium">{type.name}</h4>
-                      <span className="text-right">
+                    <div className="flex justify-between items-start">
+                      <h4 className="font-medium text-sm sm:text-base">{type.name}</h4>
+                      <span className="text-sm sm:text-base font-medium">
                         {type.price === 0 ? "Free" : 
                          type.price === null ? `$${practitioner.price}` : 
                          `$${type.price}`}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600">{type.duration}</p>
+                    <p className="text-xs sm:text-sm text-gray-600 mt-1">{type.duration}</p>
                   </div>
                 ))}
               </div>
@@ -463,7 +486,7 @@ const Booking = () => {
             {/* Date Selection */}
             <div className="mb-6">
               <h3 className="font-semibold mb-3">Select Date</h3>
-              <div className="grid grid-cols-3 md:grid-cols-7 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
                 {next7Days.map((date) => {
                   const d = new Date(date);
                   const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
@@ -472,15 +495,15 @@ const Booking = () => {
                   return (
                     <div
                       key={date}
-                      className={`p-3 border rounded-md text-center cursor-pointer ${
+                      className={`p-2 sm:p-3 border rounded-md text-center cursor-pointer transition-colors ${
                         selectedDate === date 
                           ? "border-[#148BAF] bg-blue-50" 
-                          : "border-gray-200"
+                          : "border-gray-200 hover:border-gray-300"
                       }`}
                       onClick={() => handleDateSelect(date)}
                     >
-                      <div className="text-sm font-medium">{dayName}</div>
-                      <div className="text-lg">{dayNum}</div>
+                      <div className="text-xs sm:text-sm font-medium">{dayName}</div>
+                      <div className="text-sm sm:text-lg font-medium">{dayNum}</div>
                     </div>
                   );
                 })}
@@ -491,19 +514,19 @@ const Booking = () => {
             {selectedDate && (
               <div className="mb-6">
                 <h3 className="font-semibold mb-3">Select Time</h3>
-                <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                   {/* Simplified time slots for demo purposes */}
                   {["9:00 AM", "10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"].map((time) => (
                     <div
                       key={time}
-                      className={`p-3 border rounded-md text-center cursor-pointer ${
+                      className={`p-2 sm:p-3 border rounded-md text-center cursor-pointer transition-colors ${
                         selectedTime === time
                           ? "border-[#148BAF] bg-blue-50" 
-                          : "border-gray-200"
+                          : "border-gray-200 hover:border-gray-300"
                       }`}
                       onClick={() => handleTimeSelect(time)}
                     >
-                      {time}
+                      <span className="text-sm sm:text-base">{time}</span>
                     </div>
                   ))}
                 </div>

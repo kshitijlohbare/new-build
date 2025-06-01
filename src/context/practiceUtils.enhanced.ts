@@ -58,10 +58,15 @@ function loadFromLocalStorage(userId: string) {
 // This function handles updating a user's practices and progress data
 export async function savePracticeData(userId: string, practices: Practice[], userProgress: UserProgress) {
   try {
-    // Make sure we're working with boolean values for isDaily
+    // Always enforce key practices as daily before saving
+    const keyPracticeNames = [
+      "Cold Shower Exposure",
+      "Gratitude Journal",
+      "Focus Breathing (3:3:6)"
+    ];
     const normalizedPractices = practices.map(practice => ({
       ...practice,
-      isDaily: practice.isDaily === true, // Explicitly convert to boolean
+      isDaily: keyPracticeNames.includes(practice.name) ? true : practice.isDaily === true, // Force key practices to daily
       completed: practice.completed === true // Explicitly convert to boolean
     }));
     
@@ -185,14 +190,28 @@ async function updateUserDailyPractices(userId: string, practices: Practice[]) {
     // Extra explicit normalization to ensure boolean values
     const normalizedPractices = practices.map(p => ({
       ...p,
-      isDaily: p.isDaily === true
+      isDaily: p.isDaily === true // Explicitly convert to boolean
     }));
     
     const dailyPractices = normalizedPractices.filter(p => p.isDaily === true);
     const dailyPracticeIds = dailyPractices.map(p => p.id);
     
-    console.log(`updateUserDailyPractices: Found ${dailyPracticeIds.length} daily practices to save`);
+    // Force key practices to be daily
+    const keyPracticeNames = ["Cold Shower Exposure", "Gratitude Journal", "Focus Breathing (3:3:6)"];
+    const keyPracticeIds = normalizedPractices
+      .filter(p => keyPracticeNames.includes(p.name))
+      .map(p => p.id);
+    
+    // Make sure key practices are included in dailyPracticeIds
+    keyPracticeIds.forEach(id => {
+      if (!dailyPracticeIds.includes(id)) {
+        dailyPracticeIds.push(id);
+      }
+    });
+    
+    console.log(`updateUserDailyPractices: Found ${dailyPracticeIds.length} daily practices to save (including key practices)`);
     dailyPractices.forEach(p => console.log(`Daily practice to be saved: "${p.name}" (ID: ${p.id})`));
+    keyPracticeIds.forEach(id => console.log(`Key practice ID to ensure as daily: ${id}`));
     
     try {
       // Get current daily practices to compare with what we want to save
@@ -470,6 +489,28 @@ export async function loadPracticeData(userId: string) {
     
     console.log(`Found ${userCreatedPractices.length} user-created practices and ${systemPracticeStatusData.length} system practice status entries`);
     
+    // Helper function to check if a date is today
+    const isToday = (date: Date): boolean => {
+      const today = new Date();
+      return date.getFullYear() === today.getFullYear() &&
+             date.getMonth() === today.getMonth() &&
+             date.getDate() === today.getDate();
+    };
+
+    // Get the last completion date from user progress to determine if practices should be reset
+    const userProgressData = userData?.progress as UserProgress;
+    const lastCompletionDate = userProgressData?.lastCompletionDate 
+      ? new Date(userProgressData.lastCompletionDate) 
+      : null;
+    
+    const shouldResetCompletion = !lastCompletionDate || !isToday(lastCompletionDate);
+    
+    if (shouldResetCompletion) {
+      console.log('🔄 Resetting practice completion status - practices were not completed today');
+    } else {
+      console.log('✅ Preserving practice completion status - practices were completed today');
+    }
+    
     // For user-created practices, update daily status based on dailyPracticeIds
     const formattedUserPractices = userCreatedPractices.map((p: Practice) => {
       const isDaily = dailyPracticeIds.includes(p.id);
@@ -477,25 +518,26 @@ export async function loadPracticeData(userId: string) {
       
       return {
         ...p,
-        isDaily: isDaily // Update daily status
+        isDaily: isDaily, // Update daily status
+        completed: shouldResetCompletion ? false : p.completed // Reset completion status if needed
       };
     });
-    
+
     // Apply system practice status data (completion and streaks) to the system practices
     const updatedSystemPractices = formattedSystemPractices.map(systemPractice => {
       // Find the status data for this system practice if it exists
       const statusData = systemPracticeStatusData.find((s: any) => s.id === systemPractice.id);
       
       if (statusData) {
-        // Apply the saved status
+        // Apply the saved status, but reset completion if it wasn't completed today
         const updatedPractice = {
           ...systemPractice,
-          completed: statusData.completed === true,
+          completed: shouldResetCompletion ? false : (statusData.completed === true),
           streak: statusData.streak || 0,
           // isDaily is already set from dailyPracticeIds above
         };
         
-        console.log(`Applied saved status to system practice "${updatedPractice.name}": completed=${updatedPractice.completed}, streak=${updatedPractice.streak}, isDaily=${updatedPractice.isDaily}`);
+        console.log(`Applied saved status to system practice "${updatedPractice.name}": completed=${updatedPractice.completed} (was ${statusData.completed}, reset=${shouldResetCompletion}), streak=${updatedPractice.streak}, isDaily=${updatedPractice.isDaily}`);
         return updatedPractice;
       }
       

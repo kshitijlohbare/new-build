@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Test - Comprehensive Diagnostics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9fdfe;
+        }
+        .card {
+            border: 1px solid #04C4D5;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background-color: white;
+            position: relative;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: #148BAF;
+        }
+        h1 {
+            color: #148BAF;
+        }
+        .button {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(to right, #04C4D5, #148BAF);
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 10px;
+            z-index: 10;
+            position: relative;
+        }
+        .button:hover {
+            box-shadow: 0 2px 5px rgba(4,196,213,0.4);
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            display: none;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .nav-section {
+            border: 1px solid #04C4D5;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            background: rgba(4,196,213,0.05);
+        }
+        .method-button {
+            display: inline-block;
+            background: #f0f8ff;
+            border: 1px solid #04C4D5;
+            color: #148BAF;
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .method-button:hover {
+            background: #e0f0ff;
+        }
+        .debug-panel {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            max-height: 100px;
+            overflow: auto;
+        }
+        .nav-test-all {
+            background: linear-gradient(to right, #04C4D5, #148BAF);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #E6F9FA;
+            color: #148BAF;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .alternative-links {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px dashed #04C4D5;
+        }
+        .alternative-links h3 {
+            color: #148BAF;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Advanced Navigation Test</h1>
+    <p>This diagnostic page tests various navigation methods to the practitioner detail pages.</p>
+    
+    <div class="nav-section">
+        <h3>Test Results & Browser Info</h3>
+        <div id="browser-info"></div>
+        <div id="navigation-status"></div>
+    </div>
+    
+    <div class="card" id="card1">
+        <span class="badge">top rated</span>
+        <h3>Dr. Sarah Johnson</h3>
+        <p>Clinical Psychologist specializing in anxiety disorders</p>
+        <a href="/practitioner/1" class="button">View Profile</a>
+    </div>
+    
+    <div class="card" id="card2">
+        <span class="badge">experienced</span>
+        <h3>Dr. Michael Chen</h3>
+        <p>Psychiatrist focusing on depression and mood disorders</p>
+        <a href="/practitioner/2" class="button">View Profile</a>
+    </div>
+    
+    <div class="card" id="card3">
+        <span class="badge">new</span>
+        <h3>Dr. Emily Rodriguez</h3>
+        <p>Licensed Therapist specializing in relationships</p>
+        <a href="/practitioner/3" class="button">View Profile</a>
+    </div>
+    
+    <hr>
+    
+    <h2>Navigation Testing Methods</h2>
+    <p>Choose a method below to test navigation to practitioner details:</p>
+    
+    <div class="nav-section">
+        <h3>Test Direct Navigation Methods</h3>
+        <button class="method-button" onclick="testMethod('location', 1)">window.location.href</button>
+        <button class="method-button" onclick="testMethod('location-replace', 1)">window.location.replace</button>
+        <button class="method-button" onclick="testMethod('history', 1)">history.pushState</button>
+        <button class="method-button" onclick="testMethod('form', 1)">Form Submission</button>
+        <button class="method-button" onclick="testMethod('anchor', 1)">Anchor Click</button>
+        <button class="method-button" onclick="testMethod('fetch', 1)">Fetch API</button>
+        <button class="nav-test-all" onclick="testAllMethods()">Test All Navigation Methods</button>
+    </div>
+    
+    <div id="result"></div>
+    
+    <div class="alternative-links">
+        <h3>Alternative Access Links</h3>
+        <p>If all navigation methods fail, use these direct links to access static versions:</p>
+        <ul>
+            <li><a href="/practitioner-fallback.html?id=1" target="_blank">Static Version: Dr. Sarah Johnson</a></li>
+            <li><a href="/practitioner-fallback.html?id=2" target="_blank">Static Version: Dr. Michael Chen</a></li>
+            <li><a href="/practitioner-fallback.html?id=3" target="_blank">Static Version: Dr. Emily Rodriguez</a></li>
+        </ul>
+        <p>You can also try adding <code>?direct=true</code> to your URL: <a href="/practitioner/1?direct=true">/practitioner/1?direct=true</a></p>
+    </div>
+    
+    <div class="nav-section">
+        <h3>Advanced Diagnostics</h3>
+        <button class="method-button" onclick="window.location.reload(true)">Force Hard Reload</button>
+        <button class="method-button" onclick="copyDebugInfo()">Copy Debug Info</button>
+        <button class="method-button" onclick="showHistoryState()">Show History State</button>
+        <button class="method-button" onclick="testAllPractitioners()">Test All Practitioners</button>
+        <div id="routing-mode"></div>
+    </div>
+    
+    <script>
+        // Store navigation test results
+        const navigationResults = {
+            success: false,
+            attempts: [],
+            errors: [],
+            currentTest: null
+        };
+        
+        // Detect browser and display info
+        function displayBrowserInfo() {
+            const browserInfo = document.getElementById('browser-info');
+            const userAgent = navigator.userAgent;
+            let browserName = "Unknown Browser";
+            
+            if (userAgent.match(/chrome|chromium|crios/i)) {
+                browserName = "Chrome";
+            } else if (userAgent.match(/firefox|fxios/i)) {
+                browserName = "Firefox";
+            } else if (userAgent.match(/safari/i)) {
+                browserName = "Safari";
+            } else if (userAgent.match(/opr\//i)) {
+                browserName = "Opera";
+            } else if (userAgent.match(/edg/i)) {
+                browserName = "Edge";
+            }
+            
+            browserInfo.innerHTML = `
+                <p><strong>Browser:</strong> ${browserName}</p>
+                <p><strong>Current URL:</strong> ${window.location.href}</p>
+                <p><strong>User Agent:</strong> ${navigator.userAgent}</p>
+            `;
+        }
+        
+        // Track navigation tests and results
+        function trackNavigationTest(method, id, result, error = null) {
+            navigationResults.attempts.push({
+                method,
+                id,
+                timestamp: new Date().toISOString(),
+                result
+            });
+            
+            if (error) {
+                navigationResults.errors.push({
+                    method,
+                    error: error.toString()
+                });
+            }
+            
+            updateNavigationStatus();
+        }
+        
+        // Update the navigation status display
+        function updateNavigationStatus() {
+            const statusDiv = document.getElementById('navigation-status');
+            const attempts = navigationResults.attempts;
+            
+            if (attempts.length === 0) {
+                statusDiv.innerHTML = '<p>No navigation tests run yet.</p>';
+                return;
+            }
+            
+            let html = `<h4>Navigation Test Results (${attempts.length} attempts)</h4>`;
+            
+            if (navigationResults.currentTest) {
+                html += `<p><strong>Currently testing:</strong> ${navigationResults.currentTest}</p>`;
+            }
+            
+            html += '<ul style="padding-left: 20px;">';
+            attempts.slice(-5).forEach(attempt => {
+                const icon = attempt.result === 'success' ? '✅' : '❌';
+                html += `<li>${icon} ${attempt.method} to practitioner/${attempt.id} - ${attempt.result}</li>`;
+            });
+            html += '</ul>';
+            
+            if (navigationResults.errors.length > 0) {
+                html += '<details><summary style="color: red; cursor: pointer;">View Errors</summary>';
+                html += '<div class="debug-panel">';
+                navigationResults.errors.forEach(error => {
+                    html += `<p>${error.method}: ${error.error}</p>`;
+                });
+                html += '</div></details>';
+            }
+            
+            statusDiv.innerHTML = html;
+        }
+        
+        // Show routing mode
+        function detectRoutingMode() {
+            const routingDiv = document.getElementById('routing-mode');
+            let mode = 'Unknown';
+            if (window.history && window.history.pushState) {
+                mode = 'SPA (Client-side routing likely enabled)';
+            } else {
+                mode = 'Static/Server-side navigation';
+            }
+            routingDiv.innerHTML = `<p><strong>Routing Mode:</strong> ${mode}</p>`;
+        }
+        
+        // Copy debug info
+        function copyDebugInfo() {
+            const info = {
+                url: window.location.href,
+                userAgent: navigator.userAgent,
+                historyLength: window.history.length,
+                historyState: window.history.state,
+                navigationResults,
+            };
+            navigator.clipboard.writeText(JSON.stringify(info, null, 2));
+            alert('Debug info copied to clipboard!');
+        }
+        
+        // Show history state
+        function showHistoryState() {
+            alert('Current history.state: ' + JSON.stringify(window.history.state));
+        }
+        
+        // Test a specific navigation method
+        function testMethod(method, id) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<h4>Testing navigation method: ${method}</h4>`;
+            
+            navigationResults.currentTest = method;
+            updateNavigationStatus();
+            
+            const url = `/practitioner/${id}`;
+            
+            try {
+                switch (method) {
+                    case 'location':
+                        resultDiv.innerHTML += `Using window.location.href = ${url}`;
+                        window.location.href = url;
+                        break;
+                        
+                    case 'location-replace':
+                        resultDiv.innerHTML += `Using window.location.replace(${url})`;
+                        window.location.replace(url);
+                        break;
+                        
+                    case 'history':
+                        resultDiv.innerHTML += `Using history.pushState + window.dispatchEvent`;
+                        // Use history API with event dispatch to trigger router
+                        const oldPath = window.location.pathname;
+                        history.pushState({}, '', url);
+                        window.dispatchEvent(new PopStateEvent('popstate'));
+                        
+                        setTimeout(() => {
+                            if (window.location.pathname === oldPath) {
+                                resultDiv.innerHTML += `<p style="color: red">History API failed to navigate</p>`;
+                                trackNavigationTest(method, id, 'failed');
+                            }
+                        }, 500);
+                        break;
+                        
+                    case 'form':
+                        resultDiv.innerHTML += `Using form submission to ${url}`;
+                        const form = document.createElement('form');
+                        form.action = url;
+                        form.method = 'get';
+                        document.body.appendChild(form);
+                        form.submit();
+                        break;
+                        
+                    case 'anchor':
+                        resultDiv.innerHTML += `Using programmatic anchor click to ${url}`;
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.style.display = 'none';
+                        document.body.appendChild(a);
+                        a.click();
+                        break;
+                        
+                    case 'fetch':
+                        resultDiv.innerHTML += `Using fetch API for ${url} (this will just check if path exists)`;
+                        fetch(url)
+                            .then(response => {
+                                resultDiv.innerHTML += `<p>Fetch response: ${response.status} ${response.statusText}</p>`;
+                                if (response.ok) {
+                                    resultDiv.innerHTML += `<p style="color: green">URL exists and returns content. Redirecting now...</p>`;
+                                    window.location.href = url;
+                                    trackNavigationTest(method, id, 'success');
+                                } else {
+                                    resultDiv.innerHTML += `<p style="color: red">URL returned error status</p>`;
+                                    trackNavigationTest(method, id, 'failed');
+                                }
+                            })
+                            .catch(error => {
+                                resultDiv.innerHTML += `<p style="color: red">Fetch error: ${error.message}</p>`;
+                                trackNavigationTest(method, id, 'failed', error);
+                            });
+                        return; // Don't record success yet - wait for fetch result
+                }
+                
+                // If we get here without returning, assume success
+                trackNavigationTest(method, id, 'success');
+                
+            } catch (error) {
+                resultDiv.innerHTML += `<p style="color: red">Error: ${error.message}</p>`;
+                trackNavigationTest(method, id, 'failed', error);
+            }
+        }
+        
+        // Test all navigation methods in sequence
+        function testAllMethods() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<h4>Testing all navigation methods</h4>
+                <p>This will attempt multiple methods in sequence after short delays.</p>
+                <p>If navigation is successful, you won't see all tests complete.</p>`;
+            
+            const methods = ['location', 'anchor', 'location-replace', 'form', 'history', 'fetch'];
+            const id = 1;
+            
+            // Test methods with delays between them
+            methods.forEach((method, index) => {
+                setTimeout(() => {
+                    if (document.getElementById('result')) { // Still on this page
+                        resultDiv.innerHTML += `<p>Testing method ${index + 1}/${methods.length}: ${method}...</p>`;
+                        testMethod(method, id);
+                    }
+                }, index * 2000); // 2 second between each test
+            });
+            
+            // Final fallback - redirect to static version after all methods tried
+            setTimeout(() => {
+                if (document.getElementById('result')) { // If still on this page
+                    resultDiv.innerHTML += `<p style="color: red"><strong>All methods failed!</strong> Redirecting to static fallback...</p>`;
+                    window.location.href = `/practitioner-fallback.html?id=${id}`;
+                }
+            }, methods.length * 2000 + 1000);
+        }
+        
+        // Test all practitioners
+        function testAllPractitioners() {
+            [1,2,3].forEach((id, idx) => {
+                setTimeout(() => {
+                    testAllMethodsForId(id);
+                }, idx * 8000);
+            });
+        }
+        function testAllMethodsForId(id) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML += `<hr><h4>Testing all navigation methods for Practitioner ${id}</h4>`;
+            const methods = ['location', 'anchor', 'location-replace', 'form', 'history', 'fetch'];
+            methods.forEach((method, index) => {
+                setTimeout(() => {
+                    if (document.getElementById('result')) {
+                        resultDiv.innerHTML += `<p>Testing method ${index + 1}/${methods.length}: ${method} for practitioner ${id}...</p>`;
+                        testMethod(method, id);
+                    }
+                }, index * 1200);
+            });
+            setTimeout(() => {
+                if (document.getElementById('result')) {
+                    resultDiv.innerHTML += `<p style="color: red"><strong>All methods for practitioner ${id} failed!</strong> Redirecting to static fallback...</p>`;
+                    window.open(`/practitioner-fallback.html?id=${id}`, '_blank');
+                }
+            }, methods.length * 1200 + 1000);
+        }
+        
+        // Navigate to profile with advanced fallback
+        function navigateToProfile(id) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<h4>Navigating to Practitioner ${id}</h4>
+                <p>Using progressive enhancement with fallbacks...</p>`;
+            
+            // Test method 1 first - direct navigation
+            testMethod('location', id);
+            
+            // Set up fallbacks if first method fails
+            setTimeout(() => {
+                if (document.getElementById('result')) { // Still on this page
+                    resultDiv.innerHTML += `<p>First attempt failed, trying alternative method...</p>`;
+                    testMethod('location-replace', id);
+                    
+                    // Third attempt
+                    setTimeout(() => {
+                        if (document.getElementById('result')) {
+                            resultDiv.innerHTML += `<p>Still failing, trying form submission...</p>`;
+                            testMethod('form', id);
+                            
+                            // Final fallback to static page
+                            setTimeout(() => {
+                                if (document.getElementById('result')) {
+                                    resultDiv.innerHTML += `<p style="color: red">All navigation attempts failed!</p>
+                                    <p>Redirecting to static fallback page...</p>`;
+                                    window.location.href = `/practitioner-fallback.html?id=${id}`;
+                                }
+                            }, 1000);
+                        }
+                    }, 1000);
+                }
+            }, 1000);
+        }
+        
+        // Add click handlers for entire cards
+        document.getElementById('card1').addEventListener('click', function(e) {
+            if (!e.target.classList.contains('button')) {
+                console.log('Card 1 clicked');
+                navigateToProfile(1);
+            }
+        });
+        
+        document.getElementById('card2').addEventListener('click', function(e) {
+            if (!e.target.classList.contains('button')) {
+                console.log('Card 2 clicked');
+                navigateToProfile(2);
+            }
+        });
+        
+        document.getElementById('card3').addEventListener('click', function(e) {
+            if (!e.target.classList.contains('button')) {
+                console.log('Card 3 clicked');
+                navigateToProfile(3);
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            displayBrowserInfo();
+            updateNavigationStatus();
+            detectRoutingMode();
+            
+            // Check if navigation test was requested in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('test')) {
+                const testMethod = urlParams.get('test');
+                const id = urlParams.get('id') || 1;
+                
+                if (testMethod === 'all') {
+                    testAllMethods();
+                } else if (testMethod) {
+                    testMethod(testMethod, id);
+                }
+            }
+        });
+    </script>
+    </script>
+</body>
+</html>

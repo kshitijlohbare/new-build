@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Onboarding Demo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        h1 {
+            color: #4a6bc8;
+            text-align: center;
+        }
+        .note {
+            background: #fff9db;
+            border-left: 4px solid #f5cc15;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            background: #4a6bc8;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            margin: 10px 0;
+        }
+        .button:hover {
+            background: #3a59a7;
+        }
+        .button.secondary {
+            background: #6c757d;
+        }
+        .button.secondary:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Form Functionality Demo</h1>
+        
+        <div class="note">
+            <strong>About this page:</strong> This is a standalone demonstration page that doesn't depend on React
+            or any other framework. You can use this page to view the onboarding form and test form validation.
+        </div>
+        
+        <a href="/practitioner-onboarding-demo.html" class="button">View Practitioner Onboarding Form Demo</a>
+        <a href="/static-test.html" class="button secondary">View Static Test Page</a>
+    </div>
+    
+    <div class="card">
+        <h2>Troubleshooting Resources</h2>
+        <p>Resources for testing and troubleshooting your application:</p>
+        
+        <a href="/react-test.html" class="button secondary">React Test Page</a>
+        <a href="/fallback-index.html" class="button secondary">Emergency Fallback Page</a>
+    </div>
+</body>
+</html>

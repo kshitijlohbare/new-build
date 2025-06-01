@@ -1,0 +1,75 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
+import fs from 'fs'
+
+// Get the index.html content once at startup
+let indexHtmlContent = '';
+try {
+  indexHtmlContent = fs.readFileSync(resolve(__dirname, 'index.html'), 'utf-8');
+} catch (err) {
+  console.error('Failed to read index.html at startup:', err);
+}
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    {
+      name: 'html5-routing',
+      configureServer(server) {
+        return () => {
+          server.middlewares.use((req, res, next) => {
+            const { url } = req;
+            
+            // Skip if the request is for a static file
+            if (url && /\.(js|css|ico|png|jpg|jpeg|gif|svg|json|woff|woff2|ttf|eot)$/.test(url)) {
+              return next();
+            }
+            
+            // Skip HMR requests
+            if (url && (url.includes('__vite') || url.includes('/@')) || url.endsWith('.hot-update.json')) {
+              return next();
+            }
+            
+            // For all other non-API requests, serve index.html
+            if (url && !url.startsWith('/api/')) {
+              try {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'text/html');
+                res.end(indexHtmlContent);
+                return;
+              } catch (err) {
+                console.error('Error serving SPA fallback:', err);
+                res.statusCode = 500;
+                res.end('Server error');
+                return;
+              }
+            }
+            
+            next();
+          });
+        };
+      }
+    }
+  ],
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src')
+    }
+  },
+  server: {
+    port: 5173
+  },
+  preview: {
+    port: 5173
+  },
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html')
+      }
+    }
+  }
+})

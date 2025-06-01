@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Static Test Page</title>
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .test-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+        }
+        h1 { color: #4a6fa5; }
+        .status { 
+            background: #e6f7e6;
+            border-left: 4px solid #28a745;
+            padding: 10px 15px; 
+            margin: 20px 0;
+            text-align: left;
+        }
+        button {
+            background: #4a6fa5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #385d8a;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Static HTML Test Page</h1>
+        <div class="status">
+            <p><strong>Status:</strong> If you're seeing this page, the server is working!</p>
+            <p><strong>Path:</strong> <span id="path"></span></p>
+            <p><strong>Time:</strong> <span id="time"></span></p>
+        </div>
+        <div>
+            <button onclick="testFetch()">Test Fetch API</button>
+            <button onclick="testConsole()">Test Console</button>
+        </div>
+        <div id="result" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        // Set current path and time
+        document.getElementById('path').textContent = window.location.pathname;
+        document.getElementById('time').textContent = new Date().toLocaleString();
+        
+        // Update time every second
+        setInterval(() => {
+            document.getElementById('time').textContent = new Date().toLocaleString();
+        }, 1000);
+        
+        function testFetch() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = "<p>Testing Fetch API...</p>";
+            
+            fetch('/manifest.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    resultDiv.innerHTML = `<p>Fetch successful! Data received:</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `<p style="color: red">Fetch failed: ${error.message}</p>`;
+                });
+        }
+        
+        function testConsole() {
+            const resultDiv = document.getElementById('result');
+            console.log("Console test", { working: true, time: new Date() });
+            resultDiv.innerHTML = "<p>Check browser console for test message</p>";
+            
+            // Show a list of what's available in the window
+            const windowKeys = Object.keys(window).slice(0, 20); // First 20 keys
+            console.log("Window keys:", windowKeys);
+        }
+    </script>
+</body>
+</html>

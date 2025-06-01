@@ -1,106 +1,48 @@
--- fix-rls-policies.sql - THIS FILE IS DEPRECATED
--- Please use the individual fix files instead:
--- - fix-practice-likes.sql
--- - fix-practice-comments.sql
--- - fix-shared-practices.sql
+-- fix-rls-policies.sql
+-- This script adds RLS policies for practitioners table to ensure anonymous read access
 
--- This file is kept for reference but should not be used
--- as it may cause issues with your database.
+-- Check if practitioners table exists
+DO $$
+DECLARE
+    table_exists BOOLEAN;
+BEGIN
+    SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'practitioners'
+    ) INTO table_exists;
 
--- Create new optimized policy that uses a subquery for auth.uid()
-CREATE POLICY "Users can create their own comments" 
-ON public.practice_comments 
-FOR INSERT 
-WITH CHECK ((SELECT auth.uid()) = user_id);
+    IF NOT table_exists THEN
+        RAISE NOTICE 'The practitioners table does not exist. Please create it first.';
+        RETURN;
+    END IF;
 
--- Fix for any other potential auth function calls in RLS policies for practice_comments
-DROP POLICY IF EXISTS "Users can view comments" ON public.practice_comments;
+    -- Enable RLS if not already enabled
+    EXECUTE 'ALTER TABLE public.practitioners ENABLE ROW LEVEL SECURITY';
+    RAISE NOTICE 'RLS enabled on practitioners table.';
 
-CREATE POLICY "Users can view comments"
-ON public.practice_comments
-FOR SELECT
-USING (true);
-
-DROP POLICY IF EXISTS "Users can delete their own comments" ON public.practice_comments;
-
-CREATE POLICY "Users can delete their own comments"
-ON public.practice_comments
-FOR DELETE
-USING ((SELECT auth.uid()) = user_id);
-
--- Fix for practice_likes table
-DROP POLICY IF EXISTS "Users can add their own likes" ON public.practice_likes;
-
--- Create new optimized policy that uses a subquery for auth.uid()
-CREATE POLICY "Users can add their own likes" 
-ON public.practice_likes 
-FOR INSERT 
-WITH CHECK ((SELECT auth.uid()) = user_id);
-
--- Fix for any other potential auth function calls in RLS policies for practice_likes
-DROP POLICY IF EXISTS "Users can delete their own likes" ON public.practice_likes;
-
-CREATE POLICY "Users can delete their own likes"
-ON public.practice_likes
-FOR DELETE
-USING ((SELECT auth.uid()) = user_id);
-
--- Fix for community_delights table (as it might have similar issues)
-DROP POLICY IF EXISTS "Users can insert their own delights" ON public.community_delights;
-
-CREATE POLICY "Users can insert their own delights"
-ON public.community_delights
-FOR INSERT
-WITH CHECK ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Users can update their own delights" ON public.community_delights;
-
-CREATE POLICY "Users can update their own delights"
-ON public.community_delights
-FOR UPDATE
-USING ((SELECT auth.uid()) = user_id);
-
-DROP POLICY IF EXISTS "Users can delete their own delights" ON public.community_delights;
-
-CREATE POLICY "Users can delete their own delights"
-ON public.community_delights
-FOR DELETE
-USING ((SELECT auth.uid()) = user_id);
-
--- Fix for user_profiles table
-DROP POLICY IF EXISTS "Users can update their own profile" ON public.user_profiles;
-
-CREATE POLICY "Users can update their own profile"
-ON public.user_profiles
-FOR UPDATE
-USING ((SELECT auth.uid()) = id);
-
--- Fix for user_followers table
-DROP POLICY IF EXISTS "Users can create follow relationships" ON public.user_followers;
-
-CREATE POLICY "Users can create follow relationships"
-ON public.user_followers
-FOR INSERT
-WITH CHECK ((SELECT auth.uid()) = follower_id);
-
-DROP POLICY IF EXISTS "Users can delete their own follows" ON public.user_followers;
-
-CREATE POLICY "Users can delete their own follows"
-ON public.user_followers
-FOR DELETE
-USING ((SELECT auth.uid()) = follower_id);
-
--- Fix for profile_views table
-DROP POLICY IF EXISTS "Users can see their own profile views" ON public.profile_views;
-
-CREATE POLICY "Users can see their own profile views"
-ON public.profile_views
-FOR SELECT
-USING ((SELECT auth.uid()) = profile_id);
-
-DROP POLICY IF EXISTS "Anyone can create a view" ON public.profile_views;
-
-CREATE POLICY "Anyone can create a view"
-ON public.profile_views
-FOR INSERT
-WITH CHECK (viewer_id = (SELECT auth.uid()) OR viewer_id IS NULL);
+    -- Check if any read policy already exists
+    PERFORM 1 FROM pg_policy 
+    WHERE polrelid = 'public.practitioners'::regclass 
+    AND (polname ILIKE '%read%' OR polname ILIKE '%select%' OR polname ILIKE '%all%');
+    
+    IF NOT FOUND THEN
+        -- Add read policy for anonymous access
+        EXECUTE 'CREATE POLICY "Allow anonymous read access to practitioners" 
+                ON public.practitioners 
+                FOR SELECT 
+                USING (true)';
+        RAISE NOTICE 'Read policy added for anonymous access.';
+    ELSE
+        RAISE NOTICE 'A read policy already exists.';
+    END IF;
+    
+    -- Verify the policy exists now
+    RAISE NOTICE 'Policies for practitioners table:';
+    FOR policy_name IN (
+        SELECT polname FROM pg_policy WHERE polrelid = 'public.practitioners'::regclass
+    ) LOOP
+        RAISE NOTICE '%', policy_name;
+    END LOOP;
+    
+END $$;

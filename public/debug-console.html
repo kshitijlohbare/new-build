@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Console Capture</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        .log-container {
+            border: 1px solid #333;
+            padding: 20px;
+            margin: 20px 0;
+            background: #000;
+        }
+        .error { color: #ff4444; }
+        .warn { color: #ffaa00; }
+        .info { color: #4444ff; }
+        .success { color: #44ff44; }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #333;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>TherapistListing Console Debug</h1>
+    
+    <div class="log-container">
+        <h3>Console Output:</h3>
+        <div id="console-output"></div>
+    </div>
+    
+    <button onclick="captureConsole()">Capture Console</button>
+    <button onclick="testSupabase()">Test Supabase</button>
+    
+    <iframe src="http://localhost:5174/therapist-listing" id="app-frame"></iframe>
+
+    <script>
+        const consoleOutput = document.getElementById('console-output');
+        
+        // Capture console messages
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToOutput(message, type = 'log') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${type.toUpperCase()}: ${JSON.stringify(message)}`;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            addToOutput(args.join(' '), 'info');
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            addToOutput(args.join(' '), 'error');
+            originalError.apply(console, args);
+        };
+        
+        console.warn = function(...args) {
+            addToOutput(args.join(' '), 'warn');
+            originalWarn.apply(console, args);
+        };
+        
+        function captureConsole() {
+            addToOutput('=== CONSOLE CAPTURE STARTED ===', 'success');
+            // Send message to iframe to trigger re-fetch
+            const iframe = document.getElementById('app-frame');
+            iframe.contentWindow.postMessage('debug-refresh', '*');
+        }
+        
+        async function testSupabase() {
+            addToOutput('=== TESTING SUPABASE CONNECTION ===', 'info');
+            try {
+                // Test if we can reach the iframe's console
+                const iframe = document.getElementById('app-frame');
+                iframe.contentWindow.postMessage('debug-supabase', '*');
+            } catch (error) {
+                addToOutput(`Supabase test error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Listen for messages from iframe
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'console') {
+                addToOutput(event.data.message, event.data.level || 'info');
+            }
+        });
+        
+        // Auto-capture on load
+        setTimeout(() => {
+            addToOutput('=== AUTO CAPTURE ON LOAD ===', 'success');
+        }, 2000);
+    </script>
+</body>
+</html>

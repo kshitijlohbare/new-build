@@ -8,7 +8,7 @@ interface PracticeDetailPopupProps {
 }
 
 const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, onClose }) => {
-  const { practices } = usePractices();
+  const { practices, addPractice } = usePractices();
   const practice = practices.find(p => p.id === practiceId);
   const [currentStep, setCurrentStep] = useState<number | null>(null);
   const [animateIn, setAnimateIn] = useState(false);
@@ -23,6 +23,12 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
   const handleClose = () => {
     setAnimateOut(true);
     setTimeout(onClose, 300); // Close after animation completes
+  };
+
+  // Handler for add/remove daily
+  const handleToggleDaily = () => {
+    if (!practice) return;
+    addPractice({ ...practice, isDaily: !practice.isDaily });
   };
 
   if (!practice) return null;
@@ -88,7 +94,7 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
         <div className="bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white p-4 md:p-6 relative">
           <button
             onClick={handleClose}
-            className="absolute right-3 top-3 p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors text-white active:scale-95"
+            className="absolute right-3 top-3 p-1.5 rounded-full bg-white/40 hover:bg-white/60 transition-colors text-white active:scale-95 shadow-sm border border-white/30"
             aria-label="Close"
           >
             <X size={20} />
@@ -323,14 +329,26 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
           )}
         </div>
 
-        {/* Footer with close button */}
-        <div className="border-t border-[rgba(4,196,213,0.2)] p-4 flex justify-end">
+        {/* Footer with add to daily and close button */}
+        <div className="border-t border-[rgba(4,196,213,0.2)] p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
           <button
-            onClick={handleClose}
-            className="px-6 py-2 bg-gradient-to-r from-[#04C4D5] to-[#148BAF] hover:from-[#03b1c1] hover:to-[#0f7a99] text-white rounded-lg font-happy-monkey transition-all shadow-[0_2px_8px_rgba(4,196,213,0.3)] hover:shadow-[0_4px_12px_rgba(4,196,213,0.4)] active:scale-[0.98] transform"
+            onClick={handleToggleDaily}
+            className={`px-6 py-2 rounded-lg font-happy-monkey transition-all shadow-[0_2px_8px_rgba(4,196,213,0.3)] active:scale-[0.98] transform text-base lowercase ${
+              practice.isDaily
+                ? 'bg-white text-[#148BAF] border border-[#04C4D5] hover:bg-gray-100'
+                : 'bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white hover:from-[#03b1c1] hover:to-[#0f7a99]'
+            }`}
           >
-            Close
+            {practice.isDaily ? 'remove from daily practices' : 'add to daily practices'}
           </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleClose}
+              className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-[#148BAF] rounded-lg font-happy-monkey transition-all shadow-[0_2px_8px_rgba(4,196,213,0.1)] active:scale-[0.98] transform text-base lowercase"
+            >
+              close
+            </button>
+          </div>
         </div>
       </div>
     </div>

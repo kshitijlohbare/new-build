@@ -47,6 +47,7 @@ const calculateProgressPercentage = (currentPoints: number, nextLevelPoints: num
   
   if (pointsNeededForLevel <= 0) return 100; // Avoid division by zero if already at next level threshold
 
+  // Ensure we return a valid percentage between 0 and 100
   return Math.min(100, Math.max(0, (pointsInLevel / pointsNeededForLevel) * 100));
 };
 
@@ -59,6 +60,17 @@ const DailyPracticesSimple = () => {
   // Consume context
   const { practices, userProgress, togglePracticeCompletion, updatePracticeDuration, removePractice, isLoading } = usePractices();
   const { toast } = useToast();
+  
+  // Define text shadow style for reuse
+  const textShadowStyle = {
+    textShadow: `
+      -1px -1px 0 #0A7C9C,
+       1px -1px 0 #0A7C9C,
+      -1px  1px 0 #0A7C9C,
+       1px  1px 0 #0A7C9C
+    `,
+    fontWeight: 'bold' as 'bold'
+  };
   
   console.log("DailyPracticesSimple rendering:", { 
     isLoading, 
@@ -327,7 +339,16 @@ const DailyPracticesSimple = () => {
   const leftPractices = displayedPractices.filter((_, index) => index % 2 === 0);
   const rightPractices = displayedPractices.filter((_, index) => index % 2 === 1);
 
+  // Calculate progress percentage from user progress data
   const progressPercentage = calculateProgressPercentage(userProgress.totalPoints, userProgress.nextLevelPoints);
+  
+  // Debug information about progress calculation
+  console.log("Progress bar data:", {
+    totalPoints: userProgress.totalPoints,
+    nextLevelPoints: userProgress.nextLevelPoints,
+    progressPercentage,
+    level: userProgress.level
+  });
 
 
   if (isLoading) {
@@ -356,17 +377,6 @@ const DailyPracticesSimple = () => {
       </div>
     );
   }
-
-  // Custom text shadow style for white text on icons - refined for border effect
-  const textShadowStyle = {
-    textShadow: `
-      -2px -2px 0 #49DADD,
-       2px -2px 0 #49DADD,
-      -2px  2px 0 #49DADD,
-       2px  2px 0 #49DADD,
-       0px 0px 3px #49DADD
-    ` // Creates a 1px border effect + slight glow
-  };
 
   // Define a consistent style for input boxes to match the container styling
   const inputStyle = "w-16 px-1 md:px-2 py-0.5 border border-[#04C4D5] rounded text-center bg-white text-primary text-xs md:text-sm font-happy-monkey";
@@ -424,22 +434,17 @@ const DailyPracticesSimple = () => {
            {/* Filled part of the bar - Keep existing colors */}
            <div 
              className="h-3 md:h-4 bg-gradient-to-l from-[#49DAEA] to-[rgba(195,253,255,0.2)] rounded-full absolute left-0 flex items-center justify-center"
-             style={{ width: `${progressPercentage}%` }}
+             style={{ 
+               width: `${Math.max(0, Math.min(100, progressPercentage))}%`,
+               transition: 'width 0.3s ease-in-out'
+             }}
            >
              {/* Empty by design - percentage text moved to overlay all parts */}
            </div>
            
            {/* Percentage Text - Centered on entire bar */}
            <div className="absolute w-full text-center z-10">
-             <span className="text-white text-xs md:text-sm font-happy-monkey lowercase" style={{
-               textShadow: `
-                 -1px -1px 0 #0A7C9C,
-                  1px -1px 0 #0A7C9C,
-                 -1px  1px 0 #0A7C9C,
-                  1px  1px 0 #0A7C9C
-               `, // Creates a 1px border effect around text
-               fontWeight: 'bold'
-             }}>
+             <span className="text-white text-xs md:text-sm font-happy-monkey lowercase" style={textShadowStyle}>
                {Math.round(progressPercentage)}%
              </span>
            </div>
@@ -448,7 +453,8 @@ const DailyPracticesSimple = () => {
            <div
              className="absolute top-1/2 transform -translate-y-1/2 w-6 md:w-8 h-6 md:h-8 flex items-center justify-center z-20"
              style={{ 
-               left: `calc(${progressPercentage}% - 16px)`, 
+               // Calculate position but ensure it doesn't extend beyond the edges
+               left: `max(12px, min(calc(${Math.max(0, Math.min(100, progressPercentage))}% - 12px), calc(100% - 24px)))`,
                filter: 'drop-shadow(1px 2px 2px rgba(73, 218, 234, 0.5))',
                transition: 'left 0.3s ease'
              }}

@@ -1,0 +1,155 @@
+/* BadgeCarousel styles */
+.badge-carousel {
+  min-height: 320px;
+  height: 100%;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.badge-container {
+  background-color: rgba(83, 252, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.badge-id {
+  background-color: rgba(83, 252, 255, 0.15);
+  border-radius: 9999px;
+  padding: 0.25rem 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.badge-id span {
+  font-size: 0.75rem;
+  font-family: monospace;
+  font-weight: 500;
+  color: #04C4D5;
+}
+
+.badge-icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  background-color: rgba(83, 252, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.badge-icon span {
+  font-size: 1.875rem;
+}
+
+.badge-name {
+  font-family: 'Happy Monkey', cursive;
+  color: #04C4D5;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.badge-description {
+  color: #4B5563;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.pagination-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  background-color: rgba(4, 196, 213, 0.3);
+}
+
+.pagination-dot:hover {
+  background-color: rgba(4, 196, 213, 0.6);
+}
+
+.pagination-dot.active {
+  background-color: #04C4D5;
+  width: 1rem;
+}
+
+/* Ensure carousel navigation arrows and CTAs are always visible and above content */
+.badge-carousel .carousel-arrow, .badge-carousel .carousel-cta {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: white;
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(4,196,213,0.15);
+  color: #04C4D5;
+  border: 2px solid #04C4D5;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.95;
+  transition: background 0.2s, color 0.2s;
+}
+.badge-carousel .carousel-arrow.left { left: 0.5rem; }
+.badge-carousel .carousel-arrow.right { right: 0.5rem; }
+.badge-carousel .carousel-cta {
+  bottom: 1.5rem;
+  left: 50%;
+  top: auto;
+  transform: translate(-50%, 0);
+  min-width: 120px;
+  padding: 0.5rem 1.25rem;
+  font-family: 'Happy Monkey', cursive;
+  font-size: 1rem;
+  font-weight: bold;
+  background: linear-gradient(90deg, #04C4D5 0%, #148BAF 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(4,196,213,0.15);
+  z-index: 20;
+}
+.badge-carousel .carousel-cta:hover {
+  background: linear-gradient(90deg, #03b1c1 0%, #0f7a99 100%);
+  color: #fff;
+}
+
+/* Practice Detail Popup CTA styles */
+.practice-detail-popup-cta {
+  display: inline-block;
+  margin: 1.5rem auto 0 auto;
+  padding: 0.75rem 2rem;
+  font-family: 'Happy Monkey', cursive;
+  font-size: 1.1rem;
+  font-weight: bold;
+  background: linear-gradient(90deg, #04C4D5 0%, #148BAF 100%);
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(4,196,213,0.15);
+  cursor: pointer;
+  z-index: 30;
+  position: relative;
+  text-align: center;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.practice-detail-popup-cta:hover {
+  background: linear-gradient(90deg, #03b1c1 0%, #0f7a99 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(4,196,213,0.25);
+}

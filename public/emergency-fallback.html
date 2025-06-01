@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Fallback Page</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #e63946;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #457b9d;
+            margin-top: 30px;
+        }
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        .btn {
+            background-color: #457b9d;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #1d3557;
+        }
+        .diagnostic {
+            background-color: #f1faee;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: left;
+            margin-top: 20px;
+        }
+        .diagnostic pre {
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        p {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Emergency Fallback Page</h1>
+        <p>This is a static HTML fallback page that should always load regardless of JavaScript issues.</p>
+        
+        <h2>Application Status</h2>
+        <p>The React application is experiencing loading issues. This page has been loaded instead.</p>
+        
+        <div class="diagnostic">
+            <p><strong>Time:</strong> <span id="current-time"></span></p>
+            <p><strong>URL:</strong> <span id="current-url"></span></p>
+        </div>
+        
+        <h2>Available Resources</h2>
+        <div class="actions">
+            <a href="/static-test.html" class="btn">Static Test Page</a>
+            <a href="/react-test.html" class="btn">React Test Page</a>
+            <a href="/index.html" class="btn">Reload Main App</a>
+        </div>
+    </div>
+
+    <script>
+        // Simple script that doesn't rely on any dependencies
+        document.getElementById('current-time').textContent = new Date().toLocaleString();
+        document.getElementById('current-url').textContent = window.location.href;
+    </script>
+</body>
+</html>

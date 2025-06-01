@@ -58,15 +58,9 @@ export function savePracticeDataToLocalStorage(userId: string, practices: Practi
       "Gratitude Journal", 
       "Focus Breathing (3:3:6)"
     ];
-    
     practicesCopy.forEach((p: Practice) => {
       if (keyPracticeNames.includes(p.name)) {
-        // Always force these key practices to be daily regardless of their current setting
-        const oldValue = p.isDaily;
         p.isDaily = true;
-        if (oldValue !== true) {
-          console.log(`Fixed key practice "${p.name}" to be daily (was ${oldValue})`);
-        }
       }
     });
     
@@ -113,6 +107,31 @@ export function loadPracticeDataFromLocalStorage(userId: string) {
       "Focus Breathing (3:3:6)"
     ];
     
+    // Helper function to check if a date is today
+    const isToday = (date: Date): boolean => {
+      const today = new Date();
+      return date.getFullYear() === today.getFullYear() &&
+             date.getMonth() === today.getMonth() &&
+             date.getDate() === today.getDate();
+    };
+
+    // Check if we need to reset practice completion status
+    const lastCompletionDate = parsedData.progress?.lastCompletionDate 
+      ? new Date(parsedData.progress.lastCompletionDate) 
+      : null;
+    
+    const shouldResetCompletion = !lastCompletionDate || !isToday(lastCompletionDate);
+    
+    if (shouldResetCompletion) {
+      console.log('🔄 localStorage: Resetting practice completion status - last completion was not today');
+      parsedData.practices.forEach((p: Practice) => {
+        p.completed = false;
+      });
+    } else {
+      console.log('✅ localStorage: Preserving practice completion status - practices were completed today');
+    }
+
+    // Always ensure key practices are marked as daily
     parsedData.practices.forEach((p: Practice) => {
       if (keyPracticeNames.includes(p.name)) {
         // Always set these key practices to isDaily=true, regardless of their stored value
@@ -125,11 +144,11 @@ export function loadPracticeDataFromLocalStorage(userId: string) {
     });
     
     const dailyPractices = parsedData.practices.filter((p: Practice) => p.isDaily === true);
-    console.log(`Loaded ${parsedData.practices.length} practices from localStorage, including ${dailyPractices.length} daily practices`);
+    console.log(`Loaded ${parsedData.practices.length} practices from localStorage, including ${dailyPractices.length} daily practices. Reset completed: ${shouldResetCompletion}`);
     
     // Log the daily practices
     if (dailyPractices.length > 0) {
-      dailyPractices.forEach((p: Practice) => console.log(`- "${p.name}" (ID: ${p.id})`));
+      dailyPractices.forEach((p: Practice) => console.log(`- "${p.name}" (ID: ${p.id}, completed: ${p.completed})`));
     }
     
     return {

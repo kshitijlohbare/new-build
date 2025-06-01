@@ -1,32 +1,44 @@
 import { supabase } from '../lib/supabase';
 
-// Function to create the practitioners table
-async function createPractitionersTable() {
-  console.log('Creating practitioners table...');
-  
-  // First check if the table already exists
+// Type for practitioner data
+interface Practitioner {
+  name: string;
+  specialty: string;
+  reviews: number;
+  rating: number;
+  price: number;
+  image_url?: string;
+  badge?: 'top rated' | 'new' | 'experienced' | null;
+  education: string;
+  degree: string;
+  location_type: 'online' | 'in-person' | 'both';
+  conditions: string[];
+  calendly_link?: string;
+}
+
+// Function to drop practitioners table if exists
+async function dropPractitionersTableIfExists() {
   const { data: existingTables } = await supabase
     .from('pg_tables')
     .select('tablename')
     .eq('schemaname', 'public');
-  
   const tableExists = existingTables?.some(table => table.tablename === 'practitioners');
-  
   if (tableExists) {
-    console.log('Table already exists. Dropping and recreating...');
-    
-    // Drop the existing table
+    console.log('Table already exists. Dropping...');
     const { error: dropError } = await supabase.rpc('pg_exec', {
       query: 'DROP TABLE practitioners'
     });
-    
     if (dropError) {
       console.error('Error dropping table:', dropError);
       return false;
     }
+    console.log('Table dropped.');
   }
-  
-  // Create the table
+  return true;
+}
+
+// Function to create practitioners table
+async function createPractitionersTable() {
   const { error: createError } = await supabase.rpc('pg_exec', {
     query: `
       CREATE TABLE practitioners (
@@ -42,22 +54,21 @@ async function createPractitionersTable() {
         degree TEXT,
         location_type TEXT CHECK (location_type IN ('online', 'in-person', 'both')),
         conditions TEXT[] DEFAULT '{}',
+        calendly_link TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
     `
   });
-  
   if (createError) {
     console.error('Error creating table:', createError);
     return false;
   }
-  
   console.log('Practitioners table created successfully!');
   return true;
 }
 
 // Sample data for practitioners
-const samplePractitioners = [
+const samplePractitioners: Practitioner[] = [
   {
     name: 'Dr. Sarah Johnson',
     specialty: 'Clinical Psychologist specializing in anxiety disorders',
@@ -69,7 +80,8 @@ const samplePractitioners = [
     education: 'PhD in Clinical Psychology, Stanford University',
     degree: 'PhD',
     location_type: 'both',
-    conditions: ['anxiety', 'depression', 'trauma', 'stress']
+    conditions: ['anxiety', 'depression', 'trauma', 'stress'],
+    calendly_link: 'https://calendly.com/dr-sarah-johnson/therapy-session'
   },
   {
     name: 'Dr. Michael Chen',
@@ -82,7 +94,8 @@ const samplePractitioners = [
     education: 'MD in Psychiatry, Johns Hopkins University',
     degree: 'MD',
     location_type: 'online',
-    conditions: ['depression', 'bipolar', 'anxiety', 'insomnia']
+    conditions: ['depression', 'bipolar', 'anxiety', 'insomnia'],
+    calendly_link: 'https://calendly.com/dr-michael-chen/psychiatric-consultation'
   },
   {
     name: 'Emily Rodriguez, LCSW',
@@ -191,44 +204,37 @@ const samplePractitioners = [
 ];
 
 // Function to insert sample data
-async function insertSampleData() {
-  console.log('Inserting sample data...');
-  
+async function insertSampleData(practitioners: Practitioner[]) {
+  if (!practitioners.length) {
+    console.warn('No practitioners to insert.');
+    return true;
+  }
+  // Cast each practitioner to unknown first, then to Record<string, unknown>[] for supabase insert
   const { error } = await supabase
     .from('practitioners')
-    .insert(samplePractitioners);
-  
+    .insert(practitioners as unknown as Record<string, unknown>[]);
   if (error) {
     console.error('Error inserting data:', error);
     return false;
   }
-  
   console.log('Sample data inserted successfully!');
   return true;
 }
 
 // Main function to run the setup
-async function setupTherapistData() {
+export async function setupTherapistData() {
   try {
-    // Create the table
-    const tableCreated = await createPractitionersTable();
-    if (!tableCreated) {
-      console.error('Failed to create practitioners table');
-      return;
-    }
-    
-    // Insert sample data
-    const dataInserted = await insertSampleData();
-    if (!dataInserted) {
-      console.error('Failed to insert sample data');
-      return;
-    }
-    
+    const dropped = await dropPractitionersTableIfExists();
+    if (!dropped) return;
+    const created = await createPractitionersTable();
+    if (!created) return;
+    const inserted = await insertSampleData(samplePractitioners);
+    if (!inserted) return;
     console.log('Therapist data setup completed successfully!');
   } catch (error) {
     console.error('An error occurred during setup:', error);
   }
 }
 
-// Run the setup
+// Run the setup if this script is executed directly
 setupTherapistData();

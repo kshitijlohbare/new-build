@@ -13,6 +13,12 @@ export default defineConfig({
   css: {
     postcss: './postcss.config.cjs'
   },
+  server: {
+    host: 'localhost',
+    port: 5173,
+    open: true,
+    cors: true,
+  },
   build: {
     rollupOptions: {
       output: {

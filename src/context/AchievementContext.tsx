@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 // Types
 interface Achievement {
   id: string;
+  badgeId?: string; // A user-friendly badge ID that will be displayed to users
   name: string;
   description: string;
   icon: string;
@@ -142,7 +143,19 @@ export const AchievementProvider: React.FC<AchievementProviderProps> = ({ childr
   // Function to get all user achievements for display in UI components
   const getAllUserAchievements = (): Achievement[] => {
     if (!userProgress?.achievements) return [];
-    return userProgress.achievements;
+    // Ensure badges are unique by filtering out duplicates
+    const uniqueAchievements = new Map<string, Achievement>();
+    userProgress.achievements.forEach((achievement) => {
+      if (!uniqueAchievements.has(achievement.id)) {
+        // Create a badge ID if it doesn't exist
+        const enhancedAchievement = {
+          ...achievement,
+          badgeId: `BADGE-${achievement.id.substring(0, 6).toUpperCase()}`
+        };
+        uniqueAchievements.set(achievement.id, enhancedAchievement);
+      }
+    });
+    return Array.from(uniqueAchievements.values());
   };
 
   return (

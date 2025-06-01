@@ -179,4 +179,4 @@ export const ResetPassword = () => {
 };
 
 // Need to import supabase client for the useEffect listener
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase-simple';

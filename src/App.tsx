@@ -5,7 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { PracticeProvider } from "./context/PracticeContext"; // Import the new provider
 import { AchievementProvider } from "./context/AchievementContext"; // Import the achievement provider
 import { ProfileProvider } from "./context/ProfileContext"; // Import the profile provider
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { checkCommunityDelightsTable } from "./scripts/checkCommunityDelights";
 import { checkUserProfileTables } from "./scripts/profileUtils";
 import { ToastProvider, ToastViewport, Toaster } from "./components/ui/toast";
@@ -26,16 +26,29 @@ import Appointments from "./pages/Appointments";
 import TherapistListing from "./pages/TherapistListing";
 import TherapyBooking from "./pages/TherapyBooking";
 import Booking from "./pages/Booking"; // Import the Booking page
+import PractitionerDetail from "./pages/PractitionerDetail"; // Import the new PractitionerDetail page
 import TherapistRegistration from "./pages/TherapistRegistration";
 import FocusTimer from "./pages/FocusTimer";
 import PractitionerOnboarding from "./pages/PractitionerOnboarding"; // Import PractitionerOnboarding
+import PractitionerEditProfile from "./pages/PractitionerEditProfile"; // Import PractitionerEditProfile
 import Community from "./pages/Community"; // Import Community
 import Learn from "./pages/Learn"; // Import Learn
+import TestPage from "./pages/TestPage"; // Import TestPage for debugging
+import SplashScreen from './components/ui/SplashScreen';
 import './App.css';
 
 const queryClient = new QueryClient();
 
 const App = () => {
+  // Splash screen state
+  const [showSplash, setShowSplash] = useState(true);
+
+  // Always call all hooks at the top level, before any conditional return
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Initialize necessary tables when app loads
   useEffect(() => {
     const initTables = async () => {
@@ -45,7 +58,6 @@ const App = () => {
         if (communityResult) {
           console.log("Community delights table verification complete");
         }
-        
         // Check user profile tables
         const profileResult = await checkUserProfileTables();
         if (profileResult) {
@@ -55,10 +67,13 @@ const App = () => {
         console.error("Error initializing database tables:", error);
       }
     };
-    
     initTables();
   }, []);
-  
+
+  if (showSplash) {
+    return <SplashScreen />;
+  }
+
   return (
     <AuthProvider>
       <ThemeProvider>
@@ -92,14 +107,17 @@ const App = () => {
                     <Route path="settings" element={<Settings />} />
                     <Route path="appointments" element={<Appointments />} />
                     <Route path="therapist-listing" element={<TherapistListing />} />
+                    <Route path="practitioner/:id" element={<PractitionerDetail />} /> {/* New detailed practitioner page */}
                     <Route path="therapy-booking" element={<TherapyBooking />} />
                     <Route path="therapy-booking/:id" element={<TherapyBooking />} />
                     <Route path="booking" element={<Booking />} /> {/* Add the new booking route */}
                     <Route path="therapist-registration" element={<TherapistRegistration />} />
                     <Route path="focus-timer" element={<FocusTimer />} />
                     <Route path="practitioner-onboarding" element={<PractitionerOnboarding />} />
+                    <Route path="practitioner-edit-profile" element={<PractitionerEditProfile />} />
                     <Route path="community" element={<Community />} /> {/* Add the new community route */}
                     <Route path="learn" element={<Learn />} /> {/* Add the learn page route */}
+                    <Route path="test" element={<TestPage />} /> {/* Add the test page route for debugging */}
                   </Route>
 
                   {/* Catch-all redirect */}
