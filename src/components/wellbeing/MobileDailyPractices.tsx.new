@@ -1,0 +1,186 @@
+import { usePractices } from "../../context/PracticeContext";
+
+const MobileDailyPractices = () => {
+  // Consume context
+  const { practices, togglePracticeCompletion, isLoading } = usePractices();
+  
+  // Filter practices for display (show only daily practices)
+  const displayedPractices = practices.filter(practice => practice.isDaily === true);
+  
+  if (isLoading) {
+    return <div className="p-3 text-center">Loading practices...</div>;
+  }
+  
+  // Check for empty daily practices and show a message
+  if (displayedPractices.length === 0) {
+    return (
+      <div 
+        className="practices-container"
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px 10px 10px',
+          gap: '20px',
+          width: '360px',
+          height: '155px',
+          flex: 'none',
+          order: 0,
+          alignSelf: 'stretch',
+          flexGrow: 0,
+          margin: '0 auto'
+        }}>
+        <div className="practice-card p-3 relative rounded-[15px] border border-[rgba(4,196,213,0.3)] shadow-[0px_3px_6px_rgba(73,218,234,0.3)] hover:shadow-[0px_4px_8px_rgba(73,218,234,0.4)]" style={{
+          height: '155px',
+          width: '320px',
+          flex: 'none'
+        }}>
+          <div className="rounded-lg absolute left-1/2 transform -translate-x-1/2 top-[-12px] bg-white border border-[#04C4D5]" style={{
+            borderRadius: '10px',
+            boxShadow: '0px 2px 4px rgba(73,218,234,0.2)',
+            padding: '4px 12px'
+          }}>
+            <span className="text-[#148BAF] inline-flex font-happy-monkey text-xs lowercase text-center font-medium">daily practices</span>
+          </div>
+          <div className="flex flex-col items-center justify-center h-full">
+            <p className="text-center text-[#148BAF] font-happy-monkey lowercase mb-4">you don't have any daily practices yet</p>
+            <a 
+              href="/Practices"
+              className="inline-block bg-white hover:bg-[#F7FFFF] rounded-lg px-4 py-1.5 text-[#148BAF] font-happy-monkey text-xs lowercase border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] transition-all"
+            >
+              add daily practice
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div 
+      className="practices-container"
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px 10px 10px',
+        gap: '20px',
+        width: '360px',
+        height: '155px',
+        flex: 'none',
+        order: 0,
+        alignSelf: 'stretch',
+        flexGrow: 0,
+        margin: '0 auto'
+      }}>
+      
+      <div className="practice-card p-3 relative rounded-[15px] border border-[rgba(4,196,213,0.3)] shadow-[0px_3px_6px_rgba(73,218,234,0.3)] hover:shadow-[0px_4px_8px_rgba(73,218,234,0.4)]" style={{
+        height: '155px',
+        width: '160px',
+        flex: 'none'
+      }}>
+        <div className="rounded-lg absolute left-1/2 transform -translate-x-1/2 top-[-12px] bg-white border border-[#04C4D5]" style={{
+          borderRadius: '10px',
+          boxShadow: '0px 2px 4px rgba(73,218,234,0.2)',
+          padding: '4px 12px'
+        }}>
+          <span className="text-[#148BAF] inline-flex font-happy-monkey text-xs lowercase text-center font-medium">daily practices</span>
+        </div>
+        <div className="flex flex-col h-full justify-between">
+          {/* First practice */}
+          {displayedPractices[0] && (
+            <div className="flex items-center justify-between mb-2 mt-4">
+              <div className="text-xs text-[#148BAF] font-happy-monkey lowercase truncate max-w-[80px]">{displayedPractices[0].name}</div>
+              <button
+                onClick={() => togglePracticeCompletion(displayedPractices[0].id)}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-happy-monkey lowercase ${
+                  displayedPractices[0].completed
+                    ? 'bg-[#088BAF] text-white'
+                    : 'bg-white text-[#04C4D5] border border-[#04C4D5]'
+                }`}
+              >
+                {displayedPractices[0].completed ? 'done' : 'mark'}
+              </button>
+            </div>
+          )}
+          
+          {/* Second practice */}
+          {displayedPractices[1] && (
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-xs text-[#148BAF] font-happy-monkey lowercase truncate max-w-[80px]">{displayedPractices[1].name}</div>
+              <button
+                onClick={() => togglePracticeCompletion(displayedPractices[1].id)}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-happy-monkey lowercase ${
+                  displayedPractices[1].completed
+                    ? 'bg-[#088BAF] text-white'
+                    : 'bg-white text-[#04C4D5] border border-[#04C4D5]'
+                }`}
+              >
+                {displayedPractices[1].completed ? 'done' : 'mark'}
+              </button>
+            </div>
+          )}
+          
+          <div className="mt-auto">
+            <a 
+              href="/Practices"
+              className="block text-center text-[#148BAF] font-happy-monkey text-xs lowercase py-1 hover:underline"
+            >
+              view all practices
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div className="progress-card p-3 relative rounded-[15px] border border-[rgba(4,196,213,0.3)] shadow-[0px_3px_6px_rgba(73,218,234,0.3)] hover:shadow-[0px_4px_8px_rgba(73,218,234,0.4)]" style={{
+        height: '155px',
+        width: '160px',
+        flex: 'none'
+      }}>
+        <div className="rounded-lg absolute left-1/2 transform -translate-x-1/2 top-[-12px] bg-white border border-[#04C4D5]" style={{
+          borderRadius: '10px',
+          boxShadow: '0px 2px 4px rgba(73,218,234,0.2)',
+          padding: '4px 12px'
+        }}>
+          <span className="text-[#148BAF] inline-flex font-happy-monkey text-xs lowercase text-center font-medium">your progress</span>
+        </div>
+        
+        <div className="flex flex-col items-center justify-center h-full">
+          <div className="mb-3 text-center">
+            <div className="text-[#148BAF] font-happy-monkey text-xs mb-1">completion today</div>
+            <div className="flex justify-center">
+              <div className="relative w-20 h-20">
+                <svg viewBox="0 0 36 36" className="w-full h-full">
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="rgba(4,196,213,0.2)"
+                    strokeWidth="3"
+                  />
+                  <path
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="#04C4D5"
+                    strokeWidth="3"
+                    strokeDasharray={`${displayedPractices.filter(p => p.completed).length / displayedPractices.length * 100}, 100`}
+                    strokeLinecap="round"
+                  />
+                  <text x="18" y="16" textAnchor="middle" fill="#148BAF" fontSize="10" fontFamily="Happy Monkey">
+                    {Math.round(displayedPractices.filter(p => p.completed).length / displayedPractices.length * 100)}%
+                  </text>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div className="text-[#148BAF] font-happy-monkey text-xs text-center">
+            {displayedPractices.filter(p => p.completed).length} of {displayedPractices.length} practices completed
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MobileDailyPractices;

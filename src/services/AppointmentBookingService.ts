@@ -62,7 +62,7 @@ export class AppointmentBookingService {
         return { success: false, error: appointmentError.message };
       }
 
-      const appointmentId = appointment.id;
+      const appointmentId = appointment.id as number;
 
       // Step 2: Create video meeting if configured
       let meetingDetails: MeetingDetails | null = null;
@@ -150,7 +150,7 @@ export class AppointmentBookingService {
   }
 
   // Mock Zoom meeting creation - in production, use Zoom API
-  private async createZoomMeeting(appointmentId: number, hostEmail: string, guestEmail: string): Promise<MeetingDetails> {
+  private async createZoomMeeting(appointmentId: number, _hostEmail: string, _guestEmail: string): Promise<MeetingDetails> {
     // TODO: Implement actual Zoom API integration
     // const zoomClient = new ZoomApi({ apiKey, apiSecret });
     // const meeting = await zoomClient.meetings.create({...});
@@ -170,7 +170,7 @@ export class AppointmentBookingService {
   }
 
   // Mock Google Meet creation - in production, use Google Calendar API
-  private async createGoogleMeet(appointmentId: number, hostEmail: string, guestEmail: string): Promise<MeetingDetails> {
+  private async createGoogleMeet(appointmentId: number, _hostEmail: string, _guestEmail: string): Promise<MeetingDetails> {
     // TODO: Implement actual Google Calendar API integration
     // const calendar = google.calendar({ version: 'v3', auth });
     // const event = await calendar.events.insert({...});
@@ -188,7 +188,7 @@ export class AppointmentBookingService {
   }
 
   // Mock Microsoft Teams meeting creation
-  private async createTeamsMeeting(appointmentId: number, hostEmail: string, guestEmail: string): Promise<MeetingDetails> {
+  private async createTeamsMeeting(appointmentId: number, _hostEmail: string, _guestEmail: string): Promise<MeetingDetails> {
     // TODO: Implement actual Microsoft Graph API integration
     // const graphClient = Client.init({ authProvider });
     // const meeting = await graphClient.me.onlineMeetings.post({...});
@@ -270,7 +270,7 @@ export class AppointmentBookingService {
   }
 
   // Mock Google Calendar integration
-  private async addToGoogleCalendar(appointmentId: number, bookingData: BookingData, integration: any): Promise<void> {
+  private async addToGoogleCalendar(appointmentId: number, _bookingData: BookingData, _integration: any): Promise<void> {
     // TODO: Implement actual Google Calendar API
     console.log(`📅 [MOCK] Adding appointment ${appointmentId} to Google Calendar`);
     
@@ -282,7 +282,7 @@ export class AppointmentBookingService {
   }
 
   // Mock Outlook Calendar integration
-  private async addToOutlookCalendar(appointmentId: number, bookingData: BookingData, integration: any): Promise<void> {
+  private async addToOutlookCalendar(appointmentId: number, _bookingData: BookingData, _integration: any): Promise<void> {
     // TODO: Implement actual Microsoft Graph API
     console.log(`📅 [MOCK] Adding appointment ${appointmentId} to Outlook Calendar`);
     
@@ -329,11 +329,11 @@ export class AppointmentBookingService {
         appointmentId,
         recipientEmail: userEmail,
         recipientName: userName,
-        practitionerName: appointment.practitioner_name,
+        practitionerName: appointment.practitioner_name as string,
         date: newDate,
         time: newTime,
-        sessionType: appointment.session_type,
-        meetingUrl: appointment.appointment_meetings?.[0]?.meeting_url,
+        sessionType: appointment.session_type as string,
+        meetingUrl: appointment.appointment_meetings?.[0] ? (appointment.appointment_meetings[0] as any).meeting_url : undefined,
         notificationType: 'rescheduling'
       });
 
@@ -377,10 +377,10 @@ export class AppointmentBookingService {
         appointmentId,
         recipientEmail: userEmail,
         recipientName: userName,
-        practitionerName: appointment.practitioner_name,
-        date: appointment.date,
-        time: appointment.time,
-        sessionType: appointment.session_type,
+        practitionerName: appointment.practitioner_name as string,
+        date: appointment.date as string,
+        time: appointment.time as string,
+        sessionType: appointment.session_type as string,
         notificationType: 'cancellation'
       });
 

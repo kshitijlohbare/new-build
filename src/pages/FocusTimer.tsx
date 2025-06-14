@@ -1,69 +1,138 @@
 import { useState, useEffect } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from 'recharts';
+import PlayIconPath from '../assets/icons/play.svg';
+import PauseIconPath from '../assets/icons/pause.svg';
+import StopIconPath from '../assets/icons/stop.svg';
+
+// Music options array with SVG icons that match the reference image
+const musicOptions = [
+  { 
+    id: 'ocean', 
+    name: "Ocean waves", 
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 3h3v3H3V3zm4.5 0h3v3h-3V3zm4.5 0h3v3h-3V3zm4.5 0h3v3h-3V3zM3 7.5h3v3H3v-3zm4.5 0h3v3h-3v-3zm4.5 0h3v3h-3v-3zm4.5 0h3v3h-3v-3zM3 12h3v3H3v-3zm4.5 0h3v3h-3v-3zm4.5 0h3v3h-3v-3zm4.5 0h3v3h-3v-3zM3 16.5h3v3H3v-3zm4.5 0h3v3h-3v-3zm4.5 0h3v3h-3v-3zm4.5 0h3v3h-3v-3z"/>
+      </svg>
+    )
+  },
+  { 
+    id: 'wind', 
+    name: "Wind chimes", 
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6c3.31 0 6 2.69 6 6s-2.69 6-6 6z"/>
+      </svg>
+    )
+  },
+  { 
+    id: 'cafe', 
+    name: "Cafe ambience", 
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M4 20h16v-4H4v4zm5-2h6v-2H9v2zM4 4v10h16V4H4zm5 8h6v-2H9v2zm0-4h6V6H9v2z"/>
+      </svg>
+    )
+  },
+  { 
+    id: 'white', 
+    name: "White noise", 
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm5 12.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+      </svg>
+    )
+  },
+  { 
+    id: 'rain', 
+    name: "Rainfall", 
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.66 8L12 2.35 6.34 8A8.02 8.02 0 004 13.64c0 2 .78 4.11 2.34 5.67a7.99 7.99 0 0011.32 0c1.56-1.56 2.34-3.67 2.34-5.67A8.02 8.02 0 0017.66 8zM6 14c.01-2 .62-3.27 1.76-4.4L12 5.27l4.24 4.38C17.38 10.77 17.99 12 18 14H6z"/>
+      </svg>
+    )
+  },
+  { 
+    id: 'silence', 
+    name: "Silence", 
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+      </svg>
+    )
+  }
+];
 
 const focusPresets = [
-  { label: "quick focus", work: 5, break: 5 },
-  { label: "pomodoro", work: 25, break: 5 },
-  { label: "deep work", work: 45, break: 15 },
-  { label: "balanced", work: 30, break: 10 },
+  { label: "quick focus", work: 15, break: 5 },
+  { label: "quick focus", work: 15, break: 5 },
+  { label: "quick focus", work: 15, break: 5 },
+  { label: "quick focus", work: 15, break: 5 },
   { label: "create", work: 15, break: 5 }, // Index 4
-];
-
-const musicOptions = [
-  { name: "Ocean waves" },
-  { name: "Wind chimes" },
-  { name: "Cafe ambience" },
-  { name: "White noise" },
-  { name: "Rainfall" },
-  { name: "Silence" },
-];
-
-// Sample data for focus history graph
-const focusHistoryData = [
-  { day: 'mon', workHours: 1.5, breakPercentage: 25 },
-  { day: 'tue', workHours: 2.0, breakPercentage: 20 },
-  { day: 'wed', workHours: 1.0, breakPercentage: 30 },
-  { day: 'thu', workHours: 2.5, breakPercentage: 22 },
-  { day: 'fri', workHours: 1.8, breakPercentage: 28 },
-  { day: 'sat', workHours: 3.0, breakPercentage: 15 },
-  { day: 'sun', workHours: 2.2, breakPercentage: 18 },
 ];
 
 const FocusTimer = () => {
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null); // Allow null initially
-  const [workTime, setWorkTime] = useState(20);
-  const [breakTime, setBreakTime] = useState(8);
+  const [workTime, setWorkTime] = useState(3); // Default to 3 minutes as shown in the design
+  const [breakTime, setBreakTime] = useState(3); // Default to 3 minutes as shown in the design
   const [cycles, setCycles] = useState(3);
   const [currentCycle, setCurrentCycle] = useState(1);
-  const [timer, setTimer] = useState(20 * 60); // Initialize with default workTime
+  const [timer, setTimer] = useState(15 * 60); // Initialize with default workTime
   const [isRunning, setIsRunning] = useState(false);
-  const [selectedMusic, setSelectedMusic] = useState(musicOptions[0].name);
-  const [volume, setVolume] = useState(50); // Add volume state
   const [isWorkPhase, setIsWorkPhase] = useState(true); // Track work/break phase
+  const [musicDrawerOpen, setMusicDrawerOpen] = useState(false); // State to control music drawer
+  const [selectedMusic, setSelectedMusic] = useState<string | null>(null); // Track selected music
+  
 
   const createPresetIndex = focusPresets.findIndex(p => p.label === "create");
+
+  // Function to toggle music drawer
+  const toggleMusicDrawer = () => {
+    setMusicDrawerOpen(prev => !prev);
+  };
+
+  // Function to handle music selection
+  const handleMusicSelect = (musicId: string) => {
+    setSelectedMusic(musicId === selectedMusic ? null : musicId);
+    // Here you would add code to play the actual audio
+    // For example: playAudio(musicId);
+  };
+
+  // Close the music drawer when clicking outside
+  useEffect(() => {
+    if (!musicDrawerOpen) return;
+    
+    // Use setTimeout to avoid the click event that opens the drawer from also closing it
+    const timeoutId = setTimeout(() => {
+      const handleClickOutside = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        
+        // Check if the click is outside the music drawer and music button
+        if (target.closest('[data-testid="music-drawer"]') || target.closest('[data-testid="music-button"]')) {
+          return;
+        }
+        
+        setMusicDrawerOpen(false);
+      };
+  
+      document.addEventListener('click', handleClickOutside);
+      
+      return () => {
+        document.removeEventListener('click', handleClickOutside);
+      };
+    }, 100);
+    
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [musicDrawerOpen]);
 
   // Timer logic
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval> | undefined = undefined;
 
-    console.log(`Effect run: isRunning=${isRunning}, timer=${timer}`); // Log effect run
-
     if (isRunning && timer > 0) {
-      console.log("Setting interval..."); // Log interval set
       intervalId = setInterval(() => {
         setTimer((prevTimer) => prevTimer - 1);
       }, 1000);
-      console.log(`Interval set with ID: ${intervalId}`);
     } else if (isRunning && timer === 0) {
       // Timer finished, handle cycle/phase change
       if (isWorkPhase) {
@@ -84,26 +153,18 @@ const FocusTimer = () => {
         setCurrentCycle((prevCycle) => prevCycle + 1);
         setTimer(workTime * 60);
       }
-       console.log("Timer reached 0, handling phase/cycle change.");
-    } else {
-       console.log("Condition not met for setting interval (timer paused or finished).");
     }
 
     // Cleanup function
     return () => {
       if (intervalId !== undefined) {
-        console.log(`Cleanup: Clearing interval ID: ${intervalId}`); // Log interval clear
         clearInterval(intervalId);
-      } else {
-        console.log("Cleanup: No interval ID to clear.");
       }
     };
-  }, [isRunning, timer, workTime, breakTime, cycles, currentCycle, isWorkPhase]); // Dependencies remain the same
+  }, [isRunning, timer, workTime, breakTime, cycles, currentCycle, isWorkPhase]);
 
   // Update timer ONLY when workTime, breakTime, or selectedPreset changes and timer is not running
-   useEffect(() => {
-    // The check for !isRunning inside the effect is sufficient.
-    // We don't want this effect to run *because* isRunning changed.
+  useEffect(() => {
     if (!isRunning) {
       if (selectedPreset !== null && selectedPreset !== createPresetIndex) {
         const preset = focusPresets[selectedPreset];
@@ -113,370 +174,470 @@ const FocusTimer = () => {
         setIsWorkPhase(true); // Ensure it starts with work phase
         setCurrentCycle(1); // Reset cycle count
       } else if (selectedPreset === createPresetIndex) {
-         // When switching to 'create', keep custom times but reset timer display
-         setTimer(workTime * 60);
-         setIsWorkPhase(true);
-         setCurrentCycle(1);
-      } else {
-         // Handle case where no preset is selected or custom times are adjusted directly
-         setTimer(workTime * 60);
-         setIsWorkPhase(true);
-         setCurrentCycle(1);
+        // When switching to 'create', keep custom times but reset timer display
+        setTimer(workTime * 60);
+        setIsWorkPhase(true);
+        setCurrentCycle(1);
       }
     }
-    // REMOVED isRunning from dependencies
-   }, [selectedPreset, workTime, breakTime, createPresetIndex]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPreset, createPresetIndex, isRunning]); // workTime and breakTime removed to prevent custom values from being overwritten by preset after selection
 
-  // Calculate percentages for slider track fill
-  const workPercentage = ((workTime - 5) / (60 - 5)) * 100;
-  const breakPercentage = ((breakTime - 1) / (30 - 1)) * 100;
-  const volumePercentage = volume; // Volume is already 0-100
+  // Effect to update timer when workTime or breakTime are changed in 'create' mode and timer is not running
+  useEffect(() => {
+    if (!isRunning && selectedPreset === createPresetIndex) {
+      setTimer(workTime * 60);
+      setIsWorkPhase(true);
+      setCurrentCycle(1);
+    }
+  }, [workTime, breakTime, selectedPreset, createPresetIndex, isRunning]);
 
+
+  // Time is directly formatted in the render
+
+  // --- COMPONENT RENDER START ---
   return (
-    <div className="flex flex-col gap-8 p-3 md:p-6 items-center w-full min-h-screen bg-gradient-to-b from-white to-[#F7FFFF]">
-      <div className="text-center text-[#148BAF] text-4xl font-happy-monkey lowercase w-full pt-3 animate-pulse">get things done</div>
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 w-full flex flex-col gap-5">
-        {/* Section: Presets */}
-        <div className="mb-3">
-          <h2 className="text-[#148BAF] font-happy-monkey text-xl mb-3 lowercase text-center">choose your focus style</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3 justify-center">
-            {focusPresets.map((preset, idx) => (
+    <div data-testid="focus-timer-page" className="min-h-screen pb-28">
+      {/* Main Container */}
+      <div data-testid="focus-timer-container" className="container mx-auto px-4 py-2">
+        {/* Header Bar */}
+        <header data-testid="focus-timer-header-bar" className="flex flex-col items-center justify-center py-4">
+          <p className="text-lg font-['Happy_Monkey'] text-[#148BAF] mt-2">get things done!</p>
+        </header>
+
+        {/* Timer Section */}
+        <section data-testid="circular-timer-section" className="timer-container relative mb-2 w-full">
+          {/* Timer Circle */}
+          <div data-testid="timer-circle" className="timer-display timer-display-responsive mx-auto">
+            {/* Progress Bar */}
+            <div 
+              data-testid="timer-progress-bar"
+              className="timer-progress"
+              style={{ 
+                '--progress-percentage': `${isWorkPhase 
+                  ? ((workTime * 60 - timer) / (workTime * 60)) * 100 
+                  : ((breakTime * 60 - timer) / (breakTime * 60)) * 100}%`
+              } as React.CSSProperties}
+            ></div>
+            
+            {/* Circular Embed Frame - sits between timer-progress-bar and timer-inner-display */}
+            <div 
+              data-testid="timer-circular-embed" 
+              className="absolute w-[95%] h-[95%] rounded-full overflow-hidden"
+              style={{
+                left: "2.5%",
+                top: "2.5%",
+                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                border: "2px solid rgba(4, 196, 213, 0.2)",
+                boxShadow: "inset 0 0 10px rgba(4, 196, 213, 0.15)",
+                zIndex: 0.5,
+                // Mask to hide the Spline watermark at 95% of the container
+                maskImage: "radial-gradient(circle, black 0%, black 95%, transparent 95%)",
+                WebkitMaskImage: "radial-gradient(circle, black 0%, black 95%, transparent 95%)"
+              }}
+            >
               <div
-                key={idx}
-                className={`preset-card p-3 rounded-xl border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] flex flex-col items-center gap-2 cursor-pointer transition-all ${
-                  selectedPreset === idx
-                    ? "active bg-[#F7FFFF] border-[#04C4D5] border-2" : "bg-white hover:bg-[#F7FFFF]"
-                }`}
-                onClick={() => {
-                  setSelectedPreset(idx);
+                style={{
+                  width: "125%", // 125% of parent size
+                  height: "125%", // 125% of parent size
+                  position: "relative",
+                  left: "-12.5%", // Center the enlarged frame
+                  top: "-12.5%", // Center the enlarged frame
                 }}
               >
-                <div className="text-center font-happy-monkey text-lg lowercase font-medium text-[#148BAF]">{preset.label}</div>
-                <div className="text-center font-happy-monkey text-xs lowercase text-[#04C4D5] bg-[rgba(4,196,213,0.1)] px-2 py-0.5 rounded-full w-full">
-                  {preset.work}m/{preset.break}m
-                </div>
+                <iframe 
+                  src='https://my.spline.design/celestialflowabstractdigitalform-NJJy5Cn4bQDH6EQPVG5HSfBe/' 
+                  frameBorder='0' 
+                  width='100%' 
+                  height='100%'
+                  title="Celestial Flow Abstract Digital Form"
+                  loading="eager"
+                ></iframe>
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-col lg:flex-row justify-center items-stretch gap-4 mt-4">
-          {/* Section: Customize Session */}
-          {selectedPreset === createPresetIndex && (
-            <div className="bg-white rounded-[20px] flex flex-col items-center p-5 w-full lg:w-1/3 border border-[rgba(4,196,213,0.3)] shadow-[1px_2px_8px_rgba(73,218,234,0.3)]">
-              <div className="flex items-center justify-center mb-3 gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#148BAF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="8" x2="12" y2="16"></line>
-                  <line x1="8" y1="12" x2="16" y2="12"></line>
-                </svg>
-                <div className="text-[#148BAF] font-happy-monkey text-xl lowercase">customize session</div>
-              </div>
-              
-              <div className="w-full p-3 mb-3 bg-[rgba(4,196,213,0.05)] rounded-xl border border-[rgba(4,196,213,0.1)]">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[#148BAF] font-happy-monkey text-sm lowercase font-medium">customize your focus intervals</span>
-                  <div className="text-xs text-gray-500 font-happy-monkey lowercase">5-60 min / 1-30 min</div>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap justify-center h-auto md:h-[250px] gap-8 md:gap-16 w-full">
-                {/* Work Slider */}
-                <div className="flex flex-col items-center h-full mb-6 md:mb-0">
-                  {/* Top Section */}
-                  <div className="flex flex-col items-center">
-                    {/* Work label at top */}
-                    <div className="bg-[rgba(4,196,213,0.1)] text-[#148BAF] font-happy-monkey text-sm lowercase px-3 py-1 rounded-full mb-2">
-                      work time
-                    </div>
-                    
-                    {/* Improved work time display */}
-                    <div className="bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white border-2 border-[#04C4D5] rounded-xl px-4 py-2 font-happy-monkey text-xl w-[60px] text-center shadow-[1px_2px_6px_rgba(73,218,234,0.3)]">{workTime}</div>
-                    <span className="font-happy-monkey text-[#148BAF] text-xs mt-1 mb-4">minutes</span>
-                  </div>
-                  
-                  {/* Middle Section - Slider */}
-                  <div className="slider-container">
-                    <input
-                      type="range"
-                      min={5}
-                      max={60}
-                      value={workTime}
-                      onChange={e => setWorkTime(Number(e.target.value))}
-                      className="vertical-rotated-slider"
-                      style={{ '--slider-percentage': `${workPercentage}%` } as React.CSSProperties}
-                    />
+            </div>
+            
+            {/* Timer Inner Content */}
+            <div 
+              data-testid="timer-inner-display" 
+              className="flex flex-col justify-center items-center p-0 gap-[10px] w-[157px] h-[149px] absolute"
+              style={{
+                left: "calc(50% - 157px/2 + 1px)",
+                top: "calc(50% - 149px/2 + 0.5px)",
+                zIndex: 1
+              }}
+            >
+              {/* Work/Break Controls */}
+              <div data-testid="work-break-controls" className="flex flex-row justify-center items-start p-0 gap-[10px] w-[149px] h-[26px]">
+                {/* Work Control */}
+                <div className="flex flex-row justify-center items-center p-0 gap-[4px] w-[67px] h-[26px]">
+                  <span className="w-[37px] h-[16px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] lowercase text-[#148BAF]">work :</span>
+                  <div 
+                    data-testid="work-time-display" 
+                    className="box-border flex flex-col justify-center items-center p-[4px_8px] gap-[10px] w-[26px] h-[26px] bg-white border border-[#04C4D5] rounded-[4px]"
+                  >
+                    <div className="w-[10px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] text-center uppercase text-[#148BAF]">{workTime}</div>
                   </div>
                 </div>
                 
-                {/* Break Slider */}
-                <div className="flex flex-col items-center h-full">
-                  {/* Top Section */}
-                  <div className="flex flex-col items-center">
-                    {/* Break label at top */}
-                    <div className="bg-[rgba(4,196,213,0.1)] text-[#148BAF] font-happy-monkey text-sm lowercase px-3 py-1 rounded-full mb-2">
-                      break time
+                {/* Break Control */}
+                <div className="flex flex-row justify-center items-center p-0 gap-[4px] w-[72px] h-[26px]">
+                  <span className="w-[42px] h-[16px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] lowercase text-[#148BAF]">break :</span>
+                  <div 
+                    data-testid="break-time-display" 
+                    className="box-border flex flex-col justify-center items-center p-[4px_8px] gap-[10px] w-[26px] h-[26px] bg-white border border-[#04C4D5] rounded-[4px]"
+                  >
+                    <div className="w-[10px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] text-center uppercase text-[#148BAF]">{breakTime}</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Timer Display */}
+              <div data-testid="timer-time" className="w-[157px] h-[77px] font-['Happy_Monkey'] font-normal text-[64px] leading-[77px] lowercase text-[#148BAF]">
+                {Math.floor(timer / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}
+              </div>
+              
+              {/* Cycles Control */}
+              <div data-testid="cycles-control-section" className="flex flex-col items-center p-0 gap-[20px] w-[122px] h-[26px]">
+                <div className="flex flex-row justify-center items-center p-0 gap-[4px] w-[122px] h-[26px]">
+                  <span className="w-[44px] h-[16px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] lowercase text-[#148BAF]">cycles :</span>
+                  
+                  {/* Decrease Button */}
+                  <button 
+                    data-testid="decrease-cycles-button"
+                    className="box-border flex flex-row justify-center items-center p-[4px] gap-[10px] w-[20px] h-[20px] max-w-[20px] max-h-[20px] bg-[#F7FFFF] border border-[#04C4D5] rounded-[4px]"
+                    onClick={() => setCycles(Math.max(1, cycles - 1))}
+                    style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+                  >
+                    <div className="flex flex-row justify-center items-center p-0 gap-[10px] w-[8px] h-[2px]">
+                      <div className="bg-[#148BAF] rounded-[0.5px] w-[8px] h-[2px]"></div>
                     </div>
-                    
-                    {/* Improved break time display */}
-                    <div className="bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white border-2 border-[#04C4D5] rounded-xl px-4 py-2 font-happy-monkey text-xl w-[60px] text-center shadow-[1px_2px_6px_rgba(73,218,234,0.3)]">{breakTime}</div>
-                    <span className="font-happy-monkey text-[#148BAF] text-xs mt-1 mb-4">minutes</span>
+                  </button>
+                  
+                  {/* Cycles Display */}
+                  <div 
+                    data-testid="cycles-display" 
+                    className="box-border flex flex-col justify-center items-center p-[4px_8px] gap-[10px] w-[26px] h-[26px] bg-white border border-[#04C4D5] rounded-[4px]"
+                  >
+                    <div className="w-[10px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] text-center uppercase text-[#148BAF]">{cycles}</div>
                   </div>
                   
-                  {/* Middle Section - Slider */}
-                  <div className="slider-container">
-                    <input
-                      type="range"
-                      min={1}
-                      max={30}
-                      value={breakTime}
-                      onChange={e => setBreakTime(Number(e.target.value))}
-                      className="vertical-rotated-slider"
-                      style={{ '--slider-percentage': `${breakPercentage}%`
-                      } as React.CSSProperties}
-                    />
-                  </div>
+                  {/* Increase Button */}
+                  <button 
+                    data-testid="increase-cycles-button"
+                    className="box-border flex flex-row justify-center items-center p-[4px] gap-[10px] w-[20px] h-[20px] max-w-[20px] max-h-[20px] bg-[#F7FFFF] border border-[#04C4D5] rounded-[4px]"
+                    onClick={() => setCycles(Math.min(10, cycles + 1))}
+                    style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+                  >
+                    <div className="flex flex-row justify-center items-center p-0 gap-[10px] w-[8px] h-[8px]">
+                      <div className="w-[8px] h-[8px] bg-[#148BAF] rounded-[0.5px] transform rotate-45"></div>
+                    </div>
+                  </button>
                 </div>
               </div>
             </div>
-          )}
-          
-          {/* Section: Focus Session */}
-          <div className="bg-white rounded-[20px] flex flex-col items-center gap-3 p-4 w-full lg:w-1/3 border border-[rgba(4,196,213,0.3)] shadow-[0px_4px_24px_rgba(4,196,213,0.2)]">
-            <div className="text-[#148BAF] font-happy-monkey text-xl mb-1 lowercase">focus session</div>
-            <div className="bg-[rgba(4,196,213,0.1)] text-[#148BAF] font-happy-monkey text-sm lowercase px-3 py-0.5 rounded-full">
-              {isWorkPhase ? 'work phase' : 'break phase'}
-            </div>
-            <div className="flex gap-3 items-center">
-              <div className="text-[#148BAF] font-happy-monkey text-base lowercase">cycle {currentCycle} of {cycles}</div>
-              <span className="text-[#148BAF] font-happy-monkey text-base">|</span>
-              <div className="text-[#148BAF] font-happy-monkey text-base lowercase">total: {workTime * cycles + breakTime * (cycles > 0 ? cycles - 1 : 0)} mins</div>
-            </div>
-            
-            {/* Circular Timer */}
-            <div className="timer-container my-4">
-              <div className="timer-display">
-                <div 
-                  className="timer-progress"
-                  style={{ 
-                    '--progress-percentage': `${isWorkPhase 
-                      ? 100 - (timer / (workTime * 60)) * 100
-                      : 100 - (timer / (breakTime * 60)) * 100}%` 
-                  } as React.CSSProperties}
-                ></div>
-                <div className="timer-inner">
-                  <div className={`text-[#148BAF] font-happy-monkey text-5xl font-medium ${isRunning ? 'breathing-animation' : ''}`}>
-                    {Math.floor(timer / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <span className="text-[#148BAF] font-happy-monkey text-base lowercase">cycles:</span>
-              <button 
-                className="w-8 h-8 bg-white hover:bg-[#F7FFFF] rounded-lg border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.2)] flex items-center justify-center disabled:opacity-50 transition-all" 
-                onClick={() => setCycles(Math.max(1, cycles - 1))} 
-                disabled={isRunning}
-              >-</button>
-              {/* Fixed text color and styling */}
-              <div className="bg-white border-2 border-[#04C4D5] rounded-xl px-4 py-1 font-happy-monkey text-xl text-[#148BAF] min-w-[40px] text-center">{cycles}</div>
-              <button 
-                className="w-8 h-8 bg-white hover:bg-[#F7FFFF] rounded-lg border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.2)] flex items-center justify-center disabled:opacity-50 transition-all" 
-                onClick={() => setCycles(cycles + 1)} 
-                disabled={isRunning}
-              >+</button>
-            </div>
-            <div className="flex gap-4 mt-2">
-              {/* Toggle Play/Pause */}
-              <button 
-                className="px-6 py-3 bg-gradient-to-r from-[#04C4D5] to-[#148BAF] hover:from-[#04C4D5] hover:to-[#0F6A85] rounded-full border-none shadow-md transition-all text-white font-happy-monkey flex items-center gap-2" 
-                onClick={() => setIsRunning(!isRunning)}
-              >
-                {isRunning ? (
-                  <>
-                    <svg width="24" height="24" fill="white"><rect x="8" y="8" width="3" height="8" rx="1"/><rect x="13" y="8" width="3" height="8" rx="1"/></svg>
-                    <span>pause</span>
-                  </>
-                ) : (
-                  <>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                    <span>start</span>
-                  </>
-                )}
-              </button>
-              {/* Reset Button */}
-              <button
-                className="px-4 py-3 bg-white hover:bg-[#F7FFFF] rounded-full border border-[#04C4D5] shadow-md transition-all text-[#148BAF] font-happy-monkey"
-                onClick={() => {
-                  setIsRunning(false);
-                  setCurrentCycle(1);
-                  setIsWorkPhase(true);
-                  setTimer(workTime * 60); // Reset timer based on current workTime
-                }}
-              >
-                reset
-              </button>
+            {/* Star Icon */}
+            <div data-testid="timer-star-icon" className="absolute top-[calc(50%_-_20px)] right-[-20px] transform translate-x-1/2 -translate-y-1/2 bg-[#148BAF] border-2 border-white w-10 h-10 flex items-center justify-center rounded-md shadow-md">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white" stroke="none">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
             </div>
           </div>
-          
-          {/* Section: Add Music */}
-          <div className="bg-white rounded-[20px] flex flex-col items-center p-5 w-full lg:w-1/3 border border-[rgba(4,196,213,0.3)] shadow-[1px_2px_8px_rgba(73,218,234,0.3)]">
-            <div className="flex items-center justify-center mb-3 gap-2">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#148BAF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 18V5l12-2v13"></path>
-                <circle cx="6" cy="18" r="3"></circle>
-                <circle cx="18" cy="16" r="3"></circle>
-              </svg>
-              <div className="text-[#148BAF] font-happy-monkey text-xl lowercase">ambient sounds</div>
-            </div>
-            
-            <div className="w-full p-3 mb-3 bg-[rgba(4,196,213,0.05)] rounded-xl border border-[rgba(4,196,213,0.1)]">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[#148BAF] font-happy-monkey text-sm lowercase font-medium">improve your focus with ambient sounds</span>
+        </section>
+
+        {/* Focus Presets Section - Desktop Design Exactly as Per CSS */}
+        <section data-testid="focus-presets-section" className="w-[360px] h-[225px] bg-[#F5F5F5] rounded-[20px] mx-auto relative hidden md:block">
+          {/* Focus Presets Container */}
+          <div className="relative w-full h-full">
+            {/* First Preset - Top Left */}
+            <button
+              data-testid="focus-preset-button-0"
+              className={`box-border flex flex-col justify-center items-center p-[4px_8px] gap-[4px] absolute w-[165px] h-[62px] left-[10px] top-[10px] ${
+                selectedPreset === 0 
+                  ? 'bg-[rgba(83,252,255,0.1)]' 
+                  : 'bg-white'
+              } border border-[#04C4D5] rounded-[8px]`}
+              onClick={() => setSelectedPreset(0)}
+              style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+            >
+              <div className="w-[105px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase text-[#148BAF] order-0">
+                {focusPresets[0].label}
               </div>
-            </div>
+              <div className="w-[55px] h-[32px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#04C4D5] order-1">
+                w: {focusPresets[0].work} min, b: {focusPresets[0].break} min
+              </div>
+            </button>
             
-            <div className="flex flex-col md:flex-row w-full justify-between gap-4 flex-grow h-auto md:h-[200px]">
-              {/* Music Options List */}
-              <div className="flex flex-col gap-2 w-full md:w-3/4 h-[150px] md:h-full overflow-y-auto pr-2 scrollbar-hide">
-                {musicOptions.map((music) => (
-                  <div
-                    key={music.name}
-                    className={`w-full px-3 py-3 rounded-lg border transition-all
-                      ${selectedMusic === music.name 
-                        ? "border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] bg-gradient-to-r from-[rgba(4,196,213,0.1)] to-[rgba(20,139,175,0.05)]" 
-                        : "border-[rgba(4,196,213,0.2)] bg-white hover:bg-[rgba(4,196,213,0.03)]"}`}
-                    onClick={() => setSelectedMusic(music.name)}
+            {/* Second Preset - Top Right */}
+            <button
+              data-testid="focus-preset-button-1"
+              className={`box-border flex flex-col justify-center items-center p-[4px_8px] gap-[4px] absolute w-[165px] h-[62px] left-[185px] top-[10px] ${
+                selectedPreset === 1 
+                  ? 'bg-[rgba(83,252,255,0.1)]' 
+                  : 'bg-white'
+              } border border-[#04C4D5] rounded-[8px]`}
+              onClick={() => setSelectedPreset(1)}
+              style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+            >
+              <div className="w-[105px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase text-[#148BAF] order-0">
+                {focusPresets[1].label}
+              </div>
+              <div className="w-[55px] h-[32px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#04C4D5] order-1">
+                w: {focusPresets[1].work} min, b: {focusPresets[1].break} min
+              </div>
+            </button>
+            
+            {/* Third Preset - Middle Left */}
+            <button
+              data-testid="focus-preset-button-2"
+              className={`box-border flex flex-col justify-center items-center p-[4px_8px] gap-[4px] absolute w-[165px] h-[62px] left-[10px] top-[81.67px] ${
+                selectedPreset === 2 
+                  ? 'bg-[rgba(83,252,255,0.1)]' 
+                  : 'bg-white'
+              } border border-[#04C4D5] rounded-[8px]`}
+              onClick={() => setSelectedPreset(2)}
+              style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+            >
+              <div className="w-[105px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase text-[#148BAF] order-0">
+                {focusPresets[2].label}
+              </div>
+              <div className="w-[55px] h-[32px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#04C4D5] order-1">
+                w: {focusPresets[2].work} min, b: {focusPresets[2].break} min
+              </div>
+            </button>
+            
+            {/* Fourth Preset - Middle Right */}
+            <button
+              data-testid="focus-preset-button-3"
+              className={`box-border flex flex-col justify-center items-center p-[4px_8px] gap-[4px] absolute w-[165px] h-[62px] left-[185px] top-[81.67px] ${
+                selectedPreset === 3 
+                  ? 'bg-[rgba(83,252,255,0.1)]' 
+                  : 'bg-white'
+              } border border-[#04C4D5] rounded-[8px]`}
+              onClick={() => setSelectedPreset(3)}
+              style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+            >
+              <div className="w-[105px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase text-[#148BAF] order-0">
+                {focusPresets[3].label}
+              </div>
+              <div className="w-[55px] h-[32px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#04C4D5] order-1">
+                w: {focusPresets[3].work} min, b: {focusPresets[3].break} min
+              </div>
+            </button>
+            
+            {/* Create Preset - Bottom (Full Width) */}
+            <button 
+              data-testid="create-preset-button"
+              className={`box-border flex flex-col justify-center items-center p-[4px_8px] gap-[4px] absolute w-[340px] h-[62px] left-[10px] top-[153.33px] ${
+                selectedPreset === createPresetIndex 
+                  ? 'bg-[rgba(83,252,255,0.1)]' 
+                  : 'bg-white'
+              } border border-[#04C4D5] rounded-[8px]`}
+              onClick={() => setSelectedPreset(createPresetIndex)}
+              style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+            >
+              <div className="w-[59px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase text-[#148BAF] order-0">
+                {focusPresets[createPresetIndex].label}
+              </div>
+              <div className="w-[55px] h-[32px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#04C4D5] order-1">
+                w: {workTime} min, b: {breakTime} min
+              </div>
+            </button>
+          </div>
+        </section>
+        
+        {/* Mobile Focus Presets Section - Responsive Design for Small Screens */}
+        <section data-testid="focus-presets-section-mobile" className="w-[95%] bg-[#F5F5F5] rounded-[20px] mx-auto block md:hidden py-3 px-3">
+          <div className="grid grid-cols-2 gap-3">
+            {/* First Preset - Mobile */}
+            <button
+              data-testid="focus-preset-button-mobile-0"
+              className={`box-border flex flex-col justify-center items-center p-[4px_8px] gap-[4px] h-[62px] ${
+                selectedPreset === 0 
+                  ? 'bg-[rgba(83,252,255,0.1)]' 
+                  : 'bg-white'
+              } border border-[#04C4D5] rounded-[8px]`}
+              onClick={() => setSelectedPreset(0)}
+              style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+            >
+              <div className="font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase text-[#148BAF] order-0">
+                {focusPresets[0].label}
+              </div>
+              <div className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#04C4D5] order-1">
+                w: {focusPresets[0].work} min, b: {focusPresets[0].break} min
+              </div>
+            </button>
+            
+            {/* Second Preset - Mobile */}
+            <button
+              data-testid="focus-preset-button-mobile-1"
+              className={`box-border flex flex-col justify-center items-center p-[4px_8px] gap-[4px] h-[62px] ${
+                selectedPreset === 1 
+                  ? 'bg-[rgba(83,252,255,0.1)]' 
+                  : 'bg-white'
+              } border border-[#04C4D5] rounded-[8px]`}
+              onClick={() => setSelectedPreset(1)}
+              style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+            >
+              <div className="font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase text-[#148BAF] order-0">
+                {focusPresets[1].label}
+              </div>
+              <div className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#04C4D5] order-1">
+                w: {focusPresets[1].work} min, b: {focusPresets[1].break} min
+              </div>
+            </button>
+            
+            {/* Third Preset - Mobile */}
+            <button
+              data-testid="focus-preset-button-mobile-2"
+              className={`box-border flex flex-col justify-center items-center p-[4px_8px] gap-[4px] h-[62px] ${
+                selectedPreset === 2 
+                  ? 'bg-[rgba(83,252,255,0.1)]' 
+                  : 'bg-white'
+              } border border-[#04C4D5] rounded-[8px]`}
+              onClick={() => setSelectedPreset(2)}
+              style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+            >
+              <div className="font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase text-[#148BAF] order-0">
+                {focusPresets[2].label}
+              </div>
+              <div className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#04C4D5] order-1">
+                w: {focusPresets[2].work} min, b: {focusPresets[2].break} min
+              </div>
+            </button>
+            
+            {/* Fourth Preset - Mobile */}
+            <button
+              data-testid="focus-preset-button-mobile-3"
+              className={`box-border flex flex-col justify-center items-center p-[4px_8px] gap-[4px] h-[62px] ${
+                selectedPreset === 3 
+                  ? 'bg-[rgba(83,252,255,0.1)]' 
+                  : 'bg-white'
+              } border border-[#04C4D5] rounded-[8px]`}
+              onClick={() => setSelectedPreset(3)}
+              style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+            >
+              <div className="font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase text-[#148BAF] order-0">
+                {focusPresets[3].label}
+              </div>
+              <div className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#04C4D5] order-1">
+                w: {focusPresets[3].work} min, b: {focusPresets[3].break} min
+              </div>
+            </button>
+            
+            {/* Create Preset - Mobile (Full Width) */}
+            <button 
+              data-testid="create-preset-button-mobile"
+              className={`box-border flex flex-col justify-center items-center p-[4px_8px] gap-[4px] h-[62px] col-span-2 ${
+                selectedPreset === createPresetIndex 
+                  ? 'bg-[rgba(83,252,255,0.1)]' 
+                  : 'bg-white'
+              } border border-[#04C4D5] rounded-[8px]`}
+              onClick={() => setSelectedPreset(createPresetIndex)}
+              style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+            >
+              <div className="font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase text-[#148BAF] order-0">
+                {focusPresets[createPresetIndex].label}
+              </div>
+              <div className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#04C4D5] order-1">
+                w: {workTime} min, b: {breakTime} min
+              </div>
+            </button>
+          </div>
+        </section>
+
+        {/* Player Controls Section */}
+        <footer data-testid="player-controls-container" className="fixed inset-0 z-50 pointer-events-none">
+          {/* Player Controls Center Panel - Fixed 20px from bottom and centered */}
+          <div 
+            data-testid="player-controls-center-panel" 
+            className="absolute left-1/2 bottom-[20px] transform -translate-x-1/2 flex justify-center items-center gap-[20px] py-1.5 px-5 bg-[#E0FBFF] rounded-full border-2 border-white shadow-2xl pointer-events-auto"
+          >
+            {/* Play/Pause Button */}
+            <button 
+              data-testid="play-pause-button"
+              className="bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors active:scale-90" 
+              onClick={() => setIsRunning(!isRunning)}
+              aria-label={isRunning ? "Pause timer" : "Start timer"}
+            >
+              {isRunning ? (
+                <img src={PauseIconPath} alt="Pause" className="w-10 h-10" />
+              ) : (
+                <img src={PlayIconPath} alt="Play" className="w-10 h-10" />
+              )}
+            </button>
+            {/* Stop Button */}
+            <button 
+              data-testid="stop-button"
+              className="bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors active:scale-90" 
+              onClick={() => {
+                setIsRunning(false);
+                setCurrentCycle(1);
+                setIsWorkPhase(true);
+                if (selectedPreset !== null && selectedPreset !== createPresetIndex) {
+                  const preset = focusPresets[selectedPreset];
+                  setTimer(preset.work * 60);
+                } else {
+                  setTimer(workTime * 60); 
+                }
+              }}
+              aria-label="Reset timer"
+            >
+              <img src={StopIconPath} alt="Stop" className="w-10 h-10" />
+            </button>
+          </div>
+          
+          {/* Music Button and Drawer - Positioned on the right side */}
+          <div className="absolute right-[20px] bottom-[20px] w-16 h-16 pointer-events-auto">
+            <button 
+                data-testid="music-button"
+                className={`w-16 h-16 bg-[#E0FBFF] rounded-full flex items-center justify-center shadow-2xl hover:bg-[#cbeef2] transition-colors active:scale-90 ${selectedMusic ? 'bg-[#148BAF] text-white' : ''}`}
+                onClick={() => toggleMusicDrawer()}
+                aria-label="Open music options"
+              >
+              <svg width="26" height="30" viewBox="0 0 21 24" fill={selectedMusic ? "white" : "#148BAF"}>
+                <path d="M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V7H18V3H12Z"/>
+              </svg>
+            </button>
+            {/* Music Drawer Popup */}
+            {musicDrawerOpen && (
+              <div 
+                data-testid="music-drawer"
+                className="absolute w-[314px] h-[52px] py-1 px-3 bg-[#148BAF] border border-white shadow-lg rounded-3xl flex flex-row items-center justify-center gap-2"
+                style={{ 
+                  boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)",
+                  zIndex: 60,
+                  transform: "rotate(-90deg)",
+                  bottom: "130px",
+                  right: "-130px",
+                }}
+              >
+                {musicOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    data-testid={`music-option-${option.id}`}
+                    className={`w-[44px] h-[44px] rounded-xl flex items-center justify-center transition-all ${
+                      selectedMusic === option.id 
+                        ? 'bg-white border border-[#04C4D5] text-[#148BAF]' 
+                        : 'bg-[rgba(83,252,255,0.1)] border border-white text-white'
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent clicking from closing the drawer
+                      handleMusicSelect(option.id);
+                    }}
+                    aria-label={`Play ${option.name}`}
+                    style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
                   >
-                    <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${selectedMusic === music.name ? "bg-[#04C4D5]" : "bg-[rgba(4,196,213,0.2)]"}`}></div>
-                      <span className="text-[#148BAF] font-happy-monkey text-sm lowercase truncate">{music.name}</span>
-                    </div>
-                  </div>
+                    {option.icon}
+                  </button>
                 ))}
               </div>
-              
-              {/* Vertical Volume Slider Column */}
-              <div className="flex flex-col items-center h-full w-full md:w-1/4">
-                {/* Volume number display */}
-                <div className="bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white border-2 border-[#04C4D5] rounded-xl px-3 py-1 font-happy-monkey text-sm w-[45px] text-center shadow-[1px_2px_6px_rgba(73,218,234,0.3)] mb-2">
-                  {volume}
-                </div>
-                
-                {/* Slider container with fixed dimensions */}
-                <div className="slider-container">
-                  <input
-                    id="volume"
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={volume}
-                    onChange={(e) => setVolume(Number(e.target.value))}
-                    className="vertical-rotated-slider"
-                    style={{ '--slider-percentage': `${volumePercentage}%` } as React.CSSProperties}
-                  />
-                </div>
-                
-                {/* Volume Icon */}
-                <div className="mt-4 p-2 bg-[rgba(4,196,213,0.1)] rounded-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#148BAF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    {volume === 0 ? (
-                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                    ) : volume < 50 ? (
-                      <>
-                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                      </>
-                    ) : (
-                      <>
-                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                      </>
-                    )}
-                  </svg>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
-        </div>
-        
-        {/* Section: Focus History */}
-        <div className="bg-white rounded-[20px] flex flex-col items-center gap-4 p-4 w-full mt-6 max-w-5xl mx-auto border border-[rgba(4,196,213,0.3)] shadow-[1px_2px_8px_rgba(73,218,234,0.3)]">
-          <div className="text-[#148BAF] font-happy-monkey text-xl mb-2 lowercase">focus history</div>
-          <div className="w-full h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={focusHistoryData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(73, 218, 234, 0.2)" />
-                <XAxis 
-                  dataKey="day" 
-                  stroke="#148BAF" 
-                  fontSize={14}
-                  tick={{ fontFamily: 'Happy Monkey, cursive' }}
-                />
-                <YAxis 
-                  yAxisId="left" 
-                  fontSize={14}
-                  orientation="left"
-                  stroke="#148BAF" 
-                  tick={{ fontFamily: 'Happy Monkey, cursive' }}
-                  label={{ value: 'work hours', angle: -90, position: 'insideLeft', fill: '#148BAF', style: { textAnchor: 'middle', fontFamily: 'Happy Monkey, cursive' } }} 
-                />
-                <YAxis 
-                  yAxisId="right" 
-                  fontSize={14}
-                  orientation="right" 
-                  stroke="#04C4D5" 
-                  tick={{ fontFamily: 'Happy Monkey, cursive' }}
-                  label={{ value: 'break %', angle: 90, position: 'insideRight', fill: '#04C4D5', style: { textAnchor: 'middle', fontFamily: 'Happy Monkey, cursive' } }} 
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'rgba(247, 255, 255, 0.95)',
-                    borderColor: '#04C4D5',
-                    fontFamily: 'Happy Monkey, cursive',
-                    textAlign: 'center',
-                    fontSize: '14px',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    boxShadow: '0 4px 12px rgba(4, 196, 213, 0.15)'
-                  }} 
-                  labelStyle={{ color: '#148BAF', fontWeight: 'bold' }}
-                />
-                <Legend 
-                  wrapperStyle={{ 
-                    fontFamily: 'Happy Monkey, cursive',
-                    paddingTop: '15px' 
-                  }}
-                  iconSize={12}
-                  iconType="circle"
-                />
-                <Line 
-                  yAxisId="left" 
-                  type="monotone" 
-                  dataKey="workHours" 
-                  stroke="#148BAF" 
-                  strokeWidth={3}
-                  dot={{ stroke: '#148BAF', strokeWidth: 2, r: 4, fill: 'white' }} 
-                  activeDot={{ r: 8, fill: '#148BAF', stroke: '#FFFFFF' }} 
-                  name="work hours" 
-                />
-                <Line 
-                  yAxisId="right" 
-                  type="monotone" 
-                  dataKey="breakPercentage" 
-                  stroke="#04C4D5" 
-                  strokeWidth={3} 
-                  dot={{ stroke: '#04C4D5', strokeWidth: 2, r: 4, fill: 'white' }}
-                  activeDot={{ r: 8, fill: '#04C4D5', stroke: '#FFFFFF' }} 
-                  name="break %" 
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        </footer>
       </div>
     </div>
   );
+  // --- COMPONENT RENDER END ---
 };
 
 export default FocusTimer;

@@ -97,9 +97,23 @@ export const AchievementProvider: React.FC<AchievementProviderProps> = ({ childr
     }
   }, [newAchievements, userProgress?.achievements, previousAchievements, user?.id]);
 
+  // Track when popup was last closed
+  const [lastCloseTime, setLastCloseTime] = useState<number | null>(null);
+  const COOLDOWN_PERIOD = 2000; // 2 seconds cooldown after closing a popup
+  
   // Display achievements from the queue one at a time
   useEffect(() => {
-    if (achievementQueue.length > 0 && !currentAchievement) {
+    // Only show next achievement if:
+    // 1. There are achievements in the queue 
+    // 2. No achievement is currently showing
+    // 3. Either there's been no recent close OR enough time has passed since last close
+    const currentTime = Date.now();
+    const shouldShowNext = 
+      achievementQueue.length > 0 && 
+      !currentAchievement && 
+      (!lastCloseTime || (currentTime - lastCloseTime > COOLDOWN_PERIOD));
+      
+    if (shouldShowNext) {
       // Get the first achievement from the queue
       const nextAchievement = achievementQueue[0];
       
@@ -113,7 +127,7 @@ export const AchievementProvider: React.FC<AchievementProviderProps> = ({ childr
       // const audioEffect = new Audio('/sounds/achievement-unlocked.mp3');
       // audioEffect.play();
     }
-  }, [achievementQueue, currentAchievement]);
+  }, [achievementQueue, currentAchievement, lastCloseTime]);
 
   // Function to show achievement popup
   const showAchievementPopup = (achievement: Achievement) => {
@@ -138,6 +152,8 @@ export const AchievementProvider: React.FC<AchievementProviderProps> = ({ childr
   // Handler for closing the popup
   const handleClosePopup = () => {
     setCurrentAchievement(null);
+    // Record time when popup was closed to enforce cooldown period
+    setLastCloseTime(Date.now());
   };
   
   // Function to get all user achievements for display in UI components

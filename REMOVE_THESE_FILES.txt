@@ -1,0 +1,6 @@
+Files to delete for full Community feature removal:
+- src/pages/Community.tsx
+- src/scripts/checkCommunityDelights.ts
+- src/scripts/communityDummyData.ts
+- src/assets/icons/Community_selected.svg
+- src/assets/icons/Community_nonselected.svg

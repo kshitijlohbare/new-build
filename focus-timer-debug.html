@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus Timer Debug Page</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+    h1 {
+      color: #148BAF;
+    }
+    .debug-section {
+      background: #f0f9ff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    code {
+      background: #eee;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+    .btn {
+      background: #148BAF;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    .btn:hover {
+      background: #0e7a9e;
+    }
+    .path {
+      font-family: monospace;
+      background: #eee;
+      padding: 8px;
+      border-radius: 4px;
+      word-break: break-all;
+    }
+    .warning {
+      background: #fff3cd;
+      padding: 10px;
+      border-radius: 4px;
+      color: #664d03;
+      margin: 15px 0;
+    }
+    pre {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Focus Timer Debug Page</h1>
+  
+  <div class="debug-section">
+    <h2>Project Structure Issue</h2>
+    <p>We've identified a potential issue with duplicate project structures:</p>
+    
+    <div class="path">Main project: /Users/kshitijlohbare/Downloads/new build/</div>
+    <div class="path">Duplicate project: /Users/kshitijlohbare/Downloads/new build/new-build-main/</div>
+    
+    <p>This can cause confusion about which files are being served by the development server.</p>
+  </div>
+  
+  <div class="debug-section">
+    <h2>Resolution Steps</h2>
+    <ol>
+      <li>Stop any running development servers</li>
+      <li>Run the focus-timer fix script to rename the duplicate directory:
+        <pre>cd "/Users/kshitijlohbare/Downloads/new build" && chmod +x fix-focus-timer.sh && ./fix-focus-timer.sh</pre>
+      </li>
+      <li>Clear your browser cache completely</li>
+      <li>Restart the development server with:
+        <pre>npm run dev -- --force</pre>
+      </li>
+      <li>Try accessing the focus timer at <a href="http://localhost:5173/focus-timer" target="_blank">http://localhost:5173/focus-timer</a></li>
+    </ol>
+  </div>
+  
+  <div class="debug-section">
+    <h2>Quick Tests</h2>
+    <button id="check-imports" class="btn">Test Import Paths</button>
+    <button id="clear-cache" class="btn">Clear LocalStorage Cache</button>
+    <button id="show-timer-css" class="btn">Check Timer CSS</button>
+    
+    <div id="results" style="margin-top: 15px;"></div>
+  </div>
+  
+  <div class="debug-section">
+    <h2>Still Having Issues?</h2>
+    <p>Try these additional steps:</p>
+    <ul>
+      <li>Open DevTools (F12) and check for any console errors</li>
+      <li>Try accessing the page in an incognito/private window</li>
+      <li>Check Network tab in DevTools to see which files are being loaded</li>
+      <li>Run <code>npm cache clean --force</code> to clear the npm cache</li>
+      <li>Delete <code>node_modules/.vite</code> directory to clear Vite's cache</li>
+    </ul>
+    
+    <div class="warning">
+      <strong>Note:</strong> If all else fails, you might need to create a fresh copy of the project in a new directory.
+    </div>
+  </div>
+
+  <script>
+    // Simple debug functions
+    document.getElementById('check-imports').addEventListener('click', function() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<pre>Checking import paths...\n\n';
+      
+      fetch('/src/App.tsx')
+        .then(response => response.text())
+        .then(text => {
+          const focusTimerImport = text.match(/import\s+FocusTimer\s+from\s+["'](.+?)["']/);
+          results.innerHTML += `FocusTimer imported from: ${focusTimerImport ? focusTimerImport[1] : 'Not found'}\n`;
+        })
+        .catch(err => {
+          results.innerHTML += `Error checking App.tsx: ${err}\n`;
+        });
+    });
+    
+    document.getElementById('clear-cache').addEventListener('click', function() {
+      localStorage.clear();
+      sessionStorage.clear();
+      const results = document.getElementById('results');
+      results.innerHTML = '<pre>LocalStorage and SessionStorage cleared.\nPlease also clear your browser cache manually.</pre>';
+    });
+    
+    document.getElementById('show-timer-css').addEventListener('click', function() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<pre>Looking for timer-progress CSS...\n\n';
+      
+      fetch('/src/index.css')
+        .then(response => response.text())
+        .then(text => {
+          const timerCss = text.includes('timer-progress');
+          if (timerCss) {
+            const cssSnippet = text.substring(
+              text.indexOf('timer-progress') - 20, 
+              text.indexOf('timer-progress') + 200
+            );
+            results.innerHTML += `Found timer-progress CSS:\n\n${cssSnippet}\n`;
+          } else {
+            results.innerHTML += 'timer-progress CSS not found in index.css\n';
+          }
+        })
+        .catch(err => {
+          results.innerHTML += `Error checking index.css: ${err}\n`;
+        });
+    });
+  </script>
+</body>
+</html>

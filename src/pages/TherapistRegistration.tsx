@@ -124,10 +124,10 @@ const TherapistRegistration = () => {
       </h2>
       
       {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 relative">
+        <div className="bg-[#F7FFFF] border border-[#06C4D5] text-[#208EB1] px-4 py-3 rounded mb-4 relative">
           <button
             onClick={() => setSuccess(false)}
-            className="absolute right-3 top-3 p-1 rounded-full bg-green-200 hover:bg-green-300 transition-colors text-green-600 active:scale-95"
+            className="absolute right-3 top-3 p-1 rounded-full bg-[#F7FFFF] hover:bg-[#06C4D5] transition-colors text-[#208EB1] active:scale-95"
             aria-label="Dismiss success message"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,10 +139,10 @@ const TherapistRegistration = () => {
       )}
       
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 relative">
+        <div className="bg-[#F7FFFF] border border-[#06C4D5] text-[#208EB1] px-4 py-3 rounded mb-4 relative">
           <button
             onClick={() => setError(null)}
-            className="absolute right-3 top-3 p-1 rounded-full bg-red-200 hover:bg-red-300 transition-colors text-red-600 active:scale-95"
+            className="absolute right-3 top-3 p-1 rounded-full bg-[#F7FFFF] hover:bg-[#06C4D5] transition-colors text-[#208EB1] active:scale-95"
             aria-label="Dismiss error"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ const TherapistRegistration = () => {
                   form.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
               }}
-              className="text-sm text-red-800 underline hover:text-red-900 transition-colors font-happy-monkey"
+              className="text-sm text-[#208EB1] underline hover:text-[#06C4D5] transition-colors font-happy-monkey"
             >
               Try again
             </button>
@@ -167,12 +167,12 @@ const TherapistRegistration = () => {
         </div>
       )}
       
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
+      <form onSubmit={handleSubmit} className="bg-[#FFFFFF] p-6 rounded-lg shadow-md">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             {/* Name */}
             <div>
-              <label className="block text-[#148BAF] font-happy-monkey lowercase mb-2">
+              <label className="block text-[#208EB1] font-happy-monkey lowercase mb-2">
                 Your Name
               </label>
               <input
@@ -181,14 +181,15 @@ const TherapistRegistration = () => {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="w-full p-2 border border-[#04C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#04C4D5]"
+                className="w-full px-4 py-3 sm:py-2.5 border border-[#06C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#06C4D5] min-h-[48px] sm:min-h-[40px] touch-action-manipulation"
+                style={{ fontSize: '16px' }}
                 placeholder="Enter your full name"
               />
             </div>
             
             {/* Specialty */}
             <div>
-              <label className="block text-[#148BAF] font-happy-monkey lowercase mb-2">
+              <label className="block text-[#208EB1] font-happy-monkey lowercase mb-2">
                 Your Specialty
               </label>
               <input
@@ -197,14 +198,15 @@ const TherapistRegistration = () => {
                 value={formData.specialty}
                 onChange={handleInputChange}
                 required
-                className="w-full p-2 border border-[#04C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#04C4D5]"
+                className="w-full px-4 py-3 sm:py-2.5 border border-[#06C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#06C4D5] min-h-[48px] sm:min-h-[40px] touch-action-manipulation"
+                style={{ fontSize: '16px' }}
                 placeholder="e.g., Cognitive Behavioral Therapy"
               />
             </div>
             
             {/* Education */}
             <div>
-              <label className="block text-[#148BAF] font-happy-monkey lowercase mb-2">
+              <label className="block text-[#208EB1] font-happy-monkey lowercase mb-2">
                 Education
               </label>
               <input
@@ -213,14 +215,15 @@ const TherapistRegistration = () => {
                 value={formData.education}
                 onChange={handleInputChange}
                 required
-                className="w-full p-2 border border-[#04C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#04C4D5]"
+                className="w-full px-4 py-3 sm:py-2.5 border border-[#06C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#06C4D5] min-h-[48px] sm:min-h-[40px] touch-action-manipulation"
+                style={{ fontSize: '16px' }}
                 placeholder="e.g., Masters in Psychology"
               />
             </div>
             
             {/* Degree */}
             <div>
-              <label className="block text-[#148BAF] font-happy-monkey lowercase mb-2">
+              <label className="block text-[#208EB1] font-happy-monkey lowercase mb-2">
                 Degree Obtained
               </label>
               <input
@@ -229,14 +232,15 @@ const TherapistRegistration = () => {
                 value={formData.degree}
                 onChange={handleInputChange}
                 required
-                className="w-full p-2 border border-[#04C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#04C4D5]"
+                className="w-full px-4 py-3 sm:py-2.5 border border-[#06C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#06C4D5] min-h-[48px] sm:min-h-[40px] touch-action-manipulation"
+                style={{ fontSize: '16px' }}
                 placeholder="e.g., PhD, PsyD, LMFT"
               />
             </div>
             
             {/* Price */}
             <div>
-              <label className="block text-[#148BAF] font-happy-monkey lowercase mb-2">
+              <label className="block text-[#208EB1] font-happy-monkey lowercase mb-2">
                 Session Price ($)
               </label>
               <input
@@ -246,14 +250,15 @@ const TherapistRegistration = () => {
                 onChange={handlePriceChange}
                 required
                 min="0"
-                className="w-full p-2 border border-[#04C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#04C4D5]"
+                className="w-full px-4 py-3 sm:py-2.5 border border-[#06C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#06C4D5] min-h-[48px] sm:min-h-[40px] touch-action-manipulation"
+                style={{ fontSize: '16px' }}
                 placeholder="Enter price per session"
               />
             </div>
             
             {/* Location Type */}
             <div>
-              <label className="block text-[#148BAF] font-happy-monkey lowercase mb-2">
+              <label className="block text-[#208EB1] font-happy-monkey lowercase mb-2">
                 Session Type
               </label>
               <select
@@ -261,7 +266,8 @@ const TherapistRegistration = () => {
                 value={formData.location_type}
                 onChange={handleInputChange}
                 required
-                className="w-full p-2 border border-[#04C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#04C4D5]"
+                className="w-full px-4 py-3 sm:py-2.5 border border-[#06C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#06C4D5] min-h-[48px] sm:min-h-[40px] touch-action-manipulation"
+                style={{ fontSize: '16px' }}
               >
                 <option value="online">Online Only</option>
                 <option value="in-person">In-Person Only</option>
@@ -273,7 +279,7 @@ const TherapistRegistration = () => {
           <div className="space-y-4">
             {/* Image URL */}
             <div>
-              <label className="block text-[#148BAF] font-happy-monkey lowercase mb-2">
+              <label className="block text-[#208EB1] font-happy-monkey lowercase mb-2">
                 Profile Image URL
               </label>
               <input
@@ -281,36 +287,37 @@ const TherapistRegistration = () => {
                 name="image_url"
                 value={formData.image_url}
                 onChange={handleInputChange}
-                className="w-full p-2 border border-[#04C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#04C4D5]"
+                className="w-full px-4 py-3 sm:py-2.5 border border-[#06C4D5] rounded-md focus:outline-none focus:ring-2 focus:ring-[#06C4D5] min-h-[48px] sm:min-h-[40px] touch-action-manipulation"
+                style={{ fontSize: '16px' }}
                 placeholder="Enter URL to your professional photo"
               />
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-[#208EB1] mt-1">
                 If you don't have an image URL, leave this blank and we'll add a default image.
               </p>
             </div>
             
             {/* Conditions */}
             <div>
-              <label className="block text-[#148BAF] font-happy-monkey lowercase mb-2">
+              <label className="block text-[#208EB1] font-happy-monkey lowercase mb-2">
                 Conditions You Specialize In
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {availableConditions.map(condition => (
                   <div 
                     key={condition.id}
                     onClick={() => handleConditionToggle(condition.id)}
-                    className={`p-2 border border-[#04C4D5] rounded-md cursor-pointer text-center transition-colors ${
+                    className={`p-3 sm:p-2 border border-[#06C4D5] rounded-md cursor-pointer text-center transition-colors min-h-[48px] sm:min-h-[40px] flex items-center justify-center touch-action-manipulation ${
                       formData.conditions.includes(condition.id)
-                        ? 'bg-[#148BAF] text-white'
-                        : 'bg-white text-[#04C4D5]'
+                        ? 'bg-[#208EB1] text-[#FFFFFF]'
+                        : 'bg-[#FFFFFF] text-[#06C4D5] hover:bg-[#F7FFFF]'
                     }`}
                   >
-                    <span className="font-happy-monkey lowercase">{condition.label}</span>
+                    <span className="font-happy-monkey lowercase text-sm">{condition.label}</span>
                   </div>
                 ))}
               </div>
               {formData.conditions.length === 0 && (
-                <p className="text-red-500 text-sm mt-1">Please select at least one condition</p>
+                <p className="text-[#208EB1] text-sm mt-1">Please select at least one condition</p>
               )}
             </div>
           </div>
@@ -320,8 +327,8 @@ const TherapistRegistration = () => {
           <button
             type="submit"
             disabled={loading || formData.conditions.length === 0}
-            className={`bg-[#148BAF] text-white py-3 px-8 rounded-md font-happy-monkey lowercase text-lg ${
-              (loading || formData.conditions.length === 0) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#0e6d89]'
+            className={`bg-[#208EB1] text-[#FFFFFF] py-3 px-8 rounded-md font-happy-monkey lowercase text-lg min-h-[48px] min-w-[200px] touch-action-manipulation transition-all duration-300 ${
+              (loading || formData.conditions.length === 0) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#06C4D5] active:scale-95'
             }`}
           >
             {loading ? 'Submitting...' : 'Register as a Therapist'}

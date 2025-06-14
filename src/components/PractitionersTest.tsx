@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+
+interface Practitioner {
+  id: number;
+  name: string;
+  specialty: string;
+  price: number;
+  location_type: string;
+  [key: string]: any;
+}
 
 const PractitionersTest = () => {
-  const [practitioners, setPractitioners] = useState([]);
+  const [practitioners, setPractitioners] = useState<Practitioner[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPractitioners = async () => {
@@ -33,11 +42,17 @@ const PractitionersTest = () => {
         
         console.log('✅ Success! Found practitioners:', data.length);
         console.log('📋 Practitioners data:', data);
-        setPractitioners(data);
+        // Type assertion with validation
+        const typedData = data as Practitioner[];
+        setPractitioners(typedData);
         
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('❌ Exception:', err);
-        setError(`Exception: ${err.message}`);
+        if (err instanceof Error) {
+          setError(`Exception: ${err.message}`);
+        } else {
+          setError('An unknown error occurred');
+        }
       } finally {
         setLoading(false);
         console.log('✅ Loading complete');

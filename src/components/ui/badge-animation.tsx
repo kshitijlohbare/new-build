@@ -66,6 +66,7 @@ export function BadgeAnimation({
             : "translate-y-10 opacity-0 scale-95",
           isExiting && "translate-y-10 opacity-0 scale-95"
         )}
+        onClick={(e) => e.stopPropagation()} // Prevent clicks from reaching the background overlay
       >
         {/* Confetti effect at the top */}
         <div className="absolute -top-10 left-0 right-0 h-20 overflow-hidden flex justify-center">
@@ -74,7 +75,10 @@ export function BadgeAnimation({
         
         {/* Close button (X icon) - Always visible */}
         <button
-          onClick={handleClose}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClose();
+          }}
           className="absolute right-3 top-3 p-1.5 rounded-full bg-white/40 hover:bg-white/60 transition-colors text-[#148BAF] active:scale-95 z-10 shadow-sm border border-white/30"
           aria-label="Close"
         >
@@ -99,13 +103,19 @@ export function BadgeAnimation({
               </p>
               <div className="flex gap-3">
                 <button 
-                  onClick={handleClose}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClose();
+                  }}
                   className="px-5 py-2 bg-[#148BAF] text-white rounded-full font-happy-monkey lowercase hover:bg-[#04C4D5] transition-colors"
                 >
                   awesome!
                 </button>
                 <button 
-                  onClick={handleClose}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClose();
+                  }}
                   className="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-[#148BAF] rounded-full font-happy-monkey lowercase transition-colors"
                 >
                   close

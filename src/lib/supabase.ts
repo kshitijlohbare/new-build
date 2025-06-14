@@ -1,68 +1,115 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClientOptions } from '@supabase/supabase-js';
 
-// Use environment variables if available, fallback to hardcoded values for development
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://svnczxevigicuskppyfz.supabase.co'
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bmN6eGV2aWdpY3Vza3BweWZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwNDk1NDAsImV4cCI6MjA1OTYyNTU0MH0.00MNZRYjGKHTEFvF0enW-VCZ4qgDnXC4LeV8XsjGaEU'
+// In development and production, connect directly to Supabase
+// Proxy approach was causing 404 errors, so using direct connection
+const supabaseUrl = 'https://svnczxevigicuskppyfz.supabase.co';
 
-// Determine if we're in Node.js 
-const isNode = typeof window === 'undefined' && typeof process !== 'undefined';
+// This is your public anon key.
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bmN6eGV2aWdpY3Vza3BweWZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwNDk1NDAsImV4cCI6MjA1OTYyNTU0MH0.00MNZRYjGKHTEFvF0enW-VCZ4qgDnXC4LeV8XsjGaEU';
 
-// Create fetch options with SSL disabled for Node.js
-const fetchOptions = isNode ? {
+const supabaseOptions: SupabaseClientOptions<"public"> = {
   auth: {
+    storageKey: 'caktus_coco.auth.token', // Your custom storage key
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true, // Important for OAuth and password recovery flows
   },
-  global: {
-    fetch: (input: RequestInfo | URL, init?: RequestInit) => {
-      // Disable SSL verification in Node.js environment
-      if (typeof process !== 'undefined' && process.env) {
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-      }
-      console.warn('WARNING: SSL certificate verification disabled for Supabase fetch operations');
-      return fetch(input, init);
-    }
-  }
-} : {};
+  // global.headers are not needed here for apikey or X-Client-Info.
+  // The supabaseAnonKey provided to createClient ensures the apikey header is sent.
+  // X-Client-Info is added by the Supabase client library by default.
+};
 
-// Define the type for the Supabase client
-let supabaseClient: ReturnType<typeof createClient>;
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, supabaseOptions);
 
-// Create Supabase client with appropriate settings
-if (isNode) {
-  console.warn('Initializing Supabase client in Node.js environment with SSL verification disabled');
-  // Disable SSL verification before client initialization
-  if (typeof process !== 'undefined' && process.env) {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-  }
-  
+export const getSessionFromLocalStorage = () => {
   try {
-    // Create client with custom fetch that has SSL verification disabled
-    supabaseClient = createClient(supabaseUrl, supabaseKey, fetchOptions);
-  } catch (e) {
-    console.error('Error initializing Supabase client:', e);
-    
-    // Last resort fallback - try again with even more forceful SSL disabling
-    try {
-      // Override global agent for https if available
-      if (typeof require !== 'undefined') {
-        const https = require('https');
-        if (https.globalAgent && https.globalAgent.options) {
-          https.globalAgent.options.rejectUnauthorized = false;
-          console.warn('SSL verification forcibly disabled via https.globalAgent');
-        }
-      }
-      
-      supabaseClient = createClient(supabaseUrl, supabaseKey);
-    } catch (innerError) {
-      console.error('All attempts to create Supabase client failed:', innerError);
-      throw new Error('Unable to initialize Supabase client');
-    }
+    const storageKey = 'caktus_coco.auth.token';
+    const localData = localStorage.getItem(storageKey);
+    if (!localData) return null;
+    return JSON.parse(localData);
+  } catch (error) {
+    console.error('Error retrieving session from localStorage:', error);
+    return null;
   }
-} else {
-  // Browser environment - normal client is fine
-  supabaseClient = createClient(supabaseUrl, supabaseKey);
-}
+};
 
-export const supabase = supabaseClient;
+/**
+ * Check if a valid session token exists
+ */
+export const isTokenValid = async () => {
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    
+    // Check if we have a session and if it has a valid access token
+    const isValid = !!data?.session?.access_token;
+    
+    // If token exists but is about to expire, refresh it
+    if (isValid && data.session && isTokenExpiringSoon(data.session.expires_at)) {
+      await refreshSession();
+    }
+    
+    return isValid;
+  } catch (error) {
+    console.error('Error checking token validity:', error);
+    return false;
+  }
+};
+
+/**
+ * Check if the token will expire soon (within 1 hour)
+ */
+export const isTokenExpiringSoon = (expiresAt?: number): boolean => {
+  if (!expiresAt) return true;
+  
+  // Check if token expires within the next hour (3600 seconds)
+  const now = Math.floor(Date.now() / 1000); // Current time in seconds
+  return expiresAt - now < 3600;
+};
+
+/**
+ * Refresh the current session
+ */
+export const refreshSession = async () => {
+  try {
+    const { data, error } = await supabase.auth.refreshSession();
+    if (error) throw error;
+    return data.session;
+  } catch (error) {
+    console.error('Error refreshing session:', error);
+    return null;
+  }
+};
+
+/**
+ * Configure persistent login with extended session
+ * This can be used when signing in to request a longer session
+ */
+export const signInWithExtendedSession = async (email: string, password: string) => {
+  return await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+};
+
+/**
+ * Configure OAuth login with extended session
+ */
+export const signInWithOAuthExtended = async (provider: 'google' | 'github') => {
+  return await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`
+    }
+  });
+};
+
+// Simple utility to log auth status
+export const logAuthStatus = async () => {
+  try {
+    const { data } = await supabase.auth.getSession();
+    return data.session ? 'Authenticated' : 'Not authenticated';
+  } catch (e) {
+    return `Error: ${e}`;
+  }
+};

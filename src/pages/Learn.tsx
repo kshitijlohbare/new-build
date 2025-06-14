@@ -65,7 +65,7 @@ const animationStyles = `
 }
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(4, 196, 213, 0.15);
+  box-shadow: 0 8px 20px rgba(6, 196, 213, 0.15);
 }
 
 .animate-slide-down {
@@ -84,21 +84,21 @@ export interface PsychTerm {
 const getIconComponent = (iconType: string) => {
   switch (iconType) {
     case "mindfulness":
-      return <Heart size={20} className="text-[#04C4D5]" />;
+      return <Heart size={20} className="text-[#06C4D5]" />;
     case "cognitive":
-      return <Brain size={20} className="text-purple-500" />;
+      return <Brain size={20} className="text-[#208EB1]" />;
     case "emotional":
-      return <Heart size={20} className="text-red-500" />;
+      return <Heart size={20} className="text-[#208EB1]" />;
     case "behavioral":
-      return <Lightbulb size={20} className="text-yellow-500" />;
+      return <Lightbulb size={20} className="text-[#208EB1]" />;
     case "social":
-      return <Lightbulb size={20} className="text-blue-500" />;
+      return <Lightbulb size={20} className="text-[#208EB1]" />;
     case "neuroscience":
-      return <Zap size={20} className="text-orange-500" />;
+      return <Zap size={20} className="text-[#208EB1]" />;
     case "naval":
-      return <Anchor size={20} className="text-emerald-600" />;
+      return <Anchor size={20} className="text-[#208EB1]" />;
     default:
-      return <BookOpen size={20} className="text-[#148BAF]" />;
+      return <BookOpen size={20} className="text-[#06C4D5]" />;
   }
 };
 
@@ -510,7 +510,7 @@ export default function Learn() {
       <div className="mx-auto max-w-6xl">
         {/* Header with title and search */}
         <div className="mb-6 sm:mb-8 px-2 sm:px-8">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl text-center font-bold text-[#148BAF] font-happy-monkey lowercase mb-2">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl text-center font-bold text-[#06C4D5] font-happy-monkey lowercase mb-2">
             psychology, neuroscience & wisdom
           </h1>
           <p className="text-black text-center font-happy-monkey lowercase mb-4 sm:mb-6 text-sm sm:text-base">
@@ -518,16 +518,16 @@ export default function Learn() {
           </p>
           
           {/* Search input - Mobile responsive */}
-          <div className="flex align-center flex-col sm:flex-row justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[10px] max-w-3xl mx-auto bg-white border border-[rgba(4,196,213,0.3)] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[10px]">
+          <div className="flex align-center flex-col sm:flex-row justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[10px] max-w-3xl mx-auto bg-white border border-[rgba(6,196,213,0.3)] shadow-[1px_2px_4px_rgba(6,196,213,0.5)] rounded-[10px]">
             <input
               type="text"
-              className={`flex-1 bg-transparent border-none text-center text-sm sm:text-base ${searchQuery ? 'text-[#148BAF]' : 'text-[#43D3E0]'} placeholder-[#43D3E0] font-happy-monkey lowercase focus:outline-none w-full sm:w-auto mb-2 sm:mb-0`}
+              className={`flex-1 bg-transparent border-none text-center text-sm sm:text-base ${searchQuery ? 'text-[#06C4D5]' : 'text-[#06C4D5]'} placeholder-[#06C4D5] font-happy-monkey lowercase focus:outline-none w-full min-h-[44px] px-2`}
               placeholder="search concepts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <div className="flex items-center">
-              <Search className="text-[#148BAF]" size={18} />
+            <div className="flex items-center justify-center p-2 sm:p-0">
+              <Search className="text-[#06C4D5]" size={18} />
             </div>
           </div>
         </div>
@@ -538,8 +538,8 @@ export default function Learn() {
             <button 
               className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
                 activeCategory === null 
-                  ? 'bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white shadow-sm' 
-                  : 'text-[#148BAF] border border-[rgba(4,196,213,0.3)] hover:bg-[rgba(4,196,213,0.1)]'
+                  ? 'bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] text-white shadow-sm' 
+                  : 'text-[#06C4D5] border border-[rgba(6,196,213,0.3)] hover:bg-[rgba(6,196,213,0.1)]'
               }`}
               onClick={() => setActiveCategory(null)}
             >
@@ -550,8 +550,8 @@ export default function Learn() {
           <button 
             className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
               activeCategory === 'Neuroscience' 
-                ? 'bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white shadow-sm' 
-                : 'text-[#F97316] border border-[rgba(249,115,22,0.3)] hover:bg-[rgba(249,115,22,0.1)]'
+                ? 'bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] text-white shadow-sm' 
+                : 'text-[#06C4D5] border border-[rgba(6,196,213,0.3)] hover:bg-[rgba(6,196,213,0.1)]'
             }`}
             onClick={() => setActiveCategory('Neuroscience')}
           >
@@ -564,8 +564,8 @@ export default function Learn() {
           <button 
             className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
               activeCategory === 'Naval Philosophy' 
-                ? 'bg-gradient-to-r from-[#10B981] to-[#059669] text-white shadow-sm' 
-                : 'text-[#059669] border border-[rgba(16,185,129,0.3)] hover:bg-[rgba(16,185,129,0.1)]'
+                ? 'bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] text-white shadow-sm' 
+                : 'text-[#06C4D5] border border-[rgba(6,196,213,0.3)] hover:bg-[rgba(6,196,213,0.1)]'
             }`}
             onClick={() => setActiveCategory('Naval Philosophy')}
           >
@@ -583,8 +583,8 @@ export default function Learn() {
               key={category}
               className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
                 activeCategory === category 
-                  ? 'bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white shadow-sm' 
-                  : 'text-[#148BAF] border border-[rgba(4,196,213,0.3)] hover:bg-[rgba(4,196,213,0.1)]'
+                  ? 'bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] text-white shadow-sm' 
+                  : 'text-[#06C4D5] border border-[rgba(6,196,213,0.3)] hover:bg-[rgba(6,196,213,0.1)]'
               }`}
               onClick={() => setActiveCategory(category)}
             >
@@ -611,40 +611,40 @@ export default function Learn() {
             let shadowColor, borderColor, labelColor, labelText, labelBg;
             
             // Set default values
-            shadowColor = "rgba(4, 196, 213, 0.2)";  // default teal-ish
-            borderColor = "rgba(4,196,213,0.1)";
-            labelColor = "#148BAF";
-            labelBg = "rgba(4,196,213,0.15)";
+            shadowColor = "rgba(6, 196, 213, 0.2)";  // default teal-ish
+            borderColor = "rgba(6,196,213,0.1)";
+            labelColor = "#06C4D5";
+            labelBg = "rgba(6,196,213,0.15)";
             
             // Set icon-specific colors
             switch(term.icon) {
               case "cognitive": 
-                shadowColor = "rgba(168, 85, 247, 0.2)"; // purple
+                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
                 break;
               case "emotional": 
-                shadowColor = "rgba(239, 68, 68, 0.2)"; // red
+                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
                 break;
               case "behavioral": 
-                shadowColor = "rgba(234, 179, 8, 0.2)"; // yellow
+                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
                 break;
               case "social": 
-                shadowColor = "rgba(59, 130, 246, 0.2)"; // blue
+                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
                 break;
               case "mindfulness": 
-                shadowColor = "rgba(20, 184, 166, 0.2)"; // teal
+                shadowColor = "rgba(6, 196, 213, 0.2)"; // teal
                 break;
               case "neuroscience": 
-                shadowColor = "rgba(249, 115, 22, 0.2)"; // orange
-                borderColor = "rgba(249, 115, 22, 0.15)";
-                labelColor = "#EA580C";
-                labelBg = "rgba(249, 115, 22, 0.15)";
+                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
+                borderColor = "rgba(32, 142, 177, 0.15)";
+                labelColor = "#208EB1";
+                labelBg = "rgba(32, 142, 177, 0.15)";
                 labelText = "Neuroscience";
                 break;
               case "naval": 
-                shadowColor = "rgba(16, 185, 129, 0.2)"; // emerald
-                borderColor = "rgba(16, 185, 129, 0.15)";
-                labelColor = "#059669";
-                labelBg = "rgba(16, 185, 129, 0.15)";
+                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
+                borderColor = "rgba(32, 142, 177, 0.15)";
+                labelColor = "#208EB1";
+                labelBg = "rgba(32, 142, 177, 0.15)";
                 labelText = "Naval Ravikant";
                 break;
             }
@@ -662,59 +662,65 @@ export default function Learn() {
                   borderColor: borderColor
                 }}>
                   {/* Header row with columns: Icon+Name | Tag | CTA Button */}
-                  <div className="flex items-start sm:items-center justify-between mb-1 gap-2">
+                  <div className="flex items-start justify-between mb-3 gap-2">
                     {/* Column 1: Icon + Concept Name */}
-                    <div className="flex items-center gap-2 flex-grow min-w-0">
+                    <div className="flex items-start gap-2 sm:gap-3 flex-grow min-w-0">
                       {/* Icon */}
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 mt-1">
                         <span className="flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-full shadow-sm" style={{
-                          background: `linear-gradient(135deg, rgba(4, 196, 213, 0.15), ${shadowColor} 120%)`,
+                          background: `linear-gradient(135deg, rgba(6, 196, 213, 0.15), ${shadowColor} 120%)`,
                           boxShadow: `0 2px 8px ${shadowColor}`
                         }}>
                           {getIconComponent(term.icon)}
                         </span>
                       </div>
                       
-                      {/* Term title */}
-                      <h3 className="text-lg sm:text-xl font-bold text-[#148BAF] font-happy-monkey lowercase truncate">
-                        {term.term.toLowerCase()}
-                      </h3>
+                      {/* Term title and description */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base sm:text-lg lg:text-xl font-bold text-[#06C4D5] font-happy-monkey lowercase leading-tight mb-1">
+                          {term.term.toLowerCase()}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-black font-happy-monkey leading-snug opacity-90 line-clamp-2">
+                          {getSummary(term.term, term.category)}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Column 2: Category Tag + CTA Button */}
+                    <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 flex-shrink-0">
+                      {/* Category Tag - hidden on mobile, shown on desktop */}
+                      <span className="hidden sm:inline-block px-2 py-1 text-xs font-happy-monkey lowercase rounded-full bg-[rgba(6,196,213,0.1)] text-[#06C4D5] whitespace-nowrap">
+                        {term.category.toLowerCase()}
+                      </span>
                       
                       {/* Source label for special categories - hidden on mobile */}
                       {(term.icon === "naval" || term.icon === "neuroscience") && (
                         <span 
-                          className="hidden sm:inline-block text-xs px-2 py-0.5 rounded-md font-happy-monkey lowercase ml-1" 
+                          className="hidden sm:inline-block text-xs px-2 py-1 rounded-md font-happy-monkey lowercase" 
                           style={{ backgroundColor: labelBg, color: labelColor }}
                         >
                           {labelText}
                         </span>
                       )}
+                      
+                      {/* CTA Button - mobile responsive */}
+                      <button
+                        onClick={() => setSelected(selected === idx ? null : idx)}
+                        className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-happy-monkey lowercase font-medium bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] text-white shadow-sm hover:shadow-md transition-all hover:scale-105 whitespace-nowrap min-h-[44px] sm:min-h-[36px]"
+                        style={{
+                          background: selected === idx 
+                            ? 'linear-gradient(135deg, #06C4D5, #06C4D5)' 
+                            : 'linear-gradient(135deg, #06C4D5, #06C4D5)'
+                        }}
+                      >
+                        {selected === idx ? 'hide example' : 'see example'}
+                      </button>
                     </div>
-                    
-                    {/* Column 2: Category Tag - mobile responsive */}
-                    <div className="flex-shrink-0 hidden sm:block">
-                      <span className="inline-block px-2 py-0.5 text-xs font-happy-monkey lowercase rounded-full bg-[rgba(4,196,213,0.1)] text-[#148BAF] whitespace-nowrap">
-                        {term.category.toLowerCase()}
-                      </span>
-                    </div>
-                    
-                    {/* Column 3: CTA Button */}
-                    <button
-                      className={`flex-shrink-0 px-2 sm:px-3 py-1 sm:py-0.5 rounded-full text-xs font-happy-monkey lowercase font-medium transition-all ${
-                        selected === idx 
-                          ? 'bg-[#148BAF] text-white border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.20)]' 
-                          : 'bg-[#f7ffff] text-[#148BAF] border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.10)]'
-                      }`}
-                      style={{ minHeight: 'unset', height: 'auto', minWidth: '70px', textAlign: 'center' }}
-                      onClick={() => setSelected(selected === idx ? null : idx)}
-                    >
-                      {selected === idx ? "collapse" : "learn more"}
-                    </button>
                   </div>
                   
                   {/* Mobile category tag - shown below title on mobile */}
                   <div className="sm:hidden mb-2">
-                    <span className="inline-block px-2 py-0.5 text-xs font-happy-monkey lowercase rounded-full bg-[rgba(4,196,213,0.1)] text-[#148BAF]">
+                    <span className="inline-block px-2 py-0.5 text-xs font-happy-monkey lowercase rounded-full bg-[rgba(6,196,213,0.1)] text-[#06C4D5]">
                       {term.category.toLowerCase()}
                     </span>
                     {/* Source label for special categories on mobile */}
@@ -730,16 +736,9 @@ export default function Learn() {
                   
                   {/* Content section */}
                   <div className="ml-0 sm:ml-[50px]"> {/* Remove left margin on mobile */}
-                    {/* Summary text for collapsed state */}
-                    {selected !== idx && (
-                      <p className="text-[#148BAF] text-sm font-happy-monkey font-medium italic">
-                        {getSummary(term.term, term.category)}
-                      </p>
-                    )}
-                    
                     {/* Full description - only shown when expanded */}
                     {selected === idx && (
-                      <p className="text-gray-700 text-sm font-happy-monkey">
+                      <p className="text-black text-sm font-happy-monkey">
                         {term.explanation}
                       </p>
                     )}
@@ -758,18 +757,18 @@ export default function Learn() {
                       <div className="rounded-lg p-3 text-sm text-black leading-relaxed border transition-all" 
                            style={{ 
                              boxShadow: `inset 0 1px 5px ${shadowColor}`,
-                             backgroundColor: `${labelBg || 'rgba(4,196,213,0.05)'}`,
-                             borderColor: `${borderColor || 'rgba(4,196,213,0.15)'}`,
+                             backgroundColor: `${labelBg || 'rgba(6,196,213,0.05)'}`,
+                             borderColor: `${borderColor || 'rgba(6,196,213,0.15)'}`,
                              opacity: 0.9
                            }}>
-                        <p className="mb-2 font-medium text-[#148BAF] font-happy-monkey lowercase">example:</p>
+                        <p className="mb-2 font-medium text-[#06C4D5] font-happy-monkey lowercase">example:</p>
                         <p className="font-happy-monkey leading-tight text-xs sm:text-sm">{term.story}</p>
                       </div>
                       
                       <div className="mt-3 flex justify-center sm:justify-end">
                         <button 
                           onClick={goToPractices}
-                          className="text-white text-xs font-happy-monkey lowercase font-medium flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#04C4D5] to-[#148BAF] rounded-full hover:shadow-md transition-all hover:translate-y-[-2px]"
+                          className="text-white text-xs font-happy-monkey lowercase font-medium flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] rounded-full hover:shadow-md transition-all hover:translate-y-[-2px]"
                         >
                           find related practices
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -784,11 +783,11 @@ export default function Learn() {
             );
           })
         ) : (
-          <div className="text-center py-10 bg-white rounded-xl border border-[rgba(4,196,213,0.2)] shadow-md mx-3">
-            <div className="mx-auto w-16 h-16 mb-4 rounded-full flex items-center justify-center bg-[rgba(4,196,213,0.1)]">
-              <Search className="text-[#148BAF]" size={24} />
+          <div className="text-center py-10 bg-white rounded-xl border border-[rgba(6,196,213,0.2)] shadow-md mx-3">
+            <div className="mx-auto w-16 h-16 mb-4 rounded-full flex items-center justify-center bg-[rgba(6,196,213,0.1)]">
+              <Search className="text-[#06C4D5]" size={24} />
             </div>
-            <p className="text-[#148BAF] text-lg font-happy-monkey lowercase">no matching concepts found</p>
+            <p className="text-[#06C4D5] text-lg font-happy-monkey lowercase">no matching concepts found</p>
             <p className="text-black text-sm mt-2 font-happy-monkey lowercase">try a different search term or category</p>
           </div>
         )}

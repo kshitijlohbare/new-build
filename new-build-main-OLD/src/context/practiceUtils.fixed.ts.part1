@@ -1,0 +1,81 @@
+// Daily practices with SSL workaround for Node.js
+import { supabase as centralSupabase } from '@/lib/supabase'; // Use the centralized Supabase client
+import { createClient } from '@supabase/supabase-js'; // Import createClient
+import { Practice } from './PracticeContext';
+
+interface UserProgress {
+  totalPoints: number;
+  level: number;
+  nextLevelPoints: number;
+  streakDays: number;
+  totalCompleted: number;
+  lastCompletionDate?: string;
+  lastUpdatedAt?: string; // Track when the data was last updated
+  achievements: Array<{
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+  }>;
+}
+
+// LocalStorage key
+const LS_USER_PRACTICES_KEY = 'wellbeing_user_practices';
+
+// Supabase client setup with SSL workaround
+const supabaseUrl = 'https://svnczxevigicuskppyfz.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bmN6eGV2aWdpY3Vza3BweWZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwNDk1NDAsImV4cCI6MjA1OTYyNTU0MH0.00MNZRYjGKHTEFvF0enW-VCZ4qgDnXC4LeV8XsjGaEU';
+
+// Create a custom client that will try to work with or without SSL verification 
+const createSupabaseClient = () => {
+  // Determine if we're in Node.js environment
+  const isNode = typeof window === 'undefined' && typeof process !== 'undefined';
+  
+  // Only apply SSL workarounds in Node.js environment
+  if (isNode) {
+    console.warn('Node.js environment detected, applying SSL verification workarounds');
+    
+    // Disable SSL verification for Node.js - required for local dev environments
+    if (process.env) {
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      console.warn('SSL verification disabled via NODE_TLS_REJECT_UNAUTHORIZED=0');
+    }
+    
+    try {
+      // Create client with custom fetch options that ensure SSL verification is disabled
+      return createClient(supabaseUrl, supabaseKey, {
+        auth: {
+          persistSession: false // Don't try to use localStorage in Node.js
+        }
+      });
+    } catch (err) {
+      console.error('Error creating Supabase client:', err);
+      
+      // Last resort fallback - try to disable SSL via https module
+      try {
+        if (typeof require !== 'undefined') {
+          const https = require('https');
+          if (https.globalAgent && https.globalAgent.options) {
+            https.globalAgent.options.rejectUnauthorized = false;
+            console.warn('SSL verification forcibly disabled via https.globalAgent');
+          }
+        }
+        
+        return createClient(supabaseUrl, supabaseKey, {
+          auth: {
+            persistSession: false
+          }
+        });
+      } catch (innerError) {
+        console.error('All attempts to create Supabase client failed:', innerError);
+        throw new Error('Unable to initialize Supabase client');
+      }
+    }
+  } else {
+    // Browser environment - use normal client
+    return createClient(supabaseUrl, supabaseKey);
+  }
+};
+
+// Export Supabase client with SSL workaround
+export const customSupabase = createSupabaseClient();

@@ -1,151 +1,177 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/hooks/useToast';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { GithubIcon, Mail } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
-export const Login = () => {
+export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { signIn, user } = useAuth();
+  const [error, setError] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
+  const { signIn, signInWithProvider, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { toast } = useToast();
+  
+  // Get the redirect path from state or default to dashboard
+  const from = (location.state as { from?: string })?.from || '/';
 
-  // Redirect if user is already logged in
-  useEffect(() => {
-    console.log('Login component - User state changed:', user);
-    if (user) {
-      const from = location.state?.from || '/';
-      console.log('Redirecting to:', from);
-      navigate(from, { replace: true });
-    }
-  }, [user, navigate, location]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt for email:', email);
+    setError('');
     
-    try {
-      setLoading(true);
-      const { error } = await signIn(email, password);
-      
-      if (error) {
-        console.error('Login error:', error);
-        let errorMessage = "Failed to sign in. Please try again.";
-        
-        if (error.message?.toLowerCase().includes('invalid login credentials')) {
-          errorMessage = "Invalid email or password. Please check your credentials and try again.";
-        } else if (error.message?.toLowerCase().includes('email not confirmed')) {
-          errorMessage = "Your email address has not been confirmed. Please check your inbox for the confirmation link.";
-        }
-        
-        toast({
-          title: "Login Error",
-          description: errorMessage,
-          variant: "destructive"
-        });
-        return;
-      }
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
+    }
 
-      console.log('Login successful');
-      toast({
-        title: "Success",
-        description: "You have been signed in successfully"
-      });
+    try {
+      // Attempt sign in with extended session duration
+      const { error: signInError } = await signIn(email, password);
+      if (signInError) throw signInError;
       
-      // Navigation is handled by useEffect
-    } catch (error: any) {
-      console.error('Unexpected login error:', error);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
+      // If rememberMe is false, we could set a shorter session expiry
+      // But we're keeping the extended session by default for better UX
+      
+      // Navigate to the redirect path or dashboard
+      navigate(from, { replace: true });
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Failed to sign in');
+    }
+  };
+
+  const handleProviderSignIn = async (provider: 'github' | 'google') => {
+    try {
+      await signInWithProvider(provider);
+      // The redirect will be handled by the OAuth provider
+    } catch (err: any) {
+      setError(err.message || `Failed to sign in with ${provider}`);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#49DAEA] to-[rgba(196,254,255,0.2)]">
-      <Card className="w-full max-w-md p-8">
-        <h2 className="text-3xl font-happy-monkey text-center text-[#148BAF] mb-8">Login</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-happy-monkey text-[#148BAF]">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-[#148BAF] px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#148BAF] focus:border-transparent"
-              placeholder="Enter your email"
-              required
-              disabled={loading}
-              autoComplete="email"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-happy-monkey text-[#148BAF]">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-[#148BAF] px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#148BAF] focus:border-transparent"
-              placeholder="Enter your password"
-              required
-              disabled={loading}
-              autoComplete="current-password"
-            />
-          </div>
-
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#148BAF] text-white font-happy-monkey flex items-center justify-center"
-          >
-            {loading ? (
-              <>
-                <LoadingSpinner size="sm" className="mr-2" />
-                Signing in...
-              </>
-            ) : (
-              'Sign in'
-            )}
-          </Button>
-
-          <div className="text-center space-y-2">
+    <div className="min-h-screen flex items-center justify-center bg-[#F9FCFD] px-4">
+      <div className="w-full max-w-md">
+        {/* Logo and Header */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-happy-monkey text-[#06C4D5] lowercase">Welcome to Caktus Coco</h2>
+          <p className="text-gray-600 mt-2">Sign in to continue your wellbeing journey</p>
+        </div>
+        
+        {/* Login Form */}
+        <div className="bg-white p-8 rounded-xl shadow-md">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+          
+          <form onSubmit={handleEmailSignIn} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                autoComplete="email"
+                required
+                className="w-full"
+              />
+            </div>
+            
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <Link to="/forgot-password" className="text-xs text-[#06C4D5] hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                required
+                className="w-full"
+              />
+            </div>
+            
+            <div className="flex items-center">
+              <input
+                id="remember-me"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+                className="h-4 w-4 text-[#06C4D5] focus:ring-[#06C4D5] border-gray-300 rounded"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                Remember me
+              </label>
+            </div>
+            
             <Button
-              variant="link"
-              onClick={() => navigate('/forgot-password')}
-              className="text-[#148BAF] font-happy-monkey text-sm"
+              type="submit"
               disabled={loading}
-              type="button"
+              className="w-full bg-gradient-to-r from-[#06C4D5] to-[#208EB1] text-white py-2.5"
             >
-              Forgot Password?
+              {loading ? <LoadingSpinner size="sm" /> : 'Sign In'}
             </Button>
+          </form>
+          
+          {/* Divider */}
+          <div className="my-6 flex items-center">
+            <div className="flex-grow border-t border-gray-200"></div>
+            <span className="mx-4 text-sm text-gray-400">or</span>
+            <div className="flex-grow border-t border-gray-200"></div>
+          </div>
+          
+          {/* OAuth Buttons */}
+          <div className="space-y-3">
             <Button
-              variant="link"
-              onClick={() => navigate('/register')}
-              className="text-[#148BAF] font-happy-monkey"
-              disabled={loading}
               type="button"
+              onClick={() => handleProviderSignIn('google')}
+              disabled={loading}
+              variant="outline"
+              className="w-full"
             >
-              Don't have an account? Register
+              <Mail className="mr-2 h-4 w-4" />
+              Continue with Google
+            </Button>
+            
+            <Button
+              type="button"
+              onClick={() => handleProviderSignIn('github')}
+              disabled={loading}
+              variant="outline"
+              className="w-full"
+            >
+              <GithubIcon className="mr-2 h-4 w-4" />
+              Continue with GitHub
             </Button>
           </div>
-        </form>
-      </Card>
+        </div>
+        
+        {/* Registration Link */}
+        <div className="text-center mt-6">
+          <p className="text-gray-600 text-sm">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-[#06C4D5] hover:underline font-medium">
+              Sign up
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
-};
+}

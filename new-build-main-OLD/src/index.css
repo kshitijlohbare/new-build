@@ -1,0 +1,779 @@
+@import url('https://fonts.googleapis.com/css2?family=Happy+Monkey&family=Righteous&family=Luckiest+Guy&display=swap');
+
+/* tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animations for nav elements */
+@keyframes pulse-subtle {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s infinite ease-in-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --primary: #04C4D5;
+  --font-happy-monkey: 'Happy Monkey', cursive;
+  --font-righteous: 'Righteous', cursive;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+  --radius: 0.5rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Custom styles for vertical slider in focus timer */
+/* Create a simpler vertical slider with consistent positioning */
+.vertical-rotated-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 130px;
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #04C4D5 var(--slider-percentage), #E5E7EB var(--slider-percentage));
+  outline: none;
+  position: absolute;
+  top: 65px;  /* Position at the vertical center (130/2) */
+  left: -35px; /* Position at the horizontal center (60px - 130px)/2 */
+  transform: rotate(270deg);
+}
+
+/* Clean, simple slider container with consistent dimensions */
+.slider-container {
+  height: 130px;
+  width: 60px;
+  position: relative;
+  margin: 20px auto 15px auto;
+  overflow: visible; /* Allow slider thumb to extend outside container */
+  min-width: 60px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* Mobile optimizations for slider containers */
+@media (max-width: 768px) {
+  .slider-container {
+    margin: 15px auto;
+  }
+}
+
+/* Define consistent thumb appearance for all browsers */
+input[type="range"]::-webkit-slider-thumb,
+input[type="range"]::-moz-range-thumb,
+input[type="range"]::-ms-thumb {
+  appearance: none;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  background: white !important;
+  border: 2px solid #04C4D5 !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 4px rgba(4, 196, 213, 0.3) !important;
+}
+
+.vertical-rotated-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #04C4D5;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(4, 196, 213, 0.3);
+  /* Better centering of the thumb on the track */
+  margin-top: -6px;
+  z-index: 2;
+}
+
+.vertical-rotated-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #04C4D5;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(4, 196, 213, 0.3);
+  /* Better centering and visibility */
+  z-index: 2;
+  background: white;
+  border: 2px solid #04C4D5;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom timer styles */
+.timer-container {
+  position: relative;
+}
+
+.timer-display {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 4px 20px rgba(4, 196, 213, 0.2);
+  border: 2px solid rgba(4, 196, 213, 0.3);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.timer-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    #04C4D5 var(--progress-percentage), 
+    rgba(4, 196, 213, 0.1) var(--progress-percentage)
+  );
+  z-index: 0;
+}
+
+.timer-inner {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* Breathing animation for active session */
+@keyframes breathing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(4, 196, 213, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(4, 196, 213, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(4, 196, 213, 0);
+  }
+}
+
+.breathing-animation {
+  animation: breathing 4s infinite;
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Card hover effects */
+.preset-card {
+  transition: all 0.3s ease;
+}
+
+.preset-card:hover {
+  transform: translateY(-3px);
+}
+
+.preset-card.active {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(4, 196, 213, 0.2);
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  /* base styles */
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Happy Monkey', cursive;
+    line-height: 1.4;
+    color: hsl(var(--foreground));
+    background: hsl(var(--background));
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
+
+  /* For the homepage sections that need scrolling */
+  .custom-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  .card-base {
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--background));
+    border-radius: var(--radius);
+  }
+}
+
+@layer utilities {
+  .text-base {
+    font-family: 'Righteous', sans-serif !important;
+    font-size: 16px !important;
+  }
+  
+  .text-3xl {
+    font-family: 'Righteous', sans-serif !important;
+    color:#000000 !important;
+    font-size: 24px !important;
+  }
+
+  .text-2xl {
+    font-family: 'Righteous', sans-serif !important;
+    color:#000000 !important;
+    font-size: 20px !important;
+  }
+  
+  /* Hide scrollbar utility class */
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
+}
+
+/* ... existing styles ... */
+
+/* Remove old slider thumb styles if they exist */
+.slider-thumb-square::-webkit-slider-thumb,
+.slider-thumb-square::-moz-range-thumb {
+  /* Remove previous styles here if any */
+  all: unset; /* Reset any previous thumb styles */
+}
+
+/* Remove or comment out previous vertical slider styles */
+/*
+input[type="range"].vertical-slider {
+  -webkit-appearance: slider-vertical;
+  appearance: none;
+  width: 10px; 
+  padding: 0;
+  margin: 10px 0; 
+  background: linear-gradient(180deg, #49DAEA 0%, rgba(195.50, 253.79, 255, 0.20) 100%); 
+  border-radius: 4px; 
+  cursor: pointer;
+  outline: none; 
+}
+input[type="range"].vertical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; 
+  appearance: none;
+  width: 20px; 
+  height: 20px; 
+  background: #49DADD; 
+  border-radius: 4px; 
+  border: none; 
+  filter: drop-shadow(1px 2px 2px rgba(73, 218, 234, 0.5));
+  margin-left: -5px; 
+}
+input[type="range"].vertical-slider::-moz-range-thumb {
+  width: 20px; 
+  height: 20px; 
+  background: #49DADD; 
+  border-radius: 4px; 
+  border: none; 
+  cursor: pointer;
+  box-shadow: 1px 2px 2px rgba(73, 218, 234, 0.5);
+}
+input[type="range"].vertical-slider::-moz-range-track {
+  width: 10px;
+  background: linear-gradient(180deg, #49DAEA 0%, rgba(195.50, 253.79, 255, 0.20) 100%);
+  border-radius: 4px;
+  cursor: pointer;
+}
+input[type="range"].vertical-slider:focus::-moz-range-track {
+  background: linear-gradient(180deg, #49DAEA 0%, rgba(195.50, 253.79, 255, 0.20) 100%); 
+}
+*/
+
+/* New Rotated Vertical Slider Styles */
+.vertical-rotated-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 150px; /* Adjust width to control the visual length of the rotated slider */
+  height: 10px; /* Height becomes the track thickness when rotated */
+  padding: 0;
+  margin: 0;
+  /* Use CSS variable for dynamic fill */
+  background: linear-gradient(
+    to right, /* Visually bottom to top when rotated */
+    #49daea00 0%, /* Fill color */
+    #49DAEA var(--slider-percentage, 0%), /* Fill color up to percentage */
+    rgba(195.50, 253.79, 255, 0.20) var(--slider-percentage, 0%), /* Unfilled color from percentage */
+    rgba(195.50, 253.79, 255, 0.20) 100% /* Unfilled color to end */
+  );
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  transform-origin: center center;
+  transform: rotate(-90deg);
+  transition: background 0.3s ease;
+}
+
+.horizontal-rotated-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 150px; /* Adjust width to control the visual length of the rotated slider */
+  height: 10px; /* Height becomes the track thickness when rotated */
+  padding: 0;
+  margin: 0;
+  /* Use CSS variable for dynamic fill */
+  background: linear-gradient(
+    to right, /* Visually bottom to top when rotated */
+    #49daea00 0%, /* Fill color */
+    #49DAEA var(--width, 0%), /* Fill color up to percentage */
+    rgba(195.50, 253.79, 255, 0.20) var(--width, 0%), /* Unfilled color from percentage */
+    rgba(195.50, 253.79, 255, 0.20) 100% /* Unfilled color to end */
+  );
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  transform-origin: center center;
+  transition: background 0.3s ease;
+}
+
+/* Thumb Styles for Rotated Slider (WebKit) */
+.vertical-rotated-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #49DADD;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  filter: drop-shadow(1px 2px 2px rgba(73, 218, 234, 0.5));
+  /* No margin needed usually with rotation */
+  /* Ensure thumb rotates with the track */
+  transform: rotate(0deg); /* Counter-rotation not needed if track is rotated */
+}
+
+/* Thumb Styles for Rotated Slider (Firefox) */
+.vertical-rotated-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #49DADD;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 1px 2px 2px rgba(73, 218, 234, 0.5);
+}
+
+/* Track styling for Firefox (less direct control) */
+.vertical-rotated-slider::-moz-range-track {
+  width: 100%; /* Track takes full width before rotation */
+  height: 10px;
+  /* Use CSS variable for dynamic fill */
+  background: linear-gradient(
+    to right,
+    #49DAEA 0%,
+    #49DAEA var(--slider-percentage, 0%),
+    rgba(195.50, 253.79, 255, 0.20) var(--slider-percentage, 0%),
+    rgba(195.50, 253.79, 255, 0.20) 100%
+  );
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Remove focus outline for Firefox */
+.vertical-rotated-slider:focus {
+  outline: none;
+}
+.vertical-rotated-slider:focus::-moz-range-track {
+  /* Keep the dynamic gradient on focus */
+  background: linear-gradient(
+    to right,
+    #49DAEA 0%,
+    #49DAEA var(--slider-percentage, 0%),
+    rgba(195.50, 253.79, 255, 0.20) var(--slider-percentage, 0%),
+    rgba(195.50, 253.79, 255, 0.20) 100%
+  );
+}
+
+/* ... rest of your styles ... */
+
+/* Hide the outline for Firefox */
+input[type="range"].vertical-slider:focus {
+  outline: none;
+}
+
+/* Custom styles for square slider thumb */
+.slider-thumb-square::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 16px; /* Square dimensions */
+  height: 16px;
+  background: #148BAF; /* Adjust color as needed */
+  cursor: pointer;
+  border-radius: 0; /* Make it square */
+}
+
+.slider-thumb-square::-moz-range-thumb {
+  width: 16px; /* Square dimensions */
+  height: 16px;
+  background: #148BAF; /* Adjust color as needed */
+  cursor: pointer;
+  border-radius: 0; /* Make it square */
+  border: none; /* Remove default border in Firefox */
+}
+
+/* Font classes with uniform line height */
+.font-happy-monkey {
+  line-height: 1.2;
+}
+
+.font-kavoon {
+  line-height: 1.2;
+}
+
+.font-luckiest-guy {
+  font-family: 'Luckiest Guy', cursive;
+  line-height: 1.2;
+}
+
+/* Apply to all text by default */
+p, h1, h2, h3, h4, h5, h6, span, div {
+  line-height: 1.2;
+}
+
+/* Reduce line heights for better spacing */
+p, li, div {
+  line-height: 1.4; /* Default reduction */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2; /* Tighter heading line heights */
+}
+
+.leading-tight {
+  line-height: 1.2 !important; /* Ensuring tight spacing when this class is used */
+}
+
+.font-happy-monkey {
+  font-family: var(--font-happy-monkey);
+}
+
+.font-righteous {
+  font-family: var(--font-righteous);
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+/* Mobile-first spacing reductions */
+@media (max-width: 640px) {
+  .card, .section, .container {
+    padding: 0.5rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  h1, h2, h3 {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .gap-reduced-mobile > * + * {
+    margin-top: 0.5rem !important;
+  }
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive container classes */
+.container-sm {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.container-md {
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.container-lg {
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.container-xl {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Animation helpers */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-in-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+/* Fix for flexbox gap on Safari */
+@supports not (gap: 1rem) {
+  .flex > * + * {
+    margin-left: 1rem;
+  }
+}
+
+/* Badge Achievement Animation Styles */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes badge-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.badge-confetti {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.badge-confetti::before,
+.badge-confetti::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  animation: confetti-fall 3s ease-out infinite;
+}
+
+.badge-confetti::before {
+  background-color: #49DADD;
+  animation-delay: 0.2s;
+  left: 30%;
+}
+
+.badge-confetti::after {
+  background-color: #FFC700;
+  animation-delay: 0.5s;
+  left: 70%;
+}
+
+/* Generate multiple confetti pieces with different colors */
+.badge-confetti::before,
+.badge-confetti::after {
+  box-shadow:
+    /* Blue confetti */
+    10px 0 0 #49DADD,
+    -20px 0 0 #49DADD,
+    30px 0 0 #49DADD,
+    -40px 0 0 #49DADD,
+    50px 0 0 #49DADD,
+    /* Yellow confetti */
+    -10px 0 0 #FFC700,
+    20px 0 0 #FFC700,
+    -30px 0 0 #FFC700,
+    40px 0 0 #FFC700,
+    -50px 0 0 #FFC700,
+    /* Pink confetti */
+    15px 0 0 #FF8A9A,
+    -25px 0 0 #FF8A9A,
+    35px 0 0 #FF8A9A,
+    -45px 0 0 #FF8A9A;
+}
+
+/* Badge achievement popup entrance/exit animations */
+@keyframes badge-popup-in {
+  0% {
+    transform: translateY(20px) scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes badge-popup-out {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(20px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+.badge-popup-enter {
+  animation: badge-popup-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.badge-popup-exit {
+  animation: badge-popup-out 0.4s ease-in forwards;
+}
+
+/* Shimmer effect for badge icon */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-effect {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.8) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}

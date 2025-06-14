@@ -795,7 +795,7 @@ const PractitionerOnboarding = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] ${formErrors.name ? 'border-red-500' : ''}`}
+                className={`w-full min-h-[48px] sm:min-h-[40px] px-4 sm:px-3 py-3 sm:py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] text-base touch-manipulation ${formErrors.name ? 'border-red-500' : ''}`}
               />
               {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
             </div>
@@ -808,7 +808,7 @@ const PractitionerOnboarding = () => {
                 value={formData.specialty}
                 onChange={handleInputChange}
                 placeholder="e.g. Clinical Psychologist, Psychiatrist, Therapist"
-                className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] ${formErrors.specialty ? 'border-red-500' : ''}`}
+                className={`w-full min-h-[48px] sm:min-h-[40px] px-4 sm:px-3 py-3 sm:py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] text-base touch-manipulation ${formErrors.specialty ? 'border-red-500' : ''}`}
               />
               {formErrors.specialty && <p className="text-red-500 text-sm mt-1">{formErrors.specialty}</p>}
             </div>
@@ -821,7 +821,7 @@ const PractitionerOnboarding = () => {
                 value={formData.education}
                 onChange={handleInputChange}
                 placeholder="e.g. Mumbai University"
-                className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] ${formErrors.education ? 'border-red-500' : ''}`}
+                className={`w-full min-h-[48px] sm:min-h-[40px] px-4 sm:px-3 py-3 sm:py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] text-base touch-manipulation ${formErrors.education ? 'border-red-500' : ''}`}
               />
               {formErrors.education && <p className="text-red-500 text-sm mt-1">{formErrors.education}</p>}
             </div>
@@ -834,7 +834,7 @@ const PractitionerOnboarding = () => {
                 value={formData.degree}
                 onChange={handleInputChange}
                 placeholder="e.g. M.Phil. Clinical Psychology"
-                className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] ${formErrors.degree ? 'border-red-500' : ''}`}
+                className={`w-full min-h-[48px] sm:min-h-[40px] px-4 sm:px-3 py-3 sm:py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] text-base touch-manipulation ${formErrors.degree ? 'border-red-500' : ''}`}
               />
               {formErrors.degree && <p className="text-red-500 text-sm mt-1">{formErrors.degree}</p>}
             </div>
@@ -853,7 +853,7 @@ const PractitionerOnboarding = () => {
                 value={formData.bio}
                 onChange={handleInputChange}
                 placeholder="Tell clients about yourself, your background, and approach to therapy (minimum 50 characters)"
-                className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] h-32 ${formErrors.bio ? 'border-red-500' : ''}`}
+                className={`w-full min-h-[120px] sm:min-h-[80px] px-4 sm:px-3 py-3 sm:py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] text-base touch-manipulation resize-y ${formErrors.bio ? 'border-red-500' : ''}`}
               ></textarea>
               {formErrors.bio && <p className="text-red-500 text-sm mt-1">{formErrors.bio}</p>}
               <p className="text-gray-500 text-xs mt-1">{formData.bio.length}/50 characters minimum</p>
@@ -868,14 +868,26 @@ const PractitionerOnboarding = () => {
                 value={formData.approach ? { value: formData.approach, label: approachOptions.find(opt => opt.value === formData.approach)?.label || formData.approach } : null}
                 onChange={(selected, action) => handleSingleSelectChange(selected, action)}
                 placeholder="Select your primary therapeutic approach"
-                className={`basic-select ${formErrors.approach ? 'border-red-500' : ''}`}
-                styles={formErrors.approach ? {
+                className={`basic-select touch-manipulation ${formErrors.approach ? 'border-red-500' : ''}`}
+                classNamePrefix="react-select"
+                isSearchable={true}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                   control: (base) => ({
                     ...base,
-                    borderColor: '#ef4444',
-                    '&:hover': { borderColor: '#ef4444' }
+                    minHeight: '48px',
+                    '@media (min-width: 640px)': {
+                      minHeight: '40px'
+                    },
+                    touchAction: 'manipulation',
+                    ...(formErrors.approach ? {
+                      borderColor: '#ef4444',
+                      '&:hover': { borderColor: '#ef4444' }
+                    } : {})
                   })
-                } : {}}
+                }}
               />
               {formErrors.approach && <p className="text-red-500 text-sm mt-1">{formErrors.approach}</p>}
             </div>
@@ -892,7 +904,22 @@ const PractitionerOnboarding = () => {
                 }))}
                 onChange={(selected, action) => handleSelectChange(selected, action)}
                 placeholder="Select conditions you specialize in treating"
-                className="basic-multi-select"
+                className="basic-multi-select touch-manipulation"
+                classNamePrefix="react-select"
+                isSearchable={true}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  control: (base) => ({
+                    ...base,
+                    minHeight: '48px',
+                    '@media (min-width: 640px)': {
+                      minHeight: '40px'
+                    },
+                    touchAction: 'manipulation'
+                  })
+                }}
               />
             </div>
             
@@ -908,14 +935,26 @@ const PractitionerOnboarding = () => {
                 }))}
                 onChange={handleLanguagesChange}
                 placeholder="Select languages you're fluent in"
-                className={`basic-multi-select ${formErrors.languages ? 'border-red-500' : ''}`}
-                styles={formErrors.languages ? {
+                className={`basic-multi-select touch-manipulation ${formErrors.languages ? 'border-red-500' : ''}`}
+                classNamePrefix="react-select"
+                isSearchable={true}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                   control: (base) => ({
                     ...base,
-                    borderColor: '#ef4444',
-                    '&:hover': { borderColor: '#ef4444' }
+                    minHeight: '48px',
+                    '@media (min-width: 640px)': {
+                      minHeight: '40px'
+                    },
+                    touchAction: 'manipulation',
+                    ...(formErrors.languages ? {
+                      borderColor: '#ef4444',
+                      '&:hover': { borderColor: '#ef4444' }
+                    } : {})
                   })
-                } : {}}
+                }}
               />
               {formErrors.languages && <p className="text-red-500 text-sm mt-1">{formErrors.languages}</p>}
             </div>
@@ -927,7 +966,7 @@ const PractitionerOnboarding = () => {
                 value={formData.certifications}
                 onChange={handleInputChange}
                 placeholder="List your professional certifications and licenses"
-                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] h-24"
+                className="w-full min-h-[96px] sm:min-h-[80px] px-4 sm:px-3 py-3 sm:py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] text-base touch-manipulation resize-y"
               ></textarea>
             </div>
           </div>
@@ -950,53 +989,65 @@ const PractitionerOnboarding = () => {
                 }))}
                 onChange={(selected, action) => handleSelectChange(selected, action)}
                 placeholder="Select session formats you offer"
-                className={`basic-multi-select ${formErrors.session_format ? 'border-red-500' : ''}`}
-                styles={formErrors.session_format ? {
+                className={`basic-multi-select touch-manipulation ${formErrors.session_format ? 'border-red-500' : ''}`}
+                classNamePrefix="react-select"
+                isSearchable={false}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                   control: (base) => ({
                     ...base,
-                    borderColor: '#ef4444',
-                    '&:hover': { borderColor: '#ef4444' }
+                    minHeight: '48px',
+                    '@media (min-width: 640px)': {
+                      minHeight: '40px'
+                    },
+                    touchAction: 'manipulation',
+                    ...(formErrors.session_format ? {
+                      borderColor: '#ef4444',
+                      '&:hover': { borderColor: '#ef4444' }
+                    } : {})
                   })
-                } : {}}
+                }}
               />
               {formErrors.session_format && <p className="text-red-500 text-sm mt-1">{formErrors.session_format}</p>}
             </div>
             
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Location Type</label>
-              <div className="flex space-x-4">
-                <label className="inline-flex items-center">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <label className="inline-flex items-center min-h-[44px] sm:min-h-[36px] touch-manipulation">
                   <input 
                     type="radio" 
                     name="location_type" 
                     value="online" 
                     checked={formData.location_type === 'online'}
                     onChange={handleInputChange}
-                    className="form-radio text-[#148BAF]"
+                    className="form-radio text-[#148BAF] w-5 h-5 sm:w-4 sm:h-4"
                   />
-                  <span className="ml-2">Online only</span>
+                  <span className="ml-3 sm:ml-2 text-base sm:text-sm">Online only</span>
                 </label>
-                <label className="inline-flex items-center">
+                <label className="inline-flex items-center min-h-[44px] sm:min-h-[36px] touch-manipulation">
                   <input 
                     type="radio" 
                     name="location_type" 
                     value="in-person" 
                     checked={formData.location_type === 'in-person'}
                     onChange={handleInputChange}
-                    className="form-radio text-[#148BAF]"
+                    className="form-radio text-[#148BAF] w-5 h-5 sm:w-4 sm:h-4"
                   />
-                  <span className="ml-2">In-person only</span>
+                  <span className="ml-3 sm:ml-2 text-base sm:text-sm">In-person only</span>
                 </label>
-                <label className="inline-flex items-center">
+                <label className="inline-flex items-center min-h-[44px] sm:min-h-[36px] touch-manipulation">
                   <input 
                     type="radio" 
                     name="location_type" 
                     value="hybrid" 
                     checked={formData.location_type === 'hybrid'}
                     onChange={handleInputChange}
-                    className="form-radio text-[#148BAF]"
+                    className="form-radio text-[#148BAF] w-5 h-5 sm:w-4 sm:h-4"
                   />
-                  <span className="ml-2">Both online and in-person</span>
+                  <span className="ml-3 sm:ml-2 text-base sm:text-sm">Both online and in-person</span>
                 </label>
               </div>
             </div>
@@ -1011,14 +1062,26 @@ const PractitionerOnboarding = () => {
                   label: priceRangeOptions.find(opt => opt.value === formData.price)?.label || `₹${formData.price} per session` 
                 }}
                 onChange={(selected, action) => handleNumberSelectChange(selected, action)}
-                className={`basic-select ${formErrors.price ? 'border-red-500' : ''}`}
-                styles={formErrors.price ? {
+                className={`basic-select touch-manipulation ${formErrors.price ? 'border-red-500' : ''}`}
+                classNamePrefix="react-select"
+                isSearchable={false}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                   control: (base) => ({
                     ...base,
-                    borderColor: '#ef4444',
-                    '&:hover': { borderColor: '#ef4444' }
+                    minHeight: '48px',
+                    '@media (min-width: 640px)': {
+                      minHeight: '40px'
+                    },
+                    touchAction: 'manipulation',
+                    ...(formErrors.price ? {
+                      borderColor: '#ef4444',
+                      '&:hover': { borderColor: '#ef4444' }
+                    } : {})
                   })
-                } : {}}
+                }}
               />
               {formErrors.price && <p className="text-red-500 text-sm mt-1">{formErrors.price}</p>}
             </div>
@@ -1033,14 +1096,26 @@ const PractitionerOnboarding = () => {
                   label: experienceOptions.find(opt => opt.value === formData.years_experience)?.label || `${formData.years_experience}+ years` 
                 }}
                 onChange={(selected, action) => handleNumberSelectChange(selected, action)}
-                className={`basic-select ${formErrors.years_experience ? 'border-red-500' : ''}`}
-                styles={formErrors.years_experience ? {
+                className={`basic-select touch-manipulation ${formErrors.years_experience ? 'border-red-500' : ''}`}
+                classNamePrefix="react-select"
+                isSearchable={false}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                   control: (base) => ({
                     ...base,
-                    borderColor: '#ef4444',
-                    '&:hover': { borderColor: '#ef4444' }
+                    minHeight: '48px',
+                    '@media (min-width: 640px)': {
+                      minHeight: '40px'
+                    },
+                    touchAction: 'manipulation',
+                    ...(formErrors.years_experience ? {
+                      borderColor: '#ef4444',
+                      '&:hover': { borderColor: '#ef4444' }
+                    } : {})
                   })
-                } : {}}
+                }}
               />
               {formErrors.years_experience && <p className="text-red-500 text-sm mt-1">{formErrors.years_experience}</p>}
             </div>
@@ -1057,7 +1132,21 @@ const PractitionerOnboarding = () => {
                 }))}
                 onChange={(selected, action) => handleSelectChange(selected, action)}
                 placeholder="Select insurance plans you accept"
-                className="basic-multi-select"
+                className="basic-multi-select touch-manipulation"
+                classNamePrefix="react-select"
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  control: (base) => ({
+                    ...base,
+                    minHeight: '48px',
+                    '@media (min-width: 640px)': {
+                      minHeight: '40px'
+                    },
+                    touchAction: 'manipulation'
+                  })
+                }}
               />
             </div>
             
@@ -1069,7 +1158,7 @@ const PractitionerOnboarding = () => {
                 value={formData.availability}
                 onChange={handleInputChange}
                 placeholder="e.g. Weekdays 9am-5pm, Weekends 10am-2pm"
-                className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] ${formErrors.availability ? 'border-red-500' : ''}`}
+                className={`w-full min-h-[48px] sm:min-h-[40px] px-4 sm:px-3 py-3 sm:py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] text-base touch-manipulation ${formErrors.availability ? 'border-red-500' : ''}`}
               />
               {formErrors.availability && <p className="text-red-500 text-sm mt-1">{formErrors.availability}</p>}
             </div>
@@ -1082,7 +1171,7 @@ const PractitionerOnboarding = () => {
                 value={formData.calendly_link}
                 onChange={handleInputChange}
                 placeholder="https://calendly.com/your-username"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="w-full min-h-[48px] sm:min-h-[40px] px-4 sm:px-3 py-3 sm:py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] text-base touch-manipulation"
               />
               {formErrors.calendly_link && <p className="text-red-500 text-xs mt-1">{formErrors.calendly_link}</p>}
             </div>

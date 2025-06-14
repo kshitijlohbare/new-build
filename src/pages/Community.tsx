@@ -1,17 +1,6 @@
-import { useState, useEffect } from "react";
-import { Smile, BookOpen, Lightbulb, MessageCircle, User, Heart, ThumbsUp, Filter, UserCheck } from 'lucide-react';
-import { usePractices } from "@/context/PracticeContext";
-import { useToast } from '@/hooks/useToast';
-import { useAuth } from "@/context/AuthContext";
-import { useProfile } from "@/context/ProfileContext";
-import { supabase } from "@/lib/supabase";
-import { Button } from "@/components/ui/button";
-import UserProfileCard from "@/components/ui/UserProfileCard";
-
-// Import icons for practice streaks
-import StreakLesserThan10 from "../assets/icons/Streak_lesser_than_10.svg";
-import StreakGreaterThan10 from "../assets/icons/Streak_greater_than_10.svg";
-import StreakGreaterThan21 from "../assets/icons/Streak_greater_than_21.svg";
+// filepath: /Users/kshitijlohbare/Downloads/new build/src/pages/Community.tsx
+import { useState } from "react";
+import GroupMessages from "./GroupMessages";
 
 // Premium CSS animation keyframes with glassmorphism effects
 const animationStyles = `
@@ -29,1203 +18,144 @@ const animationStyles = `
   0% { transform: translateY(-10px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
 }
-
-@keyframes mobile-bounce {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-2px); }
-  100% { transform: translateY(0px); }
-}
-
-@keyframes chip-glow {
-  0% { box-shadow: 0 6px 24px rgba(4,196,213,0.15); }
-  50% { box-shadow: 0 12px 40px rgba(4,196,213,0.25); }
-  100% { box-shadow: 0 6px 24px rgba(4,196,213,0.15); }
-}
-
-@keyframes chip-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-@keyframes float-orb {
-  0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
-  33% { transform: translateY(-10px) translateX(5px) rotate(120deg); }
-  66% { transform: translateY(5px) translateX(-5px) rotate(240deg); }
-  100% { transform: translateY(0px) translateX(0px) rotate(360deg); }
-}
-
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes backdrop-blur-pulse {
-  0% { backdrop-filter: blur(8px); }
-  50% { backdrop-filter: blur(12px); }
-  100% { backdrop-filter: blur(8px); }
-}
-
-.card-hover {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.card-hover:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 12px 32px rgba(4, 196, 213, 0.2);
-}
-
-/* Enhanced mobile-specific hover effects */
-@media (hover: hover) {
-  .card-hover:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 12px 32px rgba(4, 196, 213, 0.2);
-  }
-}
-
-@media (hover: none) {
-  .card-hover:active {
-    transform: translateY(-3px) scale(1.01);
-    box-shadow: 0 8px 24px rgba(4, 196, 213, 0.15);
-  }
-}
-
-.animate-slide-down {
-  animation: slide-down 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-.mobile-bounce {
-  animation: mobile-bounce 0.8s ease-in-out;
-}
-
-.float-orb {
-  animation: float-orb 6s ease-in-out infinite;
-}
-
-.gradient-shift {
-  background-size: 200% 200%;
-  animation: gradient-shift 4s ease infinite;
-}
-
-.backdrop-blur-pulse {
-  animation: backdrop-blur-pulse 3s ease-in-out infinite;
-}
-
-/* Enhanced scrollbar hiding for mobile */
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Alternative scrollbar hiding class */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Mobile-optimized text line clamping */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Touch-friendly button styles */
-.touch-button {
-  min-height: 44px;
-  min-width: 44px;
-  touch-action: manipulation;
-}
-
-/* Mobile-optimized focus states */
-@media (max-width: 768px) {
-  .focus-mobile:focus {
-    outline: 2px solid rgba(4, 196, 213, 0.5);
-    outline-offset: 2px;
-  }
-}
 `;
 
-interface CommunityPost {
-  id: number;
-  type: "practice" | "delight" | "tip" | "story";
-  author: string;
-  content: string;
-  createdAt: string;
-  user_id?: string; // Add user_id for filtering
-  // For practices
-  title?: string;
-  steps?: string[];
-  practiceId?: number; // Reference to original practice
-  // For delights
-  cheers?: number;
-  comments?: { author: string; text: string; createdAt: string }[];
-  // For tips & stories
-  upvotes?: number;
-  threadComments?: { author: string; text: string; createdAt: string }[];
-}
-
-interface CommunityDelight {
-  id: number;
-  text: string;
-  user_id: string;
-  username: string;
-  created_at: string;
-  cheers?: number;
-  comments?: { author: string; text: string; createdAt: string }[];
-}
-
-const typeLabels: Record<CommunityPost["type"], string> = {
-  practice: "User Practice",
-  delight: "Delight",
-  tip: "Tip",
-  story: "Story",
-};
-
 export default function Community() {
-  const { practices, addPractice } = usePractices();
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const { followingList, suggestedUsers, getSuggestedUsers } = useProfile();
-  const [posts, setPosts] = useState<CommunityPost[]>([]);
-  const [communityDelights, setCommunityDelights] = useState<CommunityDelight[]>([]);
-  const [activeTab, setActiveTab] = useState<'practice' | 'delight' | 'tipsStories'>("practice");
-  // Add a refresh timer for community delights
-  const [lastRefresh, setLastRefresh] = useState(Date.now());
-  
-  // Tips & Stories state
-  const [formContent, setFormContent] = useState("");
-  const [formType, setFormType] = useState<"tip" | "story">("tip");
-  const [threadComment, setThreadComment] = useState("");
-  const [activeThread, setActiveThread] = useState<number | null>(null);
-  
-  // Filter by following
-  const [showFollowingOnly, setShowFollowingOnly] = useState(false);
-  const [followingUserIds, setFollowingUserIds] = useState<string[]>([]);
-  
-  // People section
-  const [showPeopleSection, setShowPeopleSection] = useState(false);
-  const [followCheckMap, setFollowCheckMap] = useState<Record<string, boolean>>({});
-  
-  // Load following user IDs when the component mounts
-  useEffect(() => {
-    if (followingList?.length > 0) {
-      const ids = followingList.map(user => user.id);
-      setFollowingUserIds(ids);
-      
-      // Initialize the follow check map
-      const initialMap: Record<string, boolean> = {};
-      followingList.forEach(user => {
-        initialMap[user.id] = true;
-      });
-      setFollowCheckMap(initialMap);
-    }
-  }, [followingList]);
-  
-  // Load suggested users
-  useEffect(() => {
-    if (showPeopleSection) {
-      getSuggestedUsers();
-    }
-  }, [showPeopleSection]);
-  
-  // Check follow status for suggested users
-  useEffect(() => {
-    const checkFollowStatus = async () => {
-      if (suggestedUsers?.length > 0) {
-        const statusMap: Record<string, boolean> = { ...followCheckMap };
-        
-        for (const suggestedUser of suggestedUsers) {
-          if (statusMap[suggestedUser.id] === undefined) {
-            statusMap[suggestedUser.id] = followingUserIds.includes(suggestedUser.id);
-          }
-        }
-        
-        setFollowCheckMap(statusMap);
-      }
-    };
-    
-    checkFollowStatus();
-  }, [suggestedUsers, followingUserIds]);
+  const [activeView, setActiveView] = useState<'newsfeed' | 'community' | 'profile'>('community');
 
-  // Filter posts based on showFollowingOnly
-  const filteredPosts = showFollowingOnly 
-    ? posts.filter(post => post.user_id && followingUserIds.includes(post.user_id))
-    : posts;
-    
-  const filteredDelights = showFollowingOnly
-    ? communityDelights.filter(delight => followingUserIds.includes(delight.user_id))
-    : communityDelights;
-    
-  // Toggle follow status
-  const handleFollowToggle = (userId: string) => {
-    setFollowCheckMap(prev => ({
-      ...prev,
-      [userId]: !prev[userId]
-    }));
-    
-    // Update followingUserIds
-    if (followCheckMap[userId]) {
-      setFollowingUserIds(prev => prev.filter(id => id !== userId));
-    } else {
-      setFollowingUserIds(prev => [...prev, userId]);
-    }
-  };
-  
-  // People section toggle
-  const togglePeopleSection = () => {
-    setShowPeopleSection(!showPeopleSection);
-  };
-  
-  // Render the people section
-  const renderPeopleSection = () => {
-    if (!showPeopleSection) return null;
-    
-    return (
-      <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-white rounded-[20px] shadow-lg animate-slide-down w-full mx-2 sm:mx-0" style={{
-        boxShadow: '0 4px 20px rgba(4, 196, 213, 0.1), 0 1px 3px rgba(0,0,0,0.05)',
-        border: '1px solid rgba(4, 196, 213, 0.1)'
-      }}>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-0">
-          <h2 className="text-xl sm:text-2xl font-happy-monkey lowercase text-[#148BAF] flex items-center gap-2">
-            <User className="w-5 h-5 sm:w-6 sm:h-6" />
-            People to Follow
-          </h2>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={togglePeopleSection}
-            className="text-sm font-happy-monkey touch-button self-end sm:self-auto px-4 py-2 rounded-full hover:bg-[rgba(4,196,213,0.1)] text-[#148BAF]"
-            style={{ minHeight: '44px' }}
-          >
-            Hide
-          </Button>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-4">
-          {suggestedUsers.map(suggestedUser => (
-            <UserProfileCard
-              key={suggestedUser.id}
-              user={suggestedUser}
-              isFollowing={followCheckMap[suggestedUser.id] || false}
-              onFollowToggle={() => handleFollowToggle(suggestedUser.id)}
-            />
-          ))}
-        </div>
-        
-        {suggestedUsers.length === 0 && (
-          <div className="text-center py-8 sm:py-12">
-            <User className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
-            <p className="text-center text-gray-500 text-sm sm:text-base font-happy-monkey">
-              No suggested users available at this time.
-            </p>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // Optimized filter controls with improved mobile experience
-  const renderFilterControls = () => {
-    return (
-      <div className="mb-6 sm:mb-8 px-3 sm:px-4">
-        {/* Streamlined container with better mobile adaptation */}
-        <div className="relative backdrop-blur-lg bg-white/95 rounded-2xl p-4 sm:p-5 border border-white/60 shadow-[0_4px_24px_rgba(4,196,213,0.08)] overflow-hidden">
-          
-          {/* Subtle background accent */}
-          <div className="absolute -top-2 -left-2 w-12 h-12 bg-gradient-to-br from-[#04C4D5]/10 to-[#7B61FF]/10 rounded-full blur-xl"></div>
-          <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-gradient-to-br from-[#F59E0B]/8 to-[#DC2626]/8 rounded-full blur-xl"></div>
-          
-          {/* Main filter container */}
-          <div className="relative z-10">
-            {/* Compact header */}
-            <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#04C4D5]"></div>
-                Filters
-              </span>
-              <div className="text-xs text-gray-400 font-medium">
-                {activeTab} • {showFollowingOnly ? 'following' : 'all'} • {showPeopleSection ? 'people visible' : 'posts only'}
-              </div>
-            </div>
-            
-            {/* Single row layout for better mobile experience */}
-            <div className="flex flex-wrap gap-2 sm:gap-3">
-              {/* Content Type Chips - Compact design */}
-              <div className="flex gap-1.5 sm:gap-2">
-                <button 
-                  onClick={() => setActiveTab('practice')}
-                  className={`group px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm whitespace-nowrap transition-all duration-300 font-happy-monkey lowercase flex items-center gap-1.5 sm:gap-2 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#16A34A]/30 ${
-                    activeTab === 'practice' 
-                      ? 'bg-gradient-to-r from-[#16A34A] to-[#15803D] text-white shadow-[0_4px_16px_rgba(22,163,74,0.3)] border border-white/20' 
-                      : 'text-[#16A34A] bg-white/80 border border-[#16A34A]/25 hover:border-[#16A34A]/40 hover:bg-[#16A34A]/5 shadow-[0_2px_8px_rgba(22,163,74,0.1)]'
-                  }`}
-                >
-                  <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="font-semibold">practices</span>
-                </button>
-                
-                <button 
-                  onClick={() => setActiveTab('delight')}
-                  className={`group px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm whitespace-nowrap transition-all duration-300 font-happy-monkey lowercase flex items-center gap-1.5 sm:gap-2 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/30 ${
-                    activeTab === 'delight' 
-                      ? 'bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white shadow-[0_4px_16px_rgba(245,158,11,0.3)] border border-white/20' 
-                      : 'text-[#F59E0B] bg-white/80 border border-[#F59E0B]/25 hover:border-[#F59E0B]/40 hover:bg-[#F59E0B]/5 shadow-[0_2px_8px_rgba(245,158,11,0.1)]'
-                  }`}
-                >
-                  <Smile className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="font-semibold">delights</span>
-                </button>
-                
-                <button 
-                  onClick={() => setActiveTab('tipsStories')}
-                  className={`group px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm whitespace-nowrap transition-all duration-300 font-happy-monkey lowercase flex items-center gap-1.5 sm:gap-2 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#DC2626]/30 ${
-                    activeTab === 'tipsStories' 
-                      ? 'bg-gradient-to-r from-[#DC2626] to-[#B91C1C] text-white shadow-[0_4px_16px_rgba(220,38,38,0.3)] border border-white/20' 
-                      : 'text-[#DC2626] bg-white/80 border border-[#DC2626]/25 hover:border-[#DC2626]/40 hover:bg-[#DC2626]/5 shadow-[0_2px_8px_rgba(220,38,38,0.1)]'
-                  }`}
-                >
-                  <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="font-semibold">tips</span>
-                </button>
-              </div>
-              
-              {/* Separator */}
-              <div className="w-px bg-gradient-to-b from-transparent via-gray-300 to-transparent my-1 hidden sm:block"></div>
-              
-              {/* View Control Chips */}
-              <div className="flex gap-1.5 sm:gap-2">
-                <button 
-                  onClick={() => setShowFollowingOnly(!showFollowingOnly)}
-                  className={`group px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm whitespace-nowrap transition-all duration-300 font-happy-monkey lowercase flex items-center gap-1.5 sm:gap-2 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#04C4D5]/30 ${
-                    showFollowingOnly 
-                      ? 'bg-gradient-to-r from-[#04C4D5] to-[#0891B2] text-white shadow-[0_4px_16px_rgba(4,196,213,0.3)] border border-white/20' 
-                      : 'text-[#0891B2] bg-white/80 border border-[#04C4D5]/25 hover:border-[#04C4D5]/40 hover:bg-[#04C4D5]/5 shadow-[0_2px_8px_rgba(4,196,213,0.1)]'
-                  }`}
-                >
-                  {showFollowingOnly ? (
-                    <>
-                      <UserCheck className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span className="font-semibold hidden sm:inline">following</span>
-                      <span className="font-semibold sm:hidden">follow</span>
-                    </>
-                  ) : (
-                    <>
-                      <Filter className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span className="font-semibold">all</span>
-                    </>
-                  )}
-                </button>
-                
-                <button 
-                  onClick={togglePeopleSection}
-                  className={`group px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm whitespace-nowrap transition-all duration-300 font-happy-monkey lowercase flex items-center gap-1.5 sm:gap-2 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#7B61FF]/30 ${
-                    showPeopleSection 
-                      ? 'bg-gradient-to-r from-[#7B61FF] to-[#6D28D9] text-white shadow-[0_4px_16px_rgba(123,97,255,0.3)] border border-white/20' 
-                      : 'text-[#6D28D9] bg-white/80 border border-[#7B61FF]/25 hover:border-[#7B61FF]/40 hover:bg-[#7B61FF]/5 shadow-[0_2px_8px_rgba(123,97,255,0.1)]'
-                  }`}
-                >
-                  <User className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="font-semibold">{showPeopleSection ? 'hide' : 'people'}</span>
-                </button>
-              </div>
+  const renderContent = () => {
+    switch (activeView) {
+      case 'community':
+        // Default view showing both groups and messages
+        return <GroupMessages />;
+      case 'newsfeed':
+        // Placeholder for news feed view
+        return (
+          <div className="flex flex-col items-center justify-center h-[60vh] px-5">
+            <div className="text-center py-12 bg-[#F7FFFF] rounded-lg border border-[#04C4D5] w-full">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#04C4D5" className="mx-auto mb-4">
+                <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2z"></path>
+                <path d="M3 8h18"></path>
+                <path d="M9 21V8"></path>
+              </svg>
+              <h3 className="text-lg font-medium text-[#208EB1] mb-2">News Feed Coming Soon</h3>
+              <p className="text-[#208EB1]">Stay tuned for updates from your community!</p>
             </div>
           </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Fetch community practices and delights
-  useEffect(() => {
-    // Sample fetch for community practices - in a real app, fetch from DB
-    const fetchCommunityPractices = async () => {
-      // For demo purposes, we're creating sample community-shared practices
-      const communityPractices = practices
-        .filter(p => p.userCreated)
-        .map((practice) => ({
-          id: practice.id + 1000, // Avoid ID collision
-          type: "practice" as const,
-          author: "Community User",
-          content: practice.description,
-          title: practice.name,
-          createdAt: new Date().toISOString(),
-          practiceId: practice.id,
-          steps: practice.steps?.map(s => s.title) || []
-        }));
-      
-      setPosts(prevPosts => {
-        const nonPracticePosts = prevPosts.filter(p => p.type !== "practice");
-        return [...nonPracticePosts, ...communityPractices];
-      });
-    };
-
-    const fetchCommunityDelights = async () => {
-      try {
-        // Check if the community_delights table exists, attempt to create it if not
-        const { error: testError } = await supabase
-          .from('community_delights')
-          .select('id')
-          .limit(1);
-          
-        if (testError && testError.code === '42P01') {
-          console.log('Community delights table does not exist, initializing...');
-          try {
-            const { checkCommunityDelightsTable } = await import('../scripts/checkCommunityDelights');
-            await checkCommunityDelightsTable();
-            // Wait a moment for the table to be created
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          } catch (initError) {
-            console.error("Failed to initialize community delights table:", initError);
-          }
-        }
-      
-        // Now fetch the delights
-        const { data, error } = await supabase
-          .from('community_delights')
-          .select('*')
-          .order('created_at', { ascending: false });
-          
-        if (error) {
-          console.error("Error fetching community delights:", error);
-        } else {
-          setCommunityDelights((data || []).map((d: any) => ({
-            id: Number(d.id),
-            text: String(d.text),
-            user_id: String(d.user_id),
-            username: String(d.username),
-            created_at: String(d.created_at),
-            cheers: d.cheers !== undefined ? Number(d.cheers) : undefined,
-            comments: Array.isArray(d.comments) ? d.comments : undefined,
-          })));
-        }
-      } catch (err) {
-        console.error("Error in community delights fetch:", err);
-      }
-    };
-
-    fetchCommunityPractices();
-    fetchCommunityDelights();
-    
-    // Set up a periodic refresh of community delights every 30 seconds
-    // This ensures that newly shared delights will appear
-    const refreshInterval = setInterval(() => {
-      if (activeTab === 'delight') { // Only refresh when the delights tab is active
-        setLastRefresh(Date.now());
-      }
-    }, 30000);
-    
-    return () => clearInterval(refreshInterval);
-  }, [practices, lastRefresh, activeTab]);
-  
-  // Refresh the delights tab when it becomes active
-  useEffect(() => {
-    if (activeTab === 'delight') {
-      setLastRefresh(Date.now());
+        );
+      case 'profile':
+        // Placeholder for profile view
+        return (
+          <div className="flex flex-col items-center justify-center h-[60vh] px-5">
+            <div className="text-center py-12 bg-[#F7FFFF] rounded-lg border border-[#04C4D5] w-full">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#04C4D5" className="mx-auto mb-4">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
+              </svg>
+              <h3 className="text-lg font-medium text-[#208EB1] mb-2">Profile View Coming Soon</h3>
+              <p className="text-[#208EB1]">Your profile page is under construction!</p>
+            </div>
+          </div>
+        );
     }
-  }, [activeTab]);
-
-  // Helper function to get streak icon based on count
-  const getStreakIcon = (streakCount: number) => {
-    if (streakCount >= 21) return StreakGreaterThan21;
-    if (streakCount >= 10) return StreakGreaterThan10;
-    return StreakLesserThan10;
   };
-
-  // Handler for adding a tip or story
-  function handleTipsStoriesSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!formContent.trim() || !user) return;
-    
-    setPosts([
-      {
-        id: Date.now(),
-        type: formType,
-        author: user.email?.split('@')[0] || "Anonymous",
-        content: formContent,
-        createdAt: new Date().toISOString(),
-        upvotes: 0,
-        threadComments: [],
-      },
-      ...posts,
-    ]);
-    setFormContent("");
-    toast({ 
-      title: "Success", 
-      description: `Your ${formType} has been shared with the community!`
-    });
-  }
-
-  // Handler for upvoting a tip/story
-  function handleUpvote(postId: number) {
-    setPosts(posts => posts.map(post =>
-      post.id === postId ? { ...post, upvotes: (post.upvotes || 0) + 1 } : post
-    ));
-  }
-
-  // Handler for adding a thread comment
-  function handleAddThreadComment(postId: number) {
-    if (!threadComment.trim() || !user) return;
-    
-    setPosts(posts => posts.map(post =>
-      post.id === postId ? {
-        ...post,
-        threadComments: [
-          ...(post.threadComments || []),
-          { 
-            author: user.email?.split('@')[0] || "Anonymous", 
-            text: threadComment, 
-            createdAt: new Date().toISOString() 
-          }
-        ]
-      } : post
-    ));
-    
-    setThreadComment("");
-    setActiveThread(null);
-  }
-
-  // Handler for adding a practice to user's list
-  function handleAddPracticeToList(post: CommunityPost) {
-    if (!post.practiceId) return;
-    
-    const originalPractice = practices.find(p => p.id === post.practiceId);
-    if (!originalPractice) return;
-    
-    addPractice({
-      ...originalPractice,
-      isDaily: true,
-      userCreated: false
-    });
-    
-    toast({
-      title: "Practice Added",
-      description: `${post.title || 'Practice'} has been added to your daily practices!`,
-      variant: "success"
-    });
-  }
-
-  // Tab definitions
-  const tabs = [
-    { id: "practice", label: "User Practices", color: "#148BAF", icon: <BookOpen className="w-4 h-4 mr-1" /> },
-    { id: "delight", label: "Delights", color: "#E6A514", icon: <Smile className="w-4 h-4 mr-1" /> },
-    { id: "tipsStories", label: "Tips & Stories", color: "#7B61FF", icon: <Lightbulb className="w-4 h-4 mr-1" /> },
-  ];
-
-  // Filtered posts for each tab
-  const practicePosts = filteredPosts.filter(p => p.type === 'practice');
-  const tipsStoriesPosts = filteredPosts.filter(p => p.type === 'tip' || p.type === 'story');
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 md:p-6 items-center w-full min-h-screen bg-gradient-to-br from-[#F7FFFF] via-[#E6F9FA] to-[#F7F7FF] overflow-x-hidden">
-      {/* Add the CSS styles */}
+    <div className="w-full" style={{ backgroundColor: '#FFFFFF' }}>
       <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
       
-      {/* Enhanced header with mobile-optimized spacing */}
-      <div 
-        className="text-center text-[#148BAF] text-2xl sm:text-3xl md:text-4xl font-happy-monkey lowercase w-full mb-3 sm:mb-4 tracking-wide px-4"
-        style={{ 
-          animation: 'fadeIn 0.5s ease-out 0.1s both',
-          textShadow: '0px 2px 4px rgba(4, 196, 213, 0.2)'
-        }}
-      >
-        community
-      </div>
-      
-      <div className="max-w-6xl w-full mx-auto flex flex-col gap-4 sm:gap-6 px-2 sm:px-4">
-        {/* Filter controls */}
-        {renderFilterControls()}
-        
-        {/* Enhanced tab navigation with improved mobile experience */}
-        <div 
-          className="flex justify-center mb-3 sm:mb-4 overflow-x-auto py-3 no-scrollbar" 
-          style={{ animation: 'fadeIn 0.5s ease-out 0.2s both' }}
-        >
-          <div className="flex gap-2 sm:gap-3 px-4 sm:px-2 min-w-max">
-            {tabs.map(tab => {
-              const isActive = activeTab === tab.id;
-              
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                  className={`px-4 sm:px-5 py-3 sm:py-2.5 rounded-full text-sm sm:text-base whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 touch-button focus-mobile ${
-                    isActive 
-                      ? `text-white shadow-lg transform` 
-                      : `border border-[rgba(4,196,213,0.3)] hover:bg-[rgba(4,196,213,0.1)] active:bg-[rgba(4,196,213,0.15)]`
-                  }`}
-                  style={{ 
-                    boxShadow: isActive ? '0 4px 12px rgba(4, 196, 213, 0.3)' : 'none',
-                    minWidth: '120px',
-                    minHeight: '48px',
-                    background: isActive ? `linear-gradient(135deg, ${tab.color}, ${tab.color}dd)` : undefined,
-                    color: !isActive ? tab.color : undefined,
-                    transform: isActive ? 'translateY(-1px)' : 'translateY(0)'
-                  }}
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 flex-shrink-0">{tab.icon}</span>
-                    <span className="hidden sm:inline">{tab.label}</span>
-                    <span className="sm:hidden text-sm font-medium">
-                      {tab.id === 'practice' ? 'Practices' : 
-                       tab.id === 'delight' ? 'Delights' : 'Tips'}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        
-        <div className="max-w-5xl w-full mx-auto px-1 sm:px-2">
-          {/* Tab Content with enhanced mobile layouts */}
-          <div className="flex flex-col gap-4 sm:gap-6">
-            {/* Practices Tab - Enhanced for mobile */}
-            {activeTab === 'practice' && (
-              <div>
-                <div className="text-lg sm:text-xl text-[#148BAF] font-happy-monkey mb-4 sm:mb-6 flex items-center px-2 sm:px-1">
-                  <BookOpen className="mr-2 sm:mr-3 w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
-                  <span className="line-clamp-1">Community Shared Practices</span>
-                </div>
-                
-                {practicePosts.length === 0 ? (
-                  <div 
-                    className="text-center bg-white p-6 sm:p-8 md:p-12 rounded-[20px] border border-[rgba(4,196,213,0.3)] shadow-lg mx-2 sm:mx-0"
-                    style={{ 
-                      animation: 'fadeIn 0.5s ease-out 0.3s both',
-                      boxShadow: '0 4px 20px rgba(4, 196, 213, 0.1)'
-                    }}
-                  >
-                    <BookOpen className="w-12 h-12 sm:w-16 sm:h-16 text-[rgba(4,196,213,0.3)] mx-auto mb-3 sm:mb-4" />
-                    <div className="text-[#148BAF] font-happy-monkey text-lg sm:text-xl mb-2 sm:mb-3">No practices shared yet</div>
-                    <p className="text-black font-happy-monkey text-sm sm:text-base leading-relaxed">Create and share your own practices from the Practices page!</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 px-2 sm:px-0">
-                    {practicePosts.map((post, idx) => {
-                      const originalPractice = post.practiceId ? 
-                        practices.find(p => p.id === post.practiceId) : null;
-                        
-                      // Define style variables similar to Learn page
-                      const shadowColor = "rgba(4, 196, 213, 0.2)";
-                      const borderColor = "rgba(4,196,213,0.1)";
-                        
-                      return (
-                        <div 
-                          key={post.id}
-                          className="bg-white rounded-[20px] p-4 sm:p-5 md:p-6 relative card-hover border touch-button"
-                          style={{
-                            animation: `fadeIn 0.5s ease-out ${Math.min(idx * 0.05, 1)}s both`,
-                            boxShadow: `0 4px 20px ${shadowColor}, 0 1px 3px rgba(0,0,0,0.05)`,
-                            borderColor: borderColor,
-                            minHeight: '280px'
-                          }}
-                        >
-                          {/* Enhanced practice header for mobile */}
-                          <div className="flex flex-col sm:flex-row justify-between items-start mb-4 sm:mb-5 gap-3 sm:gap-4">
-                            <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0 w-full sm:w-auto">
-                              {originalPractice?.icon && (
-                                <div className="flex-shrink-0 mt-1">
-                                  <span 
-                                    className="flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-sm" 
-                                    style={{
-                                      background: `linear-gradient(135deg, rgba(4, 196, 213, 0.15), ${shadowColor} 120%)`,
-                                      boxShadow: `0 2px 8px ${shadowColor}`
-                                    }}
-                                  >
-                                    <span className="text-[#148BAF] text-xl sm:text-2xl">
-                                      {originalPractice.icon === 'shower' && '🚿'}
-                                      {originalPractice.icon === 'sun' && '☀️'}
-                                      {originalPractice.icon === 'moleskine' && '📓'}
-                                      {originalPractice.icon === 'smelling' && '👃'}
-                                      {originalPractice.icon === 'sparkles' && '✨'}
-                                      {originalPractice.icon === 'brain' && '🧠'} 
-                                      {originalPractice.icon === 'anchor' && '⚓'}
-                                    </span>
-                                  </span>
-                                </div>
-                              )}
-                              <div className="flex-grow min-w-0">
-                                <div className="flex items-start justify-between gap-2 mb-2">
-                                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#148BAF] font-happy-monkey lowercase line-clamp-2 flex-1">
-                                    {post.title}
-                                  </h3>
-                                </div>
-                                <p className="text-black text-sm sm:text-base font-happy-monkey line-clamp-3 leading-relaxed">
-                                  {post.content.length > 80 ? `${post.content.substring(0, 80)}...` : post.content}
-                                </p>
-                              </div>
-                            </div>
-                            
-                            {/* Enhanced streak badge for mobile */}
-                            {originalPractice?.streak !== undefined && (
-                              <div 
-                                className="flex items-center space-x-2 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm flex-shrink-0 self-start sm:self-auto" 
-                                style={{ 
-                                  background: "linear-gradient(135deg, rgba(4, 196, 213, 0.1), rgba(4, 196, 213, 0.2))",
-                                  border: "1px solid rgba(4, 196, 213, 0.3)",
-                                  minHeight: '40px'
-                                }}
-                              >
-                                <img 
-                                  src={getStreakIcon(originalPractice.streak || 0)} 
-                                  alt="streak" 
-                                  className="h-5 w-5 sm:h-6 sm:w-6" 
-                                />
-                                <span className="text-[#148BAF] font-happy-monkey font-bold text-sm sm:text-base">
-                                  {originalPractice.streak || 0}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Enhanced benefits tags for mobile */}
-                          {originalPractice?.benefits && originalPractice.benefits.length > 0 && (
-                            <div className="mb-4 flex flex-wrap gap-2">
-                              {originalPractice.benefits.slice(0, 2).map((benefit, index) => (
-                                <span 
-                                  key={index} 
-                                  className="bg-[rgba(4,196,213,0.15)] text-[#148BAF] text-xs sm:text-sm px-3 py-2 rounded-full font-happy-monkey whitespace-nowrap"
-                                >
-                                  {benefit}
-                                </span>
-                              ))}
-                              {originalPractice.benefits.length > 2 && (
-                                <span className="text-[#148BAF] text-xs sm:text-sm font-happy-monkey">
-                                  +{originalPractice.benefits.length - 2} more
-                                </span>
-                              )}
-                            </div>
-                          )}
-                          
-                          {/* Enhanced action button for mobile */}
-                          <div className="flex justify-end mt-4 sm:mt-6">
-                            <button
-                              onClick={() => handleAddPracticeToList(post)}
-                              className="text-white text-sm sm:text-base font-happy-monkey lowercase font-medium flex items-center gap-2 px-4 sm:px-5 py-3 bg-gradient-to-r from-[#04C4D5] to-[#148BAF] rounded-full hover:shadow-lg transition-all hover:translate-y-[-2px] active:translate-y-0 touch-button focus-mobile"
-                              style={{ minHeight: '48px' }}
-                            >
-                              <span className="hidden xs:inline">add to my practices</span>
-                              <span className="xs:hidden">add practice</span>
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
-                                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                              </svg>
-                            </button>
-                          </div>
-                          
-                          {/* Enhanced author info for mobile */}
-                          <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100">
-                            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[rgba(20,139,175,0.08)] flex items-center justify-center font-bold text-[#148BAF] font-happy-monkey text-sm flex-shrink-0">
-                              {post.author ? post.author[0].toUpperCase() : <User className="w-4 h-4" />}
-                            </span>
-                            <span className="text-xs sm:text-sm text-gray-500 font-happy-monkey lowercase truncate flex-1">
-                              {post.author || "anonymous"}
-                            </span>
-                            <span className="text-xs text-gray-400 flex-shrink-0">
-                              {new Date(post.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-            
-            {/* Enhanced Delights Tab for mobile */}
-            {activeTab === 'delight' && (
-              <div>
-                <div className="text-lg sm:text-xl text-[#E6A514] font-happy-monkey mb-4 sm:mb-6 flex items-center px-2 sm:px-1">
-                  <Smile className="mr-2 sm:mr-3 w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
-                  <span className="line-clamp-1">Community Shared Delights</span>
-                </div>
-                
-                {/* Enhanced refresh button for mobile */}
-                <div className="flex justify-center mb-4 sm:mb-6 px-2 sm:px-0">
-                  <button 
-                    onClick={() => setLastRefresh(Date.now())}
-                    className="bg-[rgba(230,165,20,0.1)] hover:bg-[rgba(230,165,20,0.2)] active:bg-[rgba(230,165,20,0.25)] text-[#E6A514] font-happy-monkey py-3 px-4 sm:px-5 rounded-full text-sm sm:text-base flex items-center gap-2 sm:gap-3 transition-all touch-button focus-mobile mobile-bounce"
-                    style={{ minHeight: '48px' }}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="sm:w-5 sm:h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.38-5.5M22 12.5a10 10 0 0 1-18.38 5.5"/>
-                    </svg>
-                    <span>Refresh Delights</span>
-                  </button>
-                </div>
-                
-                {filteredDelights.length === 0 ? (
-                  <div 
-                    className="text-center bg-white p-6 sm:p-8 md:p-12 rounded-[20px] border border-[rgba(230,165,20,0.3)] shadow-lg mx-2 sm:mx-0"
-                    style={{ 
-                      animation: 'fadeIn 0.5s ease-out 0.3s both',
-                      boxShadow: '0 4px 20px rgba(230, 165, 20, 0.1)'
-                    }}
-                  >
-                    <Smile className="w-12 h-12 sm:w-16 sm:h-16 text-[rgba(230,165,20,0.3)] mx-auto mb-3 sm:mb-4" />
-                    <div className="text-[#E6A514] font-happy-monkey text-lg sm:text-xl mb-2 sm:mb-3">No delights shared yet</div>
-                    <p className="text-black font-happy-monkey text-sm sm:text-base leading-relaxed">Right-click on a delight on your homepage to share it with the community!</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 lg:gap-6 px-2 sm:px-0">
-                    {filteredDelights.map((delight, idx) => {
-                      // Define style variables similar to Learn page but with delight colors
-                      const shadowColor = "rgba(230, 165, 20, 0.2)";
-                      const borderColor = "rgba(230, 165, 20, 0.15)";
-                      
-                      return (
-                        <div 
-                          key={delight.id} 
-                          className="bg-white rounded-[20px] p-4 sm:p-5 md:p-6 relative card-hover border touch-button"
-                          style={{
-                            animation: `fadeIn 0.5s ease-out ${Math.min(idx * 0.05, 1)}s both`,
-                            boxShadow: `0 4px 20px ${shadowColor}, 0 1px 3px rgba(0,0,0,0.05)`,
-                            borderColor: borderColor,
-                            minHeight: '200px'
-                          }}
-                        >
-                          {/* Enhanced delight header for mobile */}
-                          <div className="flex justify-between items-start mb-4 sm:mb-5">
-                            <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
-                              <div className="flex-shrink-0 mt-1">
-                                <span 
-                                  className="flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-sm" 
-                                  style={{
-                                    background: `linear-gradient(135deg, rgba(230, 165, 20, 0.15), ${shadowColor} 120%)`,
-                                    boxShadow: `0 2px 8px ${shadowColor}`
-                                  }}
-                                >
-                                  <Smile size={24} className="text-[#E6A514] sm:w-7 sm:h-7" />
-                                </span>
-                              </div>
-                              
-                              <div className="flex-grow min-w-0">
-                                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#E6A514] font-happy-monkey lowercase mb-2 sm:mb-3">
-                                  Delight
-                                </h3>
-                                <p className="text-black text-sm sm:text-base font-happy-monkey whitespace-pre-line leading-relaxed line-clamp-3">
-                                  {delight.text}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Enhanced interactive elements for mobile */}
-                          <div className="flex justify-end mt-4 sm:mt-6">
-                            <button
-                              className="text-white text-sm sm:text-base font-happy-monkey lowercase font-medium flex items-center gap-2 px-4 sm:px-5 py-3 bg-gradient-to-r from-[#E6A514] to-[#E67D14] rounded-full hover:shadow-lg transition-all hover:translate-y-[-2px] active:translate-y-0 touch-button focus-mobile"
-                              style={{ minHeight: '48px' }}
-                            >
-                              <Heart size={16} className="flex-shrink-0" />
-                              <span className="hidden xs:inline">cheer this</span>
-                              <span className="xs:hidden">cheer</span>
-                            </button>
-                          </div>
-                          
-                          {/* Enhanced author info for mobile */}
-                          <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100">
-                            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[rgba(230,165,20,0.08)] flex items-center justify-center font-bold text-[#E6A514] font-happy-monkey text-sm flex-shrink-0">
-                              {delight.username ? delight.username[0].toUpperCase() : <User className="w-4 h-4" />}
-                            </span>
-                            <span className="text-xs sm:text-sm text-gray-500 font-happy-monkey lowercase truncate flex-1">
-                              {delight.username || "anonymous"}
-                            </span>
-                            <span className="text-xs text-gray-400 flex-shrink-0">
-                              {new Date(delight.created_at).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-            
-            {/* Enhanced Tips & Stories Tab for mobile */}
-            {activeTab === 'tipsStories' && (
-              <div>
-                {user ? (
-                  <form 
-                    onSubmit={handleTipsStoriesSubmit} 
-                    className="bg-white rounded-[20px] p-4 sm:p-5 md:p-6 flex flex-col gap-4 sm:gap-5 border border-[rgba(123,97,255,0.3)] mb-6 sm:mb-8 shadow-lg mx-2 sm:mx-0"
-                    style={{ 
-                      animation: 'fadeIn 0.5s ease-out 0.2s both',
-                      boxShadow: '0 4px 20px rgba(123, 97, 255, 0.1)'
-                    }}
-                  >
-                    <div className="text-lg sm:text-xl md:text-2xl text-[#7B61FF] font-happy-monkey mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3">
-                      <Lightbulb className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
-                      <span className="line-clamp-1">Share Your Insights</span>
-                    </div>
-                    
-                    {/* Enhanced type selection for mobile */}
-                    <div 
-                      className="flex gap-2 sm:gap-3 mb-3 sm:mb-4"
-                      style={{ animation: 'fadeIn 0.5s ease-out 0.3s both' }}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => setFormType("tip")}
-                        className={`flex-1 sm:flex-initial px-4 sm:px-5 py-3 sm:py-2.5 rounded-full font-happy-monkey text-sm sm:text-base transition-all shadow-sm touch-button focus-mobile ${
-                          formType === "tip" 
-                            ? "bg-gradient-to-r from-[#7B61FF] to-[#B39DFF] text-white" 
-                            : "bg-[#F7F7FF] text-[#7B61FF] border border-[#7B61FF] hover:bg-[rgba(123,97,255,0.05)]"
-                        }`}
-                        style={{ minHeight: '48px' }}
-                      >
-                        <Lightbulb className="inline-block w-4 h-4 mr-1.5 flex-shrink-0" />
-                        <span>Tip</span>
-                      </button>
-                      
-                      <button
-                        type="button"
-                        onClick={() => setFormType("story")}
-                        className={`flex-1 sm:flex-initial px-4 sm:px-5 py-3 sm:py-2.5 rounded-full font-happy-monkey text-sm sm:text-base transition-all shadow-sm touch-button focus-mobile ${
-                          formType === "story" 
-                            ? "bg-gradient-to-r from-[#7B61FF] to-[#B39DFF] text-white" 
-                            : "bg-[#F7F7FF] text-[#7B61FF] border border-[#7B61FF] hover:bg-[rgba(123,97,255,0.05)]"
-                        }`}
-                        style={{ minHeight: '48px' }}
-                      >
-                        <MessageCircle className="inline-block w-4 h-4 mr-1.5 flex-shrink-0" />
-                        <span>Story</span>
-                      </button>
-                    </div>
-                    
-                    {/* Enhanced textarea for mobile */}
-                    <textarea
-                      placeholder={formType === "tip" ? "Share a helpful tip with the community..." : "Share your wellbeing story..."}
-                      value={formContent}
-                      onChange={e => setFormContent(e.target.value)}
-                      className="border border-[#7B61FF] rounded-xl px-4 py-3 sm:px-5 sm:py-4 text-[#7B61FF] font-happy-monkey lowercase bg-white focus:ring-2 focus:ring-[#7B61FF] focus:outline-none min-h-[120px] sm:min-h-[140px] shadow-inner resize-none text-sm sm:text-base focus-mobile"
-                      required
-                      style={{ animation: 'fadeIn 0.5s ease-out 0.4s both' }}
-                    />
-                    
-                    {/* Enhanced submit button for mobile */}
-                    <button 
-                      type="submit"
-                      className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#7B61FF] to-[#B39DFF] text-white rounded-full font-happy-monkey lowercase shadow-lg hover:shadow-xl hover:translate-y-[-2px] active:translate-y-0 transition-all text-sm sm:text-base touch-button focus-mobile"
-                      style={{ 
-                        animation: 'fadeIn 0.5s ease-out 0.5s both',
-                        minHeight: '52px'
-                      }}
-                    >
-                      <span className="hidden xs:inline">share with community</span>
-                      <span className="xs:hidden">share</span>
-                    </button>
-                  </form>
-                ) : (
-                  <div 
-                    className="bg-white rounded-[20px] p-6 sm:p-8 md:p-12 mb-6 sm:mb-8 text-center border border-[rgba(123,97,255,0.3)] shadow-lg mx-2 sm:mx-0"
-                    style={{ 
-                      animation: 'fadeIn 0.5s ease-out 0.3s both',
-                      boxShadow: '0 4px 20px rgba(123, 97, 255, 0.1)'
-                    }}
-                  >
-                    <Lightbulb className="h-12 w-12 sm:h-16 sm:w-16 text-[#7B61FF] mx-auto mb-3 sm:mb-4 opacity-60" />
-                    <p className="text-[#7B61FF] font-happy-monkey text-lg sm:text-xl lowercase mb-2 sm:mb-3">Login to share your tips and stories</p>
-                    <p className="text-black font-happy-monkey text-sm sm:text-base">Join our community to contribute your insights!</p>
-                  </div>
-                )}
-                
-                {/* Enhanced tips & stories list for mobile */}
-                {tipsStoriesPosts.length === 0 ? (
-                  <div 
-                    className="text-center bg-white p-6 sm:p-8 md:p-12 rounded-[20px] border border-[rgba(123,97,255,0.3)] shadow-lg mx-2 sm:mx-0"
-                    style={{ 
-                      animation: 'fadeIn 0.5s ease-out 0.3s both',
-                      boxShadow: '0 4px 20px rgba(123, 97, 255, 0.1)'
-                    }}
-                  >
-                    <Lightbulb className="w-12 h-12 sm:w-16 sm:h-16 text-[rgba(123,97,255,0.3)] mx-auto mb-3 sm:mb-4" />
-                    <div className="text-[#7B61FF] font-happy-monkey text-lg sm:text-xl mb-2">No tips or stories shared yet</div>
-                    <p className="text-black font-happy-monkey text-sm sm:text-base">Be the first to share!</p>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-4 sm:gap-6 px-2 sm:px-0">
-                    {tipsStoriesPosts.map((post, idx) => {
-                      // Define style variables similar to Learn page but with purple colors
-                      const shadowColor = "rgba(123, 97, 255, 0.2)";
-                      const borderColor = "rgba(123, 97, 255, 0.15)";
-                      
-                      return (
-                        <div 
-                          key={post.id} 
-                          className="bg-white rounded-[20px] p-4 sm:p-5 md:p-6 relative card-hover border"
-                          style={{
-                            animation: `fadeIn 0.5s ease-out ${Math.min(idx * 0.05, 1)}s both`,
-                            boxShadow: `0 4px 20px ${shadowColor}, 0 1px 3px rgba(0,0,0,0.05)`,
-                            borderColor: borderColor
-                          }}
-                        >
-                          {/* Enhanced header with type icon for mobile */}
-                          <div className="flex flex-col sm:flex-row justify-between items-start mb-4 sm:mb-5 gap-3 sm:gap-4">
-                            <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0 w-full sm:w-auto">
-                              <div className="flex-shrink-0 mt-1">
-                                <span 
-                                  className="flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-sm" 
-                                  style={{
-                                    background: `linear-gradient(135deg, rgba(123, 97, 255, 0.15), ${shadowColor} 120%)`,
-                                    boxShadow: `0 2px 8px ${shadowColor}`
-                                  }}
-                                >
-                                  {post.type === 'tip' ? 
-                                    <Lightbulb size={24} className="text-[#7B61FF] sm:w-7 sm:h-7" /> : 
-                                    <MessageCircle size={24} className="text-[#7B61FF] sm:w-7 sm:h-7" />
-                                  }
-                                </span>
-                              </div>
-                              
-                              <div className="flex-grow min-w-0">
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-2 sm:mb-3">
-                                  <span className="px-3 py-1.5 rounded-full text-xs sm:text-sm font-happy-monkey lowercase font-medium bg-[rgba(123,97,255,0.08)] text-[#7B61FF] flex-shrink-0">
-                                    {typeLabels[post.type]}
-                                  </span>
-                                  <span className="text-xs sm:text-sm text-gray-400">
-                                    {new Date(post.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
-                                  </span>
-                                </div>
-                                <p className="text-black text-sm sm:text-base font-happy-monkey whitespace-pre-line mt-2 leading-relaxed">
-                                  {post.content}
-                                </p>
-                              </div>
-                            </div>
-                            
-                            {/* Enhanced upvote count badge for mobile */}
-                            <div 
-                              className="flex items-center gap-2 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm flex-shrink-0 self-start sm:self-auto" 
-                              style={{ 
-                                background: "linear-gradient(135deg, rgba(123, 97, 255, 0.1), rgba(123, 97, 255, 0.2))",
-                                border: "1px solid rgba(123, 97, 255, 0.3)",
-                                minHeight: '40px'
-                              }}
-                            >
-                              <ThumbsUp size={16} className="text-[#7B61FF] flex-shrink-0" />
-                              <span className="text-[#7B61FF] font-happy-monkey font-bold text-sm sm:text-base">
-                                {post.upvotes || 0}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          {/* Enhanced action buttons for mobile */}
-                          <div className="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-6">
-                            <button 
-                              onClick={() => handleUpvote(post.id)} 
-                              className="text-white text-sm sm:text-base font-happy-monkey lowercase font-medium flex items-center justify-center gap-2 px-4 sm:px-5 py-3 bg-gradient-to-r from-[#7B61FF] to-[#B39DFF] rounded-full hover:shadow-lg transition-all hover:translate-y-[-2px] active:translate-y-0 touch-button focus-mobile flex-1 sm:flex-initial"
-                              style={{ minHeight: '48px' }}
-                            >
-                              <ThumbsUp size={16} className="flex-shrink-0" />
-                              <span>upvote</span>
-                            </button>
-                            <button 
-                              onClick={() => setActiveThread(post.id)}
-                              className="bg-white hover:bg-[rgba(123,97,255,0.05)] active:bg-[rgba(123,97,255,0.1)] text-[#7B61FF] border border-[#7B61FF] text-sm sm:text-base font-happy-monkey lowercase font-medium flex items-center justify-center gap-2 px-4 sm:px-5 py-3 rounded-full hover:shadow-sm transition-all touch-button focus-mobile flex-1 sm:flex-initial"
-                              style={{ minHeight: '48px' }}
-                            >
-                              <MessageCircle size={16} className="flex-shrink-0" />
-                              <span>comment</span>
-                            </button>
-                          </div>
-                          
-                          {/* Enhanced thread comments for mobile */}
-                          {post.threadComments && post.threadComments.length > 0 && (
-                            <div 
-                              className="mt-4 sm:mt-5 rounded-xl p-3 sm:p-4"
-                              style={{ 
-                                backgroundColor: 'rgba(123, 97, 255, 0.05)',
-                                border: '1px solid rgba(123, 97, 255, 0.1)'
-                              }}
-                            >
-                              <div className="font-happy-monkey text-sm sm:text-base text-[#7B61FF] mb-2 sm:mb-3">Comments:</div>
-                              <div className="space-y-2 sm:space-y-3">
-                                {post.threadComments.map((c, idx) => (
-                                  <div key={idx} className="bg-white p-3 sm:p-4 rounded-lg shadow-sm">
-                                    <p className="text-sm sm:text-base text-black font-happy-monkey leading-relaxed">{c.text}</p>
-                                    <div className="flex items-center justify-between mt-2 sm:mt-3">
-                                      <span className="text-xs sm:text-sm text-[#7B61FF] font-happy-monkey">{c.author}</span>
-                                      <span className="text-xs text-gray-400">
-                                        {new Date(c.createdAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
-                                      </span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Enhanced add thread comment for mobile */}
-                          {activeThread === post.id && user && (
-                            <div 
-                              className="mt-4 sm:mt-5 flex flex-col gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl"
-                              style={{ 
-                                backgroundColor: 'rgba(123, 97, 255, 0.03)',
-                                border: '1px solid rgba(123, 97, 255, 0.1)'
-                              }}
-                            >
-                              <input
-                                type="text"
-                                placeholder="Add your comment..."
-                                value={threadComment}
-                                onChange={e => setThreadComment(e.target.value)}
-                                className="border border-[#7B61FF] rounded-lg px-3 sm:px-4 py-3 sm:py-3.5 text-[#7B61FF] font-happy-monkey lowercase bg-white focus:ring-2 focus:ring-[#7B61FF] focus:outline-none shadow-inner text-sm sm:text-base focus-mobile"
-                                style={{ minHeight: '48px' }}
-                              />
-                              <div className="flex justify-end">
-                                <button 
-                                  onClick={() => handleAddThreadComment(post.id)}
-                                  className="text-white text-sm sm:text-base font-happy-monkey lowercase font-medium flex items-center gap-2 px-4 sm:px-5 py-3 bg-gradient-to-r from-[#7B61FF] to-[#B39DFF] rounded-full hover:shadow-lg transition-all hover:translate-y-[-2px] active:translate-y-0 touch-button focus-mobile"
-                                  style={{ minHeight: '48px' }}
-                                >
-                                  <span className="hidden xs:inline">post comment</span>
-                                  <span className="xs:hidden">post</span>
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Enhanced author info for mobile */}
-                          <div className="flex items-center gap-3 mt-4 sm:mt-5 pt-3 border-t border-[rgba(123,97,255,0.1)]">
-                            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[rgba(123,97,255,0.08)] flex items-center justify-center font-bold text-[#7B61FF] font-happy-monkey text-sm flex-shrink-0">
-                              {post.author ? post.author[0].toUpperCase() : <User className="w-4 h-4" />}
-                            </span>
-                            <span className="text-xs sm:text-sm text-gray-500 font-happy-monkey lowercase truncate flex-1">
-                              {post.author ? `by ${post.author}` : "anonymous"}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+      {/* Top Navigation Bar - With 3 sections based on the active view */}
+      <div className="community-top-nav-wrapper w-full px-5 pt-5 pb-2.5 flex flex-row justify-center items-center">
+        <div className="community-top-nav-bar w-full h-[52px] bg-[#F5F5F5] border border-white rounded-[100px] flex flex-row items-center px-5">
+          {/* News Feed Icon */}
+          <div 
+            className="community-nav-icon w-12 h-12 flex items-center justify-center cursor-pointer"
+            onClick={() => setActiveView('newsfeed')}
+          >
+            {activeView === 'newsfeed' ? (
+              <svg width="32" height="32" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11.748 20.8155C11.6169 20.8155 11.4889 20.7628 11.3946 20.6666C11.2654 20.5337 11.2217 20.3397 11.2808 20.1638L12.8606 15.5041C12.8801 15.4468 12.9101 15.3936 12.949 15.3474C13.0363 15.242 15.1067 12.7579 16.2988 11.5872C18.0421 9.87524 20.697 7.4006 23.2641 5.0075C25.0601 3.33368 26.779 1.73146 28.0278 0.536638C28.7898 -0.192885 30.0042 -0.172895 30.7359 0.578247L32.0042 1.88166V1.8822C32.7359 2.63414 32.7215 3.84895 31.9718 4.59002C30.7405 5.80801 29.0878 7.48646 27.3615 9.23947C24.9031 11.7366 22.3609 14.3185 20.6041 16.0123C19.4015 17.1715 16.8617 19.1733 16.7542 19.2576C16.7066 19.2954 16.6523 19.3238 16.5945 19.3416L11.8937 20.7933C11.8456 20.8085 11.7965 20.8155 11.7481 20.8155L11.748 20.8155ZM13.7652 15.908L12.5247 19.5662L16.2152 18.427C16.6416 18.0887 18.8618 16.3217 19.9193 15.3025C21.6669 13.6176 24.2042 11.0403 26.6584 8.54834C28.3882 6.79159 30.0441 5.10989 31.2778 3.8892C31.6439 3.52715 31.652 2.93571 31.2967 2.5696L30.0285 1.26674C29.6734 0.900632 29.0812 0.892525 28.7094 1.24945C27.4579 2.4469 25.736 4.05217 23.9365 5.72951C21.374 8.11797 18.724 10.5883 16.9899 12.2911C15.9418 13.3205 14.1148 15.4915 13.7655 15.9081L13.7652 15.908Z" fill="#FFD400"/>
+                <path d="M29.3479 6.7495C29.2195 6.7495 29.0909 6.69951 28.9945 6.60063L25.8398 3.35862C25.6501 3.16354 25.6541 2.85066 25.8495 2.66126C26.0446 2.47051 26.3575 2.47645 26.5468 2.67018L29.7016 5.91219C29.8912 6.10726 29.8872 6.42015 29.6918 6.60954C29.5962 6.7033 29.4719 6.7495 29.3479 6.7495Z" fill="#FFD400"/>
+                <path d="M16.3238 19.3281C16.1955 19.3281 16.0669 19.2781 15.9704 19.1792L13.0981 16.2268C12.9084 16.0317 12.9124 15.7188 13.1078 15.5294C13.3029 15.3387 13.6155 15.3446 13.8051 15.5383L16.6775 18.4907C16.8672 18.6858 16.8631 18.9987 16.6678 19.1881C16.5721 19.2819 16.4479 19.3281 16.3238 19.3281Z" fill="#FFD400"/>
+                <path d="M16.741 15.7485C16.6127 15.7485 16.4841 15.6985 16.3876 15.5996C16.1979 15.4045 16.202 15.0916 16.3973 14.9022L25.4003 6.14271C25.5954 5.95195 25.908 5.9579 26.0977 6.15162C26.2874 6.3467 26.2833 6.65958 26.088 6.84898L17.085 15.6085C16.9891 15.7023 16.865 15.7485 16.741 15.7485Z" fill="#FFD400"/>
+                <path d="M18.5987 29.2819C18.4088 29.2819 18.2199 29.2781 18.034 29.2735L4.00388 28.9031C3.29061 28.8844 2.21255 28.8563 1.45764 28.1962C0.608184 27.4532 0.509273 26.2725 0.483058 25.2238L0.00860199 6.35945C-0.0316562 4.76698 0.024003 2.97046 1.19906 1.79916C2.24766 0.754366 3.79289 0.594656 5.28568 0.520092L15.2072 0.0264556C17.6786 -0.0981035 19.7435 0.2164 21.5057 0.986448C23.8992 2.03124 23.5939 5.00093 23.4937 5.97739C23.4659 6.24839 23.2168 6.44752 22.9528 6.41726C22.6818 6.3897 22.4848 6.14707 22.5126 5.87607C22.7393 3.67291 22.2941 2.40629 21.1117 1.8905C19.4919 1.1829 17.5755 0.89592 15.2564 1.01157L5.3342 1.50521C3.97891 1.57275 2.69604 1.69974 1.89465 2.49792C0.99705 3.39303 0.957624 4.88396 0.994352 6.33519L1.46908 25.1996C1.49096 26.0774 1.55797 26.9736 2.10673 27.4541C2.55659 27.8469 3.27284 27.8972 4.02941 27.9169L18.0596 28.2873C19.3438 28.3246 20.7785 28.2841 21.5448 27.4076C22.1049 26.7661 22.1997 25.808 22.2538 24.7994C22.4561 21.0232 22.4942 17.1929 22.3667 13.4149C22.3575 13.1426 22.5707 12.9148 22.8428 12.9051C23.1111 12.9024 23.3432 13.1094 23.3523 13.3814C23.4807 17.1879 23.4426 21.0474 23.2386 24.8517C23.1775 25.9921 23.0541 27.1786 22.2875 28.0559C21.3692 29.108 19.9509 29.282 18.5984 29.282L18.5987 29.2819Z" fill="#FFD400"/>
+                <path d="M17.0086 21.3358H6.11175C5.8394 21.3358 5.61865 21.1148 5.61865 20.8427C5.61865 20.5704 5.83967 20.3496 6.11175 20.3496H17.0086C17.2809 20.3496 17.5017 20.5706 17.5017 20.8427C17.5017 21.1151 17.2809 21.3358 17.0086 21.3358Z" fill="#FFD400"/>
+              </svg>
+            ) : (
+              <svg width="32" height="32" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11.748 20.8155C11.6169 20.8155 11.4889 20.7628 11.3946 20.6666C11.2654 20.5337 11.2217 20.3397 11.2808 20.1638L12.8606 15.5041C12.8801 15.4468 12.9101 15.3936 12.949 15.3474C13.0363 15.242 15.1067 12.7579 16.2988 11.5872C18.0421 9.87524 20.697 7.4006 23.2641 5.0075C25.0601 3.33368 26.779 1.73146 28.0278 0.536638C28.7898 -0.192885 30.0042 -0.172895 30.7359 0.578247L32.0042 1.88166V1.8822C32.7359 2.63414 32.7215 3.84895 31.9718 4.59002C30.7405 5.80801 29.0878 7.48646 27.3615 9.23947C24.9031 11.7366 22.3609 14.3185 20.6041 16.0123C19.4015 17.1715 16.8617 19.1733 16.7542 19.2576C16.7066 19.2954 16.6523 19.3238 16.5945 19.3416L11.8937 20.7933C11.8456 20.8085 11.7965 20.8155 11.7481 20.8155L11.748 20.8155ZM13.7652 15.908L12.5247 19.5662L16.2152 18.427C16.6416 18.0887 18.8618 16.3217 19.9193 15.3025C21.6669 13.6176 24.2042 11.0403 26.6584 8.54834C28.3882 6.79159 30.0441 5.10989 31.2778 3.8892C31.6439 3.52715 31.652 2.93571 31.2967 2.5696L30.0285 1.26674C29.6734 0.900632 29.0812 0.892525 28.7094 1.24945C27.4579 2.4469 25.736 4.05217 23.9365 5.72951C21.374 8.11797 18.724 10.5883 16.9899 12.2911C15.9418 13.3205 14.1148 15.4915 13.7655 15.9081L13.7652 15.908Z" fill="#148BAF"/>
+                <path d="M29.3479 6.7495C29.2195 6.7495 29.0909 6.69951 28.9945 6.60063L25.8398 3.35862C25.6501 3.16354 25.6541 2.85066 25.8495 2.66126C26.0446 2.47051 26.3575 2.47645 26.5468 2.67018L29.7016 5.91219C29.8912 6.10726 29.8872 6.42015 29.6918 6.60954C29.5962 6.7033 29.4719 6.7495 29.3479 6.7495Z" fill="#148BAF"/>
+                <path d="M16.3238 19.3281C16.1955 19.3281 16.0669 19.2781 15.9704 19.1792L13.0981 16.2268C12.9084 16.0317 12.9124 15.7188 13.1078 15.5294C13.3029 15.3387 13.6155 15.3446 13.8051 15.5383L16.6775 18.4907C16.8672 18.6858 16.8631 18.9987 16.6678 19.1881C16.5721 19.2819 16.4479 19.3281 16.3238 19.3281Z" fill="#148BAF"/>
+                <path d="M16.741 15.7485C16.6127 15.7485 16.4841 15.6985 16.3876 15.5996C16.1979 15.4045 16.202 15.0916 16.3973 14.9022L25.4003 6.14271C25.5954 5.95195 25.908 5.9579 26.0977 6.15162C26.2874 6.3467 26.2833 6.65958 26.088 6.84898L17.085 15.6085C16.9891 15.7023 16.865 15.7485 16.741 15.7485Z" fill="#148BAF"/>
+                <path d="M18.5987 29.2819C18.4088 29.2819 18.2199 29.2781 18.034 29.2735L4.00388 28.9031C3.29061 28.8844 2.21255 28.8563 1.45764 28.1962C0.608184 27.4532 0.509273 26.2725 0.483058 25.2238L0.00860199 6.35945C-0.0316562 4.76698 0.024003 2.97046 1.19906 1.79916C2.24766 0.754366 3.79289 0.594656 5.28568 0.520092L15.2072 0.0264556C17.6786 -0.0981035 19.7435 0.2164 21.5057 0.986448C23.8992 2.03124 23.5939 5.00093 23.4937 5.97739C23.4659 6.24839 23.2168 6.44752 22.9528 6.41726C22.6818 6.3897 22.4848 6.14707 22.5126 5.87607C22.7393 3.67291 22.2941 2.40629 21.1117 1.8905C19.4919 1.1829 17.5755 0.89592 15.2564 1.01157L5.3342 1.50521C3.97891 1.57275 2.69604 1.69974 1.89465 2.49792C0.99705 3.39303 0.957624 4.88396 0.994352 6.33519L1.46908 25.1996C1.49096 26.0774 1.55797 26.9736 2.10673 27.4541C2.55659 27.8469 3.27284 27.8972 4.02941 27.9169L18.0596 28.2873C19.3438 28.3246 20.7785 28.2841 21.5448 27.4076C22.1049 26.7661 22.1997 25.808 22.2538 24.7994C22.4561 21.0232 22.4942 17.1929 22.3667 13.4149C22.3575 13.1426 22.5707 12.9148 22.8428 12.9051C23.1111 12.9024 23.3432 13.1094 23.3523 13.3814C23.4807 17.1879 23.4426 21.0474 23.2386 24.8517C23.1775 25.9921 23.0541 27.1786 22.2875 28.0559C21.3692 29.108 19.9509 29.282 18.5984 29.282L18.5987 29.2819Z" fill="#148BAF"/>
+                <path d="M17.0086 21.3358H6.11175C5.8394 21.3358 5.61865 21.1148 5.61865 20.8427C5.61865 20.5704 5.83967 20.3496 6.11175 20.3496H17.0086C17.2809 20.3496 17.5017 20.5706 17.5017 20.8427C17.5017 21.1151 17.2809 21.3358 17.0086 21.3358Z" fill="#148BAF"/>
+              </svg>
             )}
           </div>
           
-          {/* People Section */}
-          {showPeopleSection && renderPeopleSection()}
+          {/* Center Community/Find Your Tribe or Share Your Feels Button - Changes based on active view */}
+          {activeView === 'newsfeed' ? (
+            <button className="flex-1 h-12 bg-white rounded-[500px] border border-white drop-shadow-[1px_2px_4px_rgba(73,218,234,0.5)] flex items-center justify-center gap-2.5" onClick={() => setActiveView('community')}>
+              <svg width="32" height="32" viewBox="0 0 28 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.8391 2.88234C16.8391 4.45047 15.5681 5.72172 14 5.72172C12.4319 5.72172 11.1606 4.45047 11.1606 2.88234C11.1606 1.31422 12.4319 0.0429688 14 0.0429688C15.5681 0.0429688 16.8391 1.31422 16.8391 2.88234Z" fill="#FFD400"/>
+                <path d="M6.34476 8.94069C6.34476 10.5088 5.07351 11.7801 3.50539 11.7801C1.93727 11.7801 0.666016 10.5088 0.666016 8.94069C0.666016 7.37256 1.93727 6.10156 3.50539 6.10156C5.07351 6.10156 6.34476 7.37256 6.34476 8.94069Z" fill="#FFD400"/>
+                <path d="M6.34476 21.0579C6.34476 22.626 5.07351 23.8972 3.50539 23.8972C1.93727 23.8972 0.666016 22.626 0.666016 21.0579C0.666016 19.49 1.93727 18.2188 3.50539 18.2188C5.07351 18.2188 6.34476 19.49 6.34476 21.0579Z" fill="#FFD400"/>
+                <path d="M16.8391 27.1165C16.8391 28.6846 15.5681 29.9558 14 29.9558C12.4319 29.9558 11.1606 28.6846 11.1606 27.1165C11.1606 25.5483 12.4319 24.2773 14 24.2773C15.5681 24.2773 16.8391 25.5483 16.8391 27.1165Z" fill="#FFD400"/>
+                <path d="M27.333 21.0579C27.333 22.626 26.0618 23.8972 24.4937 23.8972C22.9256 23.8972 21.6543 22.626 21.6543 21.0579C21.6543 19.49 22.9256 18.2188 24.4937 18.2188C26.0618 18.2188 27.333 19.49 27.333 21.0579Z" fill="#FFD400"/>
+                <path d="M27.3323 8.94141C27.3323 10.5095 26.0613 11.7805 24.4934 11.7805C22.9255 11.7805 21.6543 10.5095 21.6543 8.94141C21.6543 7.37354 22.9255 6.10254 24.4934 6.10254C26.0613 6.10254 27.3323 7.37354 27.3323 8.94141Z" fill="#FFD400"/>
+              </svg>
+              <span className="font-['Happy_Monkey'] text-base text-[#FFD400] lowercase">find your tribe</span>
+            </button>
+          ) : activeView === 'community' ? (
+            <button className="flex-1 h-12 bg-[#FFD400] rounded-[500px] border border-white drop-shadow-[1px_2px_4px_rgba(255,212,0,0.5)] flex items-center justify-center gap-2.5">
+              <svg width="32" height="32" viewBox="0 0 28 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.8391 2.88234C16.8391 4.45047 15.5681 5.72172 14 5.72172C12.4319 5.72172 11.1606 4.45047 11.1606 2.88234C11.1606 1.31422 12.4319 0.0429688 14 0.0429688C15.5681 0.0429688 16.8391 1.31422 16.8391 2.88234Z" fill="white"/>
+                <path d="M6.34476 8.94069C6.34476 10.5088 5.07351 11.7801 3.50539 11.7801C1.93727 11.7801 0.666016 10.5088 0.666016 8.94069C0.666016 7.37256 1.93727 6.10156 3.50539 6.10156C5.07351 6.10156 6.34476 7.37256 6.34476 8.94069Z" fill="white"/>
+                <path d="M6.34476 21.0579C6.34476 22.626 5.07351 23.8972 3.50539 23.8972C1.93727 23.8972 0.666016 22.626 0.666016 21.0579C0.666016 19.49 1.93727 18.2188 3.50539 18.2188C5.07351 18.2188 6.34476 19.49 6.34476 21.0579Z" fill="white"/>
+                <path d="M16.8391 27.1165C16.8391 28.6846 15.5681 29.9558 14 29.9558C12.4319 29.9558 11.1606 28.6846 11.1606 27.1165C11.1606 25.5483 12.4319 24.2773 14 24.2773C15.5681 24.2773 16.8391 25.5483 16.8391 27.1165Z" fill="white"/>
+                <path d="M27.333 21.0579C27.333 22.626 26.0618 23.8972 24.4937 23.8972C22.9256 23.8972 21.6543 22.626 21.6543 21.0579C21.6543 19.49 22.9256 18.2188 24.4937 18.2188C26.0618 18.2188 27.333 19.49 27.333 21.0579Z" fill="white"/>
+                <path d="M27.3323 8.94141C27.3323 10.5095 26.0613 11.7805 24.4934 11.7805C22.9255 11.7805 21.6543 10.5095 21.6543 8.94141C21.6543 7.37354 22.9255 6.10254 24.4934 6.10254C26.0613 6.10254 27.3323 7.37354 27.3323 8.94141Z" fill="white"/>
+              </svg>
+              <span className="font-['Happy_Monkey'] text-base text-white lowercase">find your tribe</span>
+            </button>
+          ) : (
+            <button className="flex-1 h-12 bg-white rounded-[500px] border border-white drop-shadow-[1px_2px_4px_rgba(73,218,234,0.5)] flex items-center justify-center gap-2.5" onClick={() => setActiveView('community')}>
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M24 2L30 8L8 30H2V24L24 2Z" stroke="#FFD400" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="font-['Happy_Monkey'] text-base text-[#FFD400] lowercase">share your feels</span>
+            </button>
+          )}
+          
+          {/* Profile Icon */}
+          <div 
+            className="community-nav-icon w-11 h-12 flex items-center justify-center cursor-pointer"
+            onClick={() => setActiveView('profile')}
+          >
+            {activeView === 'profile' ? (
+              <svg width="32" height="32" viewBox="0 0 29 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <mask id="mask0_781_1241" style={{maskType:'luminance'}} maskUnits="userSpaceOnUse" x="0" y="0" width="29" height="32">
+                  <path d="M0 0H28.8363V32H0V0Z" fill="white"/>
+                </mask>
+                <g mask="url(#mask0_781_1241)">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M14.4181 31.9997C22.3576 31.9997 28.7918 28.9239 28.7918 25.1273C28.7918 22.3316 25.3004 18.2295 20.2895 16.2598C18.7225 18.1973 16.6689 19.5674 14.4181 19.5674C12.1677 19.5674 10.1138 18.1973 8.54556 16.2598C3.53599 18.2296 0.0439453 22.3318 0.0439453 25.1273C0.0439453 28.9237 6.47875 31.9997 14.4183 31.9997H14.4181ZM2.13413 23.5769C2.47106 22.905 2.98512 22.1867 3.62028 21.5C4.8241 20.1982 6.39065 19.0645 8.1101 18.2403C8.82516 18.9732 9.58957 19.5813 10.3927 20.0552C11.6913 20.8216 13.0455 21.21 14.4181 21.21C16.6428 21.21 18.8468 20.1644 20.725 18.2401C22.4446 19.0643 24.0117 20.1982 25.2155 21.5C25.8504 22.1867 26.3643 22.9048 26.7015 23.5769C27.0727 24.317 27.1508 24.8286 27.1508 25.1273C27.1508 25.6421 26.9096 26.1756 26.4338 26.7135C25.8646 27.3568 24.9798 27.9764 23.875 28.5043C22.6767 29.0772 21.2681 29.5298 19.6887 29.8491C18.0234 30.1858 16.2501 30.3565 14.4181 30.3565C12.5863 30.3565 10.8131 30.1858 9.14758 29.8491C7.56787 29.5298 6.15934 29.0772 4.96099 28.5043C3.85612 27.9761 2.97116 27.3568 2.40174 26.7135C1.92611 26.1756 1.68496 25.6419 1.68496 25.1273C1.68496 24.8286 1.76287 24.317 2.13428 23.5769H2.13413ZM14.4175 17.3005C18.6922 17.3005 22.1575 11.6019 22.1575 7.47456C22.1575 3.34678 18.6922 0 14.4175 0C10.1431 0 6.67743 3.34602 6.67743 7.47456C6.67743 11.6031 10.1428 17.3005 14.4175 17.3005ZM8.31328 7.47456C8.31328 5.92884 8.94001 4.47242 10.0781 3.37333C11.2338 2.25736 12.7748 1.64252 14.4175 1.64252C16.0602 1.64252 17.6015 2.25734 18.7572 3.37359C19.8952 4.47299 20.5222 5.92935 20.5222 7.47456C20.5222 8.30154 20.3441 9.24558 20.0071 10.2043C19.6618 11.1871 19.1638 12.1438 18.5666 12.971C17.959 13.8128 17.2601 14.5023 16.5452 14.9643C15.8334 15.4245 15.1176 15.6578 14.4175 15.6578C13.7173 15.6578 13.0015 15.4245 12.2899 14.9646C11.5751 14.5023 10.8762 13.8133 10.2686 12.9715C9.67165 12.1443 9.17345 11.1876 8.82805 10.2048C8.49112 9.24609 8.31323 8.3018 8.31323 7.47463L8.31328 7.47456Z" fill="#FFD400"/>
+                </g>
+              </svg>
+            ) : (
+              <svg width="32" height="32" viewBox="0 0 29 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <mask id="mask0_781_1241" style={{maskType:'luminance'}} maskUnits="userSpaceOnUse" x="0" y="0" width="29" height="32">
+                  <path d="M0 0H28.8363V32H0V0Z" fill="white"/>
+                </mask>
+                <g mask="url(#mask0_781_1241)">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M14.4181 31.9997C22.3576 31.9997 28.7918 28.9239 28.7918 25.1273C28.7918 22.3316 25.3004 18.2295 20.2895 16.2598C18.7225 18.1973 16.6689 19.5674 14.4181 19.5674C12.1677 19.5674 10.1138 18.1973 8.54556 16.2598C3.53599 18.2296 0.0439453 22.3318 0.0439453 25.1273C0.0439453 28.9237 6.47875 31.9997 14.4183 31.9997H14.4181ZM2.13413 23.5769C2.47106 22.905 2.98512 22.1867 3.62028 21.5C4.8241 20.1982 6.39065 19.0645 8.1101 18.2403C8.82516 18.9732 9.58957 19.5813 10.3927 20.0552C11.6913 20.8216 13.0455 21.21 14.4181 21.21C16.6428 21.21 18.8468 20.1644 20.725 18.2401C22.4446 19.0643 24.0117 20.1982 25.2155 21.5C25.8504 22.1867 26.3643 22.9048 26.7015 23.5769C27.0727 24.317 27.1508 24.8286 27.1508 25.1273C27.1508 25.6421 26.9096 26.1756 26.4338 26.7135C25.8646 27.3568 24.9798 27.9764 23.875 28.5043C22.6767 29.0772 21.2681 29.5298 19.6887 29.8491C18.0234 30.1858 16.2501 30.3565 14.4181 30.3565C12.5863 30.3565 10.8131 30.1858 9.14758 29.8491C7.56787 29.5298 6.15934 29.0772 4.96099 28.5043C3.85612 27.9761 2.97116 27.3568 2.40174 26.7135C1.92611 26.1756 1.68496 25.6419 1.68496 25.1273C1.68496 24.8286 1.76287 24.317 2.13428 23.5769H2.13413ZM14.4175 17.3005C18.6922 17.3005 22.1575 11.6019 22.1575 7.47456C22.1575 3.34678 18.6922 0 14.4175 0C10.1431 0 6.67743 3.34602 6.67743 7.47456C6.67743 11.6031 10.1428 17.3005 14.4175 17.3005ZM8.31328 7.47456C8.31328 5.92884 8.94001 4.47242 10.0781 3.37333C11.2338 2.25736 12.7748 1.64252 14.4175 1.64252C16.0602 1.64252 17.6015 2.25734 18.7572 3.37359C19.8952 4.47299 20.5222 5.92935 20.5222 7.47456C20.5222 8.30154 20.3441 9.24558 20.0071 10.2043C19.6618 11.1871 19.1638 12.1438 18.5666 12.971C17.959 13.8128 17.2601 14.5023 16.5452 14.9643C15.8334 15.4245 15.1176 15.6578 14.4175 15.6578C13.7173 15.6578 13.0015 15.4245 12.2899 14.9646C11.5751 14.5023 10.8762 13.8133 10.2686 12.9715C9.67165 12.1443 9.17345 11.1876 8.82805 10.2048C8.49112 9.24609 8.31323 8.3018 8.31323 7.47463L8.31328 7.47456Z" fill="#148BAF"/>
+                </g>
+              </svg>
+            )}
+          </div>
         </div>
       </div>
+      
+      {renderContent()}
     </div>
   );
 }

@@ -1,0 +1,332 @@
+import { useState, useEffect } from "react";
+
+const focusPresets = [
+  { label: "quick focus", work: 15, break: 5 },
+  { label: "quick focus", work: 15, break: 5 },
+  { label: "quick focus", work: 15, break: 5 },
+  { label: "quick focus", work: 15, break: 5 },
+  { label: "create", work: 15, break: 5 }, // Index 4
+];
+
+// Music options for future implementation
+// const musicOptions = [
+//   { name: "Ocean waves" },
+//   { name: "Wind chimes" },
+//   { name: "Cafe ambience" },
+//   { name: "White noise" },
+//   { name: "Rainfall" },
+//   { name: "Silence" },
+// ];
+
+const FocusTimer = () => {
+  console.log("UPDATED FOCUS TIMER COMPONENT LOADED - 20250614"); // Debug marker
+  
+  // Add a unique class for debugging
+  useEffect(() => {
+    document.title = "Focus Timer - Updated 2025-06-14";
+    console.log("FocusTimer component mounted");
+  }, []);
+  
+  const [selectedPreset, setSelectedPreset] = useState<number | null>(null); // Allow null initially
+  const [workTime, setWorkTime] = useState(3); // Default to 3 minutes as shown in the design
+  const [breakTime, setBreakTime] = useState(3); // Default to 3 minutes as shown in the design
+  const [cycles, setCycles] = useState(3);
+  const [currentCycle, setCurrentCycle] = useState(1);
+  const [timer, setTimer] = useState(15 * 60); // Initialize with default workTime
+  const [isRunning, setIsRunning] = useState(false);
+  const [isWorkPhase, setIsWorkPhase] = useState(true); // Track work/break phase
+  // Music selection is prepared for future functionality
+  // const [selectedMusic, setSelectedMusic] = useState(0); 
+
+  const createPresetIndex = focusPresets.findIndex(p => p.label === "create");
+
+  // Timer logic
+  useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval> | undefined = undefined;
+
+    if (isRunning && timer > 0) {
+      intervalId = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else if (isRunning && timer === 0) {
+      // Timer finished, handle cycle/phase change
+      if (isWorkPhase) {
+        if (currentCycle < cycles) {
+          setIsWorkPhase(false);
+          setTimer(breakTime * 60);
+        } else {
+          // All cycles complete
+          setIsRunning(false);
+          // Reset or indicate completion
+          setCurrentCycle(1);
+          setIsWorkPhase(true);
+          setTimer(workTime * 60); // Reset to initial work time
+        }
+      } else {
+        // Break phase finished
+        setIsWorkPhase(true);
+        setCurrentCycle((prevCycle) => prevCycle + 1);
+        setTimer(workTime * 60);
+      }
+    }
+
+    // Cleanup function
+    return () => {
+      if (intervalId !== undefined) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isRunning, timer, workTime, breakTime, cycles, currentCycle, isWorkPhase]);
+
+  // Update timer ONLY when workTime, breakTime, or selectedPreset changes and timer is not running
+  useEffect(() => {
+    if (!isRunning) {
+      if (selectedPreset !== null && selectedPreset !== createPresetIndex) {
+        const preset = focusPresets[selectedPreset];
+        setWorkTime(preset.work);
+        setBreakTime(preset.break);
+        setTimer(preset.work * 60); // Reset timer to new work time
+        setIsWorkPhase(true); // Ensure it starts with work phase
+        setCurrentCycle(1); // Reset cycle count
+      } else if (selectedPreset === createPresetIndex) {
+        // When switching to 'create', keep custom times but reset timer display
+        setTimer(workTime * 60);
+        setIsWorkPhase(true);
+        setCurrentCycle(1);
+      }
+    }
+  }, [selectedPreset, workTime, breakTime, createPresetIndex]);
+
+  // Time is directly formatted in the render
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#E7FCFF] to-[#DEFFFF]">
+      <div className="container mx-auto px-4 py-10">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-[#148BAF] mb-2 text-shadow-custom">Focus Timer</h1>
+          <p className="text-[#148BAF]">Stay focused and productive</p>
+        </div>
+      
+      {/* Main content */}
+      <div className="w-full px-5 pb-10 flex flex-col items-center bg-white">
+        <div className="text-center text-[#04C4D5] text-lg font-['Happy_Monkey'] lowercase w-full py-5">get things done!</div>
+        
+        {/* Circular Timer */}
+        <div className="timer-container relative mb-10 w-full">
+          {/* Work/Break time indicators - exactly as shown in design */}
+          <div className="flex justify-center mb-4 gap-6">
+            <div className="flex items-center gap-1">
+              <span className="text-[#148BAF] font-['Happy_Monkey'] text-sm lowercase">work :</span>
+              <div className="bg-white border border-[#04C4D5] rounded-[4px] h-[26px] w-[26px] flex items-center justify-center font-['Righteous'] text-[#148BAF]">{workTime}</div>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-[#148BAF] font-['Happy_Monkey'] text-sm lowercase">break :</span>
+              <div className="bg-white border border-[#04C4D5] rounded-[4px] h-[26px] w-[26px] flex items-center justify-center font-['Righteous'] text-[#148BAF]">{breakTime}</div>
+            </div>
+          </div>
+
+          {/* Timer Circle */}
+          <div className="timer-display">
+            <div 
+              className="timer-progress"
+              style={{ 
+                '--progress-percentage': `${isWorkPhase 
+                  ? 100 - (timer / (workTime * 60)) * 100
+                  : 100 - (timer / (breakTime * 60)) * 100}%` 
+              } as React.CSSProperties}
+            ></div>
+            <div className="timer-inner">
+              <div className="text-[#148BAF] font-['Happy_Monkey'] text-[64px] leading-[77px] font-normal">
+                {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
+              </div>
+            </div>
+            {/* Star icon in the corner as shown in the design */}
+            <div className="absolute top-[159px] right-[0px] bg-[#148BAF] border border-white w-[42px] h-[42px] flex items-center justify-center transform translate-x-[8px] rounded-[2px]">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="none">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            </div>
+          </div>
+          
+          {/* Cycles control - matches the image */}
+          <div className="flex justify-center items-center mt-5 gap-2">
+            <span className="text-[#148BAF] font-['Happy_Monkey'] text-sm lowercase">cycles :</span>
+            <button 
+              className="w-5 h-5 bg-[#F7FFFF] border border-[#04C4D5] rounded flex items-center justify-center shadow-md text-[#148BAF] text-xs"
+              onClick={() => setCycles(Math.max(1, cycles - 1))}
+            >
+              -
+            </button>
+            <span className="text-[#148BAF] font-['Righteous'] mx-1 w-8 text-center">{cycles}</span>
+            <button 
+              className="w-5 h-5 bg-[#F7FFFF] border border-[#04C4D5] rounded flex items-center justify-center shadow-md text-[#148BAF] text-xs"
+              onClick={() => setCycles(Math.min(10, cycles + 1))}
+            >
+              +
+            </button>
+          </div>
+        </div>
+        
+        {/* Focus presets grid - matches exactly with the 2x2+1 grid as shown in the image */}
+        <div className="grid grid-cols-2 gap-3 w-full mb-6">
+          {/* First row of QUICK FOCUS buttons */}
+          <button
+            className={`p-3 rounded-[8px] border border-[#04C4D5] shadow-md cursor-pointer text-center ${
+              selectedPreset === 0 ? "bg-[rgba(83,252,255,0.1)]" : "bg-white"
+            } w-[175px] h-[62px] flex flex-col justify-center items-center`}
+            onClick={() => {
+              setSelectedPreset(0);
+              setWorkTime(focusPresets[0].work);
+              setBreakTime(focusPresets[0].break);
+              if (!isRunning) {
+                setTimer(focusPresets[0].work * 60);
+              }
+            }}
+          >
+            <div className="font-['Righteous'] text-[#148BAF] text-base uppercase">
+              quick focus
+            </div>
+            <div className="font-['Happy_Monkey'] text-xs text-[#04C4D5] lowercase">
+              w: 15 min<br/>
+              b: 5 mins
+            </div>
+          </button>
+          
+          <button
+            className={`p-3 rounded-[8px] border border-[#04C4D5] shadow-md cursor-pointer text-center ${
+              selectedPreset === 1 ? "bg-[rgba(83,252,255,0.1)]" : "bg-white"
+            } w-[175px] h-[62px] flex flex-col justify-center items-center`}
+            onClick={() => {
+              setSelectedPreset(1);
+              setWorkTime(focusPresets[1].work);
+              setBreakTime(focusPresets[1].break);
+              if (!isRunning) {
+                setTimer(focusPresets[1].work * 60);
+              }
+            }}
+          >
+            <div className="font-['Righteous'] text-[#148BAF] text-base uppercase">
+              quick focus
+            </div>
+            <div className="font-['Happy_Monkey'] text-xs text-[#04C4D5] lowercase">
+              w: 15 min<br/>
+              b: 5 mins
+            </div>
+          </button>
+          
+          {/* Second row of QUICK FOCUS buttons */}
+          <button
+            className={`p-3 rounded-[8px] border border-[#04C4D5] shadow-md cursor-pointer text-center ${
+              selectedPreset === 2 ? "bg-[rgba(83,252,255,0.1)]" : "bg-white"
+            } w-[175px] h-[62px] flex flex-col justify-center items-center`}
+            onClick={() => {
+              setSelectedPreset(2);
+              setWorkTime(focusPresets[2].work);
+              setBreakTime(focusPresets[2].break);
+              if (!isRunning) {
+                setTimer(focusPresets[2].work * 60);
+              }
+            }}
+          >
+            <div className="font-['Righteous'] text-[#148BAF] text-base uppercase">
+              quick focus
+            </div>
+            <div className="font-['Happy_Monkey'] text-xs text-[#04C4D5] lowercase">
+              w: 15 min<br/>
+              b: 5 mins
+            </div>
+          </button>
+          
+          <button
+            className={`p-3 rounded-[8px] border border-[#04C4D5] shadow-md cursor-pointer text-center ${
+              selectedPreset === 3 ? "bg-[rgba(83,252,255,0.1)]" : "bg-white"
+            } w-[175px] h-[62px] flex flex-col justify-center items-center`}
+            onClick={() => {
+              setSelectedPreset(3);
+              setWorkTime(focusPresets[3].work);
+              setBreakTime(focusPresets[3].break);
+              if (!isRunning) {
+                setTimer(focusPresets[3].work * 60);
+              }
+            }}
+          >
+            <div className="font-['Righteous'] text-[#148BAF] text-base uppercase">
+              quick focus
+            </div>
+            <div className="font-['Happy_Monkey'] text-xs text-[#04C4D5] lowercase">
+              w: 15 min<br/>
+              b: 5 mins
+            </div>
+          </button>
+          
+          {/* CREATE button that spans the full width */}
+          <button 
+            className={`col-span-2 p-3 rounded-[8px] border border-[#04C4D5] shadow-md cursor-pointer text-center ${
+              selectedPreset === 4 ? "bg-[rgba(83,252,255,0.1)]" : "bg-white"
+            } h-[62px] flex flex-col justify-center items-center`}
+            onClick={() => setSelectedPreset(4)}
+          >
+            <div className="font-['Righteous'] text-[#148BAF] text-base uppercase">
+              create
+            </div>
+            <div className="font-['Happy_Monkey'] text-xs text-[#04C4D5] lowercase">
+              w: 15 min<br/>
+              b: 5 mins
+            </div>
+          </button>
+        </div>
+        
+        {/* Player controls - exactly matching the design */}
+        <div className="flex justify-center items-center py-5 mt-6 relative w-full">
+          {/* Center control panel */}
+          <div className="flex justify-center items-center gap-5 py-2 px-5 bg-[#DEFFFF] rounded-[20px] w-[196px] h-[52px] border border-white shadow-md">
+            <button 
+              className="w-[40px] h-[40px] bg-white border border-[#04C4D5] rounded-[10px] flex items-center justify-center shadow-md"
+              onClick={() => setIsRunning(!isRunning)}
+              aria-label={isRunning ? "Pause timer" : "Start timer"}
+            >
+              {isRunning ? (
+                <div className="flex flex-row items-center justify-center gap-2 px-2">
+                  <div className="w-[3px] h-[14px] bg-[#148BAF]"></div>
+                  <div className="w-[3px] h-[14px] bg-[#148BAF]"></div>
+                </div>
+              ) : (
+                <div className="w-[24px] h-[24px] flex items-center justify-center">
+                  <svg width="10" height="14" viewBox="0 0 10 14" fill="#148BAF">
+                    <polygon points="0,0 0,14 10,7" />
+                  </svg>
+                </div>
+              )}
+            </button>
+            
+            <button 
+              className="w-[38px] h-[38px] bg-white border border-[#04C4D5] rounded-[10px] flex items-center justify-center shadow-md"
+              onClick={() => {
+                setIsRunning(false);
+                setCurrentCycle(1);
+                setIsWorkPhase(true);
+                setTimer(workTime * 60);
+              }}
+              aria-label="Reset timer"
+            >
+              <div className="w-[14px] h-[14px] bg-[#148BAF]"></div>
+            </button>
+          </div>
+          
+          {/* Music button - positioned as in the design */}
+          <div className="absolute right-5">
+            <div className="w-[52px] h-[52px] bg-[#DEFFFF] rounded-[20px] flex items-center justify-center border border-white shadow-md transform rotate-[-90deg]">
+              <svg width="21" height="24" viewBox="0 0 21 24" fill="#148BAF">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  );
+};
+
+export default FocusTimer;

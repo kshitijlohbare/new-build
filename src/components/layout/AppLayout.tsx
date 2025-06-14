@@ -119,14 +119,14 @@ const AppLayout = () => {
   return (
     <div className="flex flex-col h-screen w-full bg-white overflow-hidden">
       {/* Top navbar - enhanced mobile-first responsive design */}
-      <header className="bg-gradient-to-b from-[#49DAEA] to-[rgba(195.50,253.79,255,0.20)] h-[68px] sm:h-[70px] md:h-[72px] w-full z-20 flex items-center justify-between px-3 sm:px-4 md:px-6 flex-shrink-0">
+      <header className="bg-[#FCDF4D] h-[48px] w-full z-20 flex items-center justify-between px-3 sm:px-4 md:px-6 flex-shrink-0">
         {/* Enhanced mobile-first layout */}
         <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0 justify-between">
           {/* Left section: Enhanced mobile hamburger + compact badges */}
           <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
             {/* Enhanced hamburger menu with better mobile touch target */}
             <button 
-              className="md:hidden p-2 sm:p-1.5 rounded-lg bg-white border border-[#04C4D5] shadow-[1px_2px_4px_rgba(4,196,213,0.5)] hover:shadow-lg transition-all hover:bg-[rgba(255,255,255,0.9)] active:scale-95 min-h-[40px] min-w-[40px] flex items-center justify-center"
+              className="md:hidden p-1.5 sm:p-1.5 rounded-lg bg-white border border-[#04C4D5] shadow-[1px_2px_4px_rgba(4,196,213,0.5)] hover:shadow-lg transition-all hover:bg-[rgba(255,255,255,0.9)] active:scale-95 min-h-[20px] min-w-[20px] flex items-center justify-center"
               onClick={toggleSidebar}
               aria-label="Open menu"
             >
@@ -193,7 +193,7 @@ const AppLayout = () => {
           <div className="flex justify-center flex-1 max-w-[200px] sm:max-w-none">
             <a href="/" className="focus:outline-none whitespace-nowrap group">
               <h1 className="font-luckiest-guy text-lg sm:text-xl md:text-2xl font-bold text-black cursor-pointer select-none drop-shadow-md group-hover:drop-shadow-lg transition-all transform group-hover:scale-105">
-                CACTUS COCO
+                Caktus Coco
               </h1>
             </a>
           </div>
@@ -312,7 +312,7 @@ const AppLayout = () => {
         </aside>
 
         {/* Enhanced main content area with improved mobile padding */}
-        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10">
+        <main className="flex-1 overflow-y-auto p-0">
           <Outlet />
         </main>
       </div>

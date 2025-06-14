@@ -1,457 +1,539 @@
-import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { 
+  Search, 
+  MapPin, 
+  Star,
+  ChevronDown,
+  Filter
+} from 'lucide-react';
 
-interface Practitioner {
-  id: number;
+// Animation styles to match existing app
+const animationStyles = `
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+`;
+
+type Therapist = {
+  id: string;
+  created_at: string;
   name: string;
   specialty: string;
-  reviews: number;
+  location: string;
   rating: number;
-  price: number;
   image_url: string;
-  badge: 'top rated' | 'new' | 'experienced' | null;
-  education: string;
-  degree: string;
-  location_type: string;
-  conditions: string[];
-  calendly_link?: string;
-}
+  bio: string;
+  years_experience: number;
+  credentials?: string;
+  session_cost?: number;
+  session_type?: "both" | "online" | "in-person";
+  reviews_count?: number;
+};
 
-// Mobile-first utility constants
-const therapyConditions = [
-  { id: "depression", label: "Depression", active: false },
-  { id: "anxiety", label: "Anxiety", active: false },
-  { id: "adhd", label: "ADHD", active: false },
-  { id: "ocd", label: "OCD", active: false },
-  { id: "postpartum", label: "Postpartum", active: false },
-  { id: "bipolar", label: "Bipolar", active: false },
-  { id: "trauma", label: "Trauma", active: false },
-  { id: "stress", label: "Stress", active: false }
+// Sample therapist data for initialization
+const sampleTherapists = [
+  {
+    name: 'Dr. Sarah Johnson',
+    specialty: 'Cognitive Behavioral Therapy',
+    location: 'New York, NY',
+    rating: 4.8,
+    bio: 'Clinical Psychologist specializing in anxiety and depression treatment with over a decade of experience helping patients develop coping strategies.',
+    years_experience: 12,
+    credentials: 'PhD in Clinical Psychology, Stanford University',
+    session_cost: 120,
+    session_type: "both",
+    reviews_count: 124
+  },
+  {
+    name: 'Dr. Michael Chen',
+    specialty: 'Psychiatry',
+    location: 'Los Angeles, CA',
+    rating: 4.7,
+    bio: 'Psychiatrist focusing on depression and bipolar disorders using evidence-based approaches and compassionate care.',
+    years_experience: 15,
+    credentials: 'MD in Psychiatry, Johns Hopkins University',
+    session_cost: 150,
+    session_type: "online",
+    reviews_count: 98
+  },
+  {
+    name: 'Emily Rodriguez, LCSW',
+    specialty: 'Family Therapy',
+    location: 'Chicago, IL',
+    rating: 4.5,
+    bio: 'Licensed Clinical Social Worker dedicated to helping individuals and families navigate challenging situations.',
+    years_experience: 8,
+    credentials: 'MSW, Columbia University',
+    session_cost: 90,
+    session_type: "online",
+    reviews_count: 76
+  }
 ];
 
-const tabs = [
-  { id: "recommended", label: "Recommended" },
-  { id: "online", label: "Online" },
-  { id: "face-to-face", label: "In-Person" }
-];
-
-const sortOptions = [
-  { value: 'recommended', label: 'Recommended' },
-  { value: 'price-low', label: 'Price: Low to High' },
-  { value: 'price-high', label: 'Price: High to Low' },
-  { value: 'rating', label: 'Highest Rated' },
-];
-
-const TherapistListing = () => {
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [locationQuery, setLocationQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("recommended");
-  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
-  const [practitioners, setPractitioners] = useState<Practitioner[]>([]);
+export default function TherapistListing() {
+  const [therapists, setTherapists] = useState<Therapist[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState('recommended');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [locationTerm, setLocationTerm] = useState('');
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string>('');
+  const [, setSpecialties] = useState<string[]>([]);
+  const [activeFilter, setActiveFilter] = useState('recommended');
+  // Status variable for database operations - needed for setup process
+  const [, setTableCreationStatus] = useState('');
 
-  // Fetch practitioners from Supabase
-  const fetchPractitioners = useCallback(async () => {
+  // Pre-defined specialty tags for the UI
+  const specialtyTags = [
+    "depression", "adhd", "ocd", "anxiety", "postpartum depression", "bi-polar disorder"
+  ];
+
+  useEffect(() => {
+    // First check if therapists table exists and create it if needed
+    checkAndCreateTherapistsTable();
+  }, []);
+
+  const checkAndCreateTherapistsTable = async () => {
+    try {
+      // Try to fetch from therapists table to check if it exists
+      setLoading(true);
+      setTableCreationStatus('Checking therapists table...');
+      
+      const { error } = await supabase
+        .from('therapists')
+        .select('count(*)')
+        .limit(1);
+      
+      // If there's a 404 error, the table doesn't exist
+      if (error && (error.code === '42P01' || error.message.includes('relation "therapists" does not exist'))) {
+        setTableCreationStatus('Creating therapists table...');
+        await createTherapistsTable();
+      } else if (error) {
+        console.error('Error checking therapists table:', error);
+        setTableCreationStatus('Error checking therapists table');
+      } else {
+        // Table exists, proceed to fetch data
+        setTableCreationStatus('Therapists table exists');
+        fetchTherapists();
+        extractSpecialties();
+      }
+    } catch (error) {
+      console.error('Error in check and create flow:', error);
+      setTableCreationStatus('Error in setup process');
+      setLoading(false);
+    }
+  };
+
+  const createTherapistsTable = async () => {
+    try {
+      // Create the therapists table
+      setTableCreationStatus('Creating therapists table structure...');
+      
+      const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS public.therapists (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+          name TEXT NOT NULL,
+          specialty TEXT NOT NULL,
+          location TEXT NOT NULL,
+          rating DECIMAL(3,1) NOT NULL CHECK (rating >= 0 AND rating <= 5),
+          image_url TEXT,
+          bio TEXT NOT NULL,
+          years_experience INTEGER NOT NULL
+        );
+      `;
+      
+      // Execute the create table query
+      const { error: createError } = await supabase.rpc('pg_execute', {
+        query: createTableQuery
+      });
+      
+      if (createError) {
+        console.error('Error creating therapists table:', createError);
+        setTableCreationStatus('Failed to create therapists table');
+        setLoading(false);
+        return;
+      }
+      
+      // Set up RLS policies
+      setTableCreationStatus('Setting up security policies...');
+      
+      const rlsQueries = [
+        `ALTER TABLE public.therapists ENABLE ROW LEVEL SECURITY;`,
+        `CREATE POLICY IF NOT EXISTS "Allow public read access to therapists" 
+         ON public.therapists FOR SELECT USING (true);`,
+        `CREATE POLICY IF NOT EXISTS "Allow authenticated users to insert therapists" 
+         ON public.therapists FOR INSERT WITH CHECK (auth.role() = 'authenticated');`,
+        `CREATE POLICY IF NOT EXISTS "Allow authenticated users to update therapists" 
+         ON public.therapists FOR UPDATE USING (auth.role() = 'authenticated');`
+      ];
+      
+      // Execute each RLS query
+      for (const query of rlsQueries) {
+        const { error } = await supabase.rpc('pg_execute', { query });
+        if (error) {
+          console.error('Error setting up RLS:', error);
+        }
+      }
+      
+      // Insert sample data
+      setTableCreationStatus('Adding sample therapist data...');
+      const { error: insertError } = await supabase
+        .from('therapists')
+        .insert(sampleTherapists);
+      
+      if (insertError) {
+        console.error('Error inserting sample data:', insertError);
+        setTableCreationStatus('Error adding sample data');
+      } else {
+        setTableCreationStatus('Setup complete - Fetching therapists...');
+        // Now fetch the data
+        await fetchTherapists();
+        await extractSpecialties();
+      }
+      
+    } catch (error) {
+      console.error('Error in create therapists table process:', error);
+      setTableCreationStatus('Failed to set up therapists data');
+      setLoading(false);
+    }
+  };
+
+  const fetchTherapists = async () => {
     try {
       setLoading(true);
-      let query = supabase
-        .from('practitioners')
+      const { data, error } = await supabase
+        .from('therapists')
         .select('*');
-
-      if (activeTab === 'online') {
-        query = query.eq('location_type', 'online');
-      } else if (activeTab === 'face-to-face') {
-        query = query.eq('location_type', 'in-person');
-      }
-
-      const { data, error } = await query;
+      
       if (error) throw error;
-
-      // Type the data properly as Practitioner array
-      let filteredData: Practitioner[] = (data || []).map((item: any) => ({
-        id: Number(item.id),
-        name: String(item.name || ''),
-        specialty: String(item.specialty || ''),
-        reviews: Number(item.reviews || 0),
-        rating: Number(item.rating || 0),
-        price: Number(item.price || 0),
-        image_url: String(item.image_url || ''),
-        badge: item.badge as 'top rated' | 'new' | 'experienced' | null,
-        education: String(item.education || ''),
-        degree: String(item.degree || ''),
-        location_type: String(item.location_type || ''),
-        conditions: Array.isArray(item.conditions) ? item.conditions.map(String) : [],
-        calendly_link: item.calendly_link ? String(item.calendly_link) : undefined
-      }));
-
-      // Filter by search query
-      if (searchQuery) {
-        filteredData = filteredData.filter(p => 
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.specialty.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+      
+      if (data) {
+        setTherapists(data);
       }
-
-      // Filter by conditions
-      if (selectedConditions.length > 0) {
-        filteredData = filteredData.filter(p => 
-          p.conditions.some((condition: string) => 
-            selectedConditions.includes(condition.toLowerCase())
-          )
-        );
-      }
-
-      // Sort practitioners
-      filteredData.sort((a, b) => {
-        switch (sortBy) {
-          case 'price-low':
-            return a.price - b.price;
-          case 'price-high':
-            return b.price - a.price;
-          case 'rating':
-            return b.rating - a.rating;
-          default:
-            return b.rating - a.rating; // Default to rating for recommended
-        }
-      });
-
-      setPractitioners(filteredData);
     } catch (error) {
-      console.error('Error fetching practitioners:', error);
+      console.error('Error fetching therapists:', error);
     } finally {
       setLoading(false);
     }
-  }, [activeTab, searchQuery, selectedConditions, sortBy]);
-
-  useEffect(() => {
-    fetchPractitioners();
-  }, [fetchPractitioners]);
-
-  const handleConditionToggle = (conditionId: string) => {
-    setSelectedConditions(prev => 
-      prev.includes(conditionId)
-        ? prev.filter(id => id !== conditionId)
-        : [...prev, conditionId]
-    );
   };
-
-  const handleBookNow = (practitioner: Practitioner) => {
-    if (practitioner.calendly_link) {
-      window.open(practitioner.calendly_link, '_blank');
-    } else {
-      navigate(`/booking/${practitioner.id}`);
+  
+  const extractSpecialties = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('therapists')
+        .select('specialty');
+      
+      if (error) throw error;
+      
+      if (data) {
+        const uniqueSpecialties = [...new Set(data.map(item => item.specialty))];
+        setSpecialties(uniqueSpecialties);
+      }
+    } catch (error) {
+      console.error('Error extracting specialties:', error);
     }
   };
 
-  const handleCardClick = (practitionerId: number) => {
-    navigate(`/therapist/${practitionerId}`);
+  const filteredTherapists = therapists.filter(therapist => {
+    const matchesSearch = 
+      therapist.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      therapist.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      therapist.bio.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesLocation = !locationTerm || 
+      therapist.location.toLowerCase().includes(locationTerm.toLowerCase());
+    
+    const matchesSpecialty = !selectedSpecialty || 
+      therapist.specialty.toLowerCase().includes(selectedSpecialty.toLowerCase());
+    
+    return matchesSearch && matchesLocation && matchesSpecialty;
+  });
+
+  const handleBookAppointment = (therapistId: string) => {
+    console.log(`Book free session with therapist ID: ${therapistId}`);
   };
 
-  const getBadgeColor = (badge: string | null) => {
-    switch (badge) {
-      case 'top rated': return 'bg-yellow-100 text-yellow-800';
-      case 'new': return 'bg-green-100 text-green-800';
-      case 'experienced': return 'bg-blue-100 text-blue-800';
-      default: return '';
-    }
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Searching for:", searchTerm);
+    // The filtering is already happening reactively
+  };
+
+  const handleSpecialtySelect = (specialty: string) => {
+    setSelectedSpecialty(prev => prev === specialty ? '' : specialty);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Section - Mobile Optimized */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-4 sm:py-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-              Find Your Perfect Therapist
-            </h1>
-            
-            {/* Search Bar - Mobile First */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="Search by name or specialty..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage-500 focus:border-transparent text-base"
-                />
-              </div>
-              <div className="flex-1 sm:max-w-xs">
-                <input
-                  type="text"
-                  placeholder="Location"
-                  value={locationQuery}
-                  onChange={(e) => setLocationQuery(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage-500 focus:border-transparent text-base"
-                />
+    <div className="min-h-screen bg-[#F9FCFD] font-happy-monkey">
+      {/* Hero Section with search */}
+      <div className="w-full bg-[rgba(6,196,213,0.10)] px-4 py-10">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-[#06C4D5] text-3xl sm:text-4xl lowercase mb-4">
+            find the perfect therapist for you
+          </h1>
+          
+          <p className="text-gray-600 max-w-2xl mx-auto mb-8">
+            Our specialized therapists are ready to support your unique journey. Get your first session free.
+          </p>
+          
+          <div className="flex flex-col gap-4 md:flex-row justify-center mb-8">
+            <div className="bg-white p-3 rounded-lg text-left shadow-sm">
+              <div className="flex items-center text-[#06C4D5]">
+                <div className="h-5 w-5 mr-2">◯</div>
+                <span className="text-sm">Personalized matching</span>
               </div>
             </div>
+            <div className="bg-white p-3 rounded-lg text-left shadow-sm">
+              <div className="flex items-center text-[#06C4D5]">
+                <div className="h-5 w-5 mr-2">◯</div>
+                <span className="text-sm">Online & in-person options</span>
+              </div>
+            </div>
+            <div className="bg-white p-3 rounded-lg text-left shadow-sm">
+              <div className="flex items-center text-[#06C4D5]">
+                <div className="h-5 w-5 mr-2">◯</div>
+                <span className="text-sm">First session free</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Mobile Filter Toggle */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-              <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 overflow-x-auto">
-                {tabs.map((tab) => (
+      {/* Search Section */}
+      <div className="max-w-6xl mx-auto px-4 -mt-6">
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-happy-monkey mb-6 text-center text-gray-800">
+            find your perfect therapist
+          </h2>
+          
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <form onSubmit={handleSearch} className="flex">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    type="text"
+                    placeholder="Try 'Anger Management'"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 border-gray-200 rounded-l-lg"
+                  />
+                </div>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    type="text"
+                    placeholder="Where do you want the therapist"
+                    value={locationTerm}
+                    onChange={(e) => setLocationTerm(e.target.value)}
+                    className="pl-10 border-gray-200 rounded-r-lg"
+                  />
+                </div>
+                <Button 
+                  type="submit"
+                  className="ml-2 bg-[#06C4D5] hover:bg-[#05b0c0] rounded-lg"
+                >
+                  search
+                </Button>
+              </form>
+            </div>
+          </div>
+          
+          {/* Specialty Tags */}
+          <div className="flex flex-wrap gap-2 mt-4">
+            {specialtyTags.map((tag, index) => (
+              <button
+                key={index}
+                onClick={() => handleSpecialtySelect(tag)}
+                className={`rounded-full px-4 py-1.5 text-sm ${
+                  selectedSpecialty === tag
+                    ? "bg-[#06C4D5] text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                } transition-colors`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      {/* Filter Bar */}
+      <div className="max-w-6xl mx-auto px-4 mt-6 mb-4">
+        <div className="flex flex-wrap gap-3 border-b pb-2">
+          <button 
+            onClick={() => setActiveFilter('recommended')}
+            className={`px-3 py-1.5 ${activeFilter === 'recommended' ? 'text-[#06C4D5] border-b-2 border-[#06C4D5]' : 'text-gray-600'}`}
+          >
+            recommended
+          </button>
+          <button 
+            onClick={() => setActiveFilter('online')}
+            className={`px-3 py-1.5 ${activeFilter === 'online' ? 'text-[#06C4D5] border-b-2 border-[#06C4D5]' : 'text-gray-600'}`}
+          >
+            online
+          </button>
+          <button 
+            onClick={() => setActiveFilter('face-to-face')}
+            className={`px-3 py-1.5 ${activeFilter === 'face-to-face' ? 'text-[#06C4D5] border-b-2 border-[#06C4D5]' : 'text-gray-600'}`}
+          >
+            face-to-face
+          </button>
+          
+          <div className="ml-auto flex items-center gap-2">
+            <select className="appearance-none bg-white border border-gray-200 rounded p-1.5 pl-3 pr-8 text-sm relative">
+              <option value="recommended">recommended</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="rating">Highest Rated</option>
+            </select>
+            <ChevronDown className="w-4 h-4 text-gray-500 -ml-7 pointer-events-none" />
+            
+            <button className="flex items-center gap-1 border border-gray-200 rounded p-1.5 text-sm">
+              <Filter className="w-4 h-4" />
+              filter
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Therapist Listings */}
+      <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {loading ? (
+          <div className="col-span-full flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#06C4D5]"></div>
+          </div>
+        ) : filteredTherapists.length > 0 ? (
+          filteredTherapists.map((therapist, index) => (
+            <div 
+              key={therapist.id || index} 
+              className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 animate-[fadeIn_0.5s_ease-out]"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <div className="flex">
+                {/* Therapist Image */}
+                <div className="w-1/3">
+                  <div className="relative h-full">
+                    {index === 0 && (
+                      <div className="absolute top-2 left-2 bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-sm">
+                        confident
+                      </div>
+                    )}
+                    {index === 1 && (
+                      <div className="absolute top-2 left-2 bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-sm">
+                        experienced
+                      </div>
+                    )}
+                    <img 
+                      src={therapist.image_url || `https://randomuser.me/api/portraits/${index % 2 === 0 ? 'women' : 'men'}/${index + 1}.jpg`} 
+                      alt={therapist.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+                
+                {/* Therapist Info */}
+                <div className="w-2/3 p-4">
+                  <div className="flex justify-between">
+                    <h3 className="text-[#06C4D5] font-happy-monkey text-lg">{therapist.name}</h3>
+                    <div className="text-[#06C4D5] font-medium">
+                      ${therapist.session_cost || 120}<span className="text-xs text-gray-500">/session</span>
+                    </div>
+                  </div>
+                  
+                  <p className="text-sm text-gray-600 mt-1">
+                    {therapist.specialty || "Clinical Psychologist specializing in anxiety"}
+                  </p>
+                  
+                  {/* Tags */}
+                  <div className="flex gap-1 mt-2 flex-wrap">
+                    {['anxiety', 'depression'].map((tag, i) => (
+                      <span key={i} className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-sm">
+                        {tag}
+                      </span>
+                    ))}
+                    {index === 0 && <span className="text-xs text-[#06C4D5]">+2 more</span>}
+                    {index === 1 && <span className="text-xs text-[#06C4D5]">+2 more</span>}
+                  </div>
+                  
+                  {/* Credentials */}
+                  <div className="text-xs text-gray-500 mt-2">
+                    {therapist.credentials || "PhD in Clinical Psychology, Stanford University"}
+                  </div>
+                  
+                  {/* Rating and Reviews */}
+                  <div className="flex items-center mt-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className={`w-3.5 h-3.5 ${
+                          i < Math.floor(therapist.rating) 
+                            ? "text-yellow-400 fill-yellow-400" 
+                            : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                    <span className="text-xs text-gray-500 ml-1">
+                      {therapist.rating.toFixed(1)} ({therapist.reviews_count || 100}+ reviews)
+                    </span>
+                  </div>
+                  
+                  {/* Session Type */}
+                  <div className="mt-3 mb-2">
+                    <span className={`text-xs px-2 py-1 rounded-sm ${
+                      therapist.session_type === 'both' 
+                        ? 'bg-purple-50 text-purple-600' 
+                        : therapist.session_type === 'online'
+                          ? 'bg-blue-50 text-blue-600'
+                          : 'bg-green-50 text-green-600'
+                    }`}>
+                      {therapist.session_type || 'both'}
+                    </span>
+                  </div>
+                  
+                  {/* Book Button */}
                   <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-white text-sage-700 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
+                    onClick={() => handleBookAppointment(therapist.id || index.toString())}
+                    className={`w-full mt-2 py-1.5 rounded text-center text-white text-sm ${
+                      index % 2 === 0 
+                        ? 'bg-[#30BFDD] hover:bg-[#27a9c6]' 
+                        : 'bg-[#06C4D5] hover:bg-[#05b0c0]'
                     }`}
                   >
-                    {tab.label}
+                    book free session
                   </button>
-                ))}
-              </div>
-              
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="sm:hidden flex items-center px-4 py-2 bg-sage-600 text-white rounded-lg text-sm font-medium"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                  </svg>
-                  Filters
-                </button>
-                
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sage-500 focus:border-transparent"
-                >
-                  {sortOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Filters Sidebar - Mobile Responsive */}
-          <div className={`lg:w-64 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
-              <div className="flex justify-between items-center mb-4 lg:block">
-                <h3 className="font-semibold text-gray-900">Conditions</h3>
-                <button
-                  onClick={() => setShowFilters(false)}
-                  className="lg:hidden text-gray-500"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <div className="space-y-3">
-                {therapyConditions.map((condition) => (
-                  <label key={condition.id} className="flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedConditions.includes(condition.id)}
-                      onChange={() => handleConditionToggle(condition.id)}
-                      className="w-4 h-4 text-sage-600 border-gray-300 rounded focus:ring-sage-500"
-                    />
-                    <span className="ml-3 text-sm text-gray-700">{condition.label}</span>
-                  </label>
-                ))}
-              </div>
-
-              {selectedConditions.length > 0 && (
-                <button
-                  onClick={() => setSelectedConditions([])}
-                  className="mt-4 text-sm text-sage-600 hover:text-sage-700"
-                >
-                  Clear all filters
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Results */}
-          <div className="flex-1">
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg shadow-sm p-6 animate-pulse">
-                    <div className="flex space-x-4">
-                      <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
-                      <div className="flex-1 space-y-3">
-                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : practitioners.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-gray-500 mb-4">
-                  <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
-                  </svg>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No therapists found</h3>
-                <p className="text-gray-500">Try adjusting your search criteria or filters.</p>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                {practitioners.map((practitioner) => (
-                  <div 
-                    key={practitioner.id} 
-                    onClick={() => handleCardClick(practitioner.id)}
-                    className="bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group border border-[rgba(4,196,213,0.2)] hover:border-[rgba(4,196,213,0.4)] min-h-[280px] sm:min-h-[320px]"
-                  >
-                    {/* Enhanced mobile-first card header */}
-                    <div className="p-4 sm:p-6">
-                      <div className="flex items-start space-x-3 sm:space-x-4 mb-4">
-                        <img
-                          src={practitioner.image_url || '/api/placeholder/64/64'}
-                          alt={practitioner.name}
-                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover border-2 border-[rgba(4,196,213,0.2)]"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex-1 pr-2">
-                              <h3 className="text-lg sm:text-xl font-happy-monkey text-[#148BAF] lowercase leading-tight truncate">
-                                {practitioner.name}
-                              </h3>
-                              <p className="text-sm text-gray-600 font-happy-monkey lowercase leading-relaxed truncate">
-                                {practitioner.specialty}
-                              </p>
-                            </div>
-                            {practitioner.badge && (
-                              <span className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${getBadgeColor(practitioner.badge)}`}>
-                                {practitioner.badge}
-                              </span>
-                            )}
-                          </div>
-                          
-                          {/* Enhanced mobile rating display */}
-                          <div className="flex items-center space-x-2 mb-3">
-                            <div className="flex items-center space-x-1">
-                              {[...Array(5)].map((_, i) => (
-                                <svg 
-                                  key={i} 
-                                  className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${i < Math.floor(practitioner.rating) ? 'text-yellow-400' : 'text-gray-200'}`} 
-                                  fill="currentColor" 
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                              ))}
-                            </div>
-                            <span className="text-xs sm:text-sm text-gray-600 font-happy-monkey">
-                              {practitioner.rating} ({practitioner.reviews} reviews)
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Enhanced mobile-first credentials */}
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center text-xs sm:text-sm text-gray-600">
-                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#04C4D5] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                          </svg>
-                          <span className="font-happy-monkey truncate">
-                            <span className="font-medium">{practitioner.degree}</span> • {practitioner.education}
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center text-xs sm:text-sm text-gray-600">
-                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#04C4D5] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          <span className="font-happy-monkey lowercase">
-                            {practitioner.location_type === 'online' ? 'Online Sessions Available' : 'In-Person Sessions'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Mobile-optimized specialties */}
-                      {practitioner.conditions && practitioner.conditions.length > 0 && (
-                        <div className="mb-4">
-                          <p className="text-xs text-gray-500 font-happy-monkey lowercase mb-2">Specializes in:</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {practitioner.conditions.slice(0, 2).map((condition, index) => (
-                              <span 
-                                key={index} 
-                                className="px-2 py-1 text-xs bg-[rgba(4,196,213,0.1)] text-[#148BAF] rounded-full font-happy-monkey lowercase"
-                              >
-                                {condition}
-                              </span>
-                            ))}
-                            {practitioner.conditions.length > 2 && (
-                              <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full font-happy-monkey">
-                                +{practitioner.conditions.length - 2} more
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Enhanced mobile-first price and book section */}
-                      <div className="flex items-center justify-between pt-4 border-t border-[rgba(4,196,213,0.1)]">
-                        <div>
-                          <div className="text-xl sm:text-2xl font-happy-monkey text-[#148BAF] font-bold">
-                            ${practitioner.price}
-                          </div>
-                          <div className="text-xs text-gray-500 font-happy-monkey lowercase">
-                            per session
-                          </div>
-                        </div>
-                        
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBookNow(practitioner);
-                          }}
-                          className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white rounded-xl hover:from-[#148BAF] hover:to-[#04C4D5] transition-all duration-300 text-sm font-happy-monkey lowercase shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2 min-h-[44px] min-w-[100px] justify-center"
-                        >
-                          <span>Book Now</span>
-                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Enhanced mobile hover effects */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-[rgba(4,196,213,0.02)] to-[rgba(20,139,175,0.02)] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl sm:rounded-2xl"></div>
-                    
-                    {/* Mobile-optimized click indicator */}
-                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2 shadow-lg">
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4 text-[#148BAF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            </div>
+          ))
+        ) : (
+          <div className="col-span-full flex flex-col items-center justify-center py-16 px-4">
+            <div className="w-20 h-20 bg-[rgba(6,196,213,0.10)] rounded-full flex items-center justify-center mb-4">
+              <Search className="w-10 h-10 text-[#06C4D5]" />
+            </div>
+            <h3 className="text-xl font-happy-monkey text-gray-800 mb-2 lowercase">No therapists found</h3>
+            <p className="text-gray-500 text-center mb-6 max-w-md">
+              We couldn't find therapists matching your criteria. Try adjusting your filters for more results.
+            </p>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setLocationTerm('');
+                setSelectedSpecialty('');
+                setActiveFilter('recommended');
+              }}
+              className="bg-[#06C4D5] text-white font-happy-monkey rounded px-6 py-2 hover:bg-[#05b0c0]"
+            >
+              Clear All Filters
+            </button>
           </div>
-        </div>
+        )}
       </div>
+      
+      <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
     </div>
   );
-};
-
-export default TherapistListing;
+}

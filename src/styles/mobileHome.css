@@ -1,0 +1,662 @@
+/* Custom styles for mobile home page */
+/* CSS Reset for mobile home - ensures no spacing between elements */
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Force navbar color override */
+nav.app-navbar {
+  background-color: #15A9D6 !important;
+}
+/* Ensure all elements in the navbar inherit this color */
+nav.app-navbar * {
+  --navbar-color: #15A9D6;
+}
+
+.mobile-home-root {
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure no spacing between app layout and mobile container */
+#root, .content-body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.mobile-home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center/* Add extra padding at the top of the input bar for the swipe indicator */
+.input-bar {
+  padding-top: 20px;
+  padding-bottom: 15px;
+} padding: 0;
+  padding-bottom: 100px; /* Space for the floating input bubble */
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  background: #FFFFFF;
+  font-family: var(--font-happy-monkey), sans-serif;
+  color: #148BAF;
+  overflow-x: hidden;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-top: 0; /* Remove gap between nav and hero */
+  background: linear-gradient(180.0deg, #FCDF4D 0.05%, #FFD400 99.95%);
+  border-radius: 0px 0px 20px 20px;
+  padding: 10px 10px 25px; /* Slightly increased bottom padding */
+  gap: 8px; /* Reduced gap between elements */
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 0;
+  overflow: visible;
+  max-height: 250px;
+  height: 249px;
+}
+
+.welcome-header {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0; /* Removed padding */
+  height: 16px;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+  margin-bottom: 0; /* Removed margin */
+}
+
+.welcome-title {
+  font-family: 'Happy Monkey', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+  text-transform: lowercase;
+  color: #148BAF;
+  animation: fadeInUp 0.3s ease-out forwards;
+  flex-grow: 1;
+}
+
+.delights-title {
+  width: 100%;
+  font-family: 'Happy Monkey', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 29px;
+  text-align: center; /* Center align the title */
+  text-transform: lowercase;
+  color: #000000;
+  order: 0; /* Position it at the top */
+  align-self: center; /* Center align horizontally */
+  display: flex;
+  flex-direction: row;
+  justify-content: center; /* Center align content */
+  align-items: center;
+  gap: 10px;
+  height: 29px;
+  margin-top: 0; /* Removed top margin */
+  margin-bottom: 0; /* Removed bottom margin */
+  padding: 0; /* Removed all padding */
+  flex-grow: 0;
+}
+
+.delights-wrapper {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center align contents */
+  position: relative;
+  align-self: stretch;
+  flex-grow: 0;
+  padding: 0; /* Removed padding */
+  margin-top: 0; /* Removed margin */
+  text-align: center; /* Ensure text is centered */
+}
+
+/* Navigation buttons removed */
+
+.delights-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  width: calc(100vw - 20px); /* Adjusted width with reduced side padding */
+  max-width: 100%;
+  max-height: 154px; /* Match the reference design height */
+  gap: 8px; /* Changed to 8px consistent spacing */
+  align-content: flex-start;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Hide scrollbar in Firefox */
+  height: 154px; /* Fixed height for consistent layout */
+  scroll-snap-type: none; /* Remove snap scrolling since nav controls are gone */
+  -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+  padding: 0; /* Removed all padding */
+  flex-grow: 0;
+  margin: 0 auto; /* Center horizontally */
+}
+
+.delights-container > * {
+  flex-shrink: 0; /* Prevent items from shrinking */
+}
+
+/* Create a wrapping container for each column of bubbles */
+.column-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Use 100% width relative to parent container */
+  flex-shrink: 0; /* Don't shrink */
+  gap: 8px; /* Reduced gap to 8px for consistent spacing */
+  padding: 0; /* Remove padding as it's handled by container */
+  margin-bottom: 0; /* Removed margin between column wrappers */
+  align-items: center; /* Center the bubbles horizontally */
+}
+
+.delights-container::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.delights-container::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.delights-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Enhanced horizontal scrolling indicators */
+.delights-container::after {
+  content: '';
+  flex: 0 0 20px;
+  height: 1px;
+  order: 99999;
+  /* Creates some padding at end of scroll to make it clearer there's more content */
+}
+
+/* Ensure content doesn't exceed 250px height */
+.hero-section {
+  overflow-y: hidden; /* Prevent vertical scrolling */
+}
+
+/* Remove column separators since we don't need them without the carousel */
+.delights-container::before {
+  content: none;
+}
+
+/* Scroll indicators removed */
+
+.delight-bubble {
+  background-color: white;
+  color: #04C4D5;
+  border-radius: 10px;
+  padding: 8px 0; /* Vertical padding only, remove horizontal padding */
+  text-align: center;
+  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
+  font-family: 'Happy Monkey', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px; /* Reduced font size to 14px */
+  line-height: 16px; /* Adjusted line height for smaller font */
+  text-transform: lowercase;
+  animation: fadeInUp 0.3s ease-out forwards;
+  width: 95%; /* Slightly narrower for better visual appearance */
+  min-height: 44px; /* Reduced min-height for smaller bubbles */
+  max-height: 60px; /* Reduced max-height to match */
+  flex: 0 0 auto;
+  position: relative;
+  margin: 0; /* Ensure no margins */
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  align-self: center; /* Center align horizontally */
+  flex-grow: 0;
+}
+
+.delight-bubble.add-delight {
+  background-color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0; /* Ensure no margins */
+  padding: 8px 0; /* Vertical padding only, remove horizontal padding */
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed rgba(4, 196, 213, 0.5);
+  color: #15A9D6;
+  font-weight: 500;
+  width: 95%; /* Match width of regular bubbles */
+  min-height: 44px; /* Match the reduced height of other bubbles */
+  font-size: 14px; /* Consistent font size */
+  /* Ensure the add button is placed at the end */
+  order: 999;
+}
+
+.delight-bubble.active-hold {
+  transform: scale(0.96);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.delight-bubble:active:not(.active-hold) {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+.delight-delete {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #FF5A5A;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  z-index: 20;
+}
+
+.delight-bubble.show-delete .delight-delete {
+  transform: scale(1.1);
+  animation: pulseDelete 1s infinite alternate;
+}
+
+.delight-delete:hover {
+  transform: scale(1.1);
+  background-color: #ff3333;
+}
+
+@keyframes deleteShake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes deleteShakeEnhanced {
+  0% { transform: translateX(0) rotate(0deg); opacity: 1; }
+  25% { transform: translateX(-3px) rotate(-2deg); opacity: 0.95; }
+  50% { transform: translateX(0) rotate(0deg); opacity: 0.9; }
+  75% { transform: translateX(3px) rotate(2deg); opacity: 0.95; }
+  100% { transform: translateX(0) rotate(0deg); opacity: 1; }
+}
+
+.delight-bubble.show-delete {
+  animation: deleteShakeEnhanced 0.5s ease-in-out;
+  box-shadow: 0 0 0 2px rgba(255, 90, 90, 0.4), 1px 2px 4px rgba(73, 218, 234, 0.5);
+}
+
+.delight-bubble.deleting {
+  animation: deleteAnimation 0.3s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes deleteAnimation {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.7); opacity: 0; }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Better visibility for delete button */
+.delight-delete {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  z-index: 20;
+}
+
+.delight-bubble.show-delete .delight-delete {
+  transform: scale(1.1);
+  animation: pulseDelete 1s infinite alternate;
+}
+
+@keyframes pulseDelete {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.2); }
+}
+
+/* Floating input bar */
+.input-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background-color: #FFD400; /* Changed from #15A9D6 to #49DADD */
+  padding: 20px 10px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 100px;
+  border: 1px solid white;
+  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
+  z-index: 100;
+  animation: slideInFromBottom 0.5s ease-out;
+  transition: box-shadow 0.2s ease, transform 0.3s ease, opacity 0.3s ease;
+  font-size: 14px;
+}
+
+/* Animation for input bar appearance/disappearance */
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToBottom {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.input-bar:focus-within {
+  box-shadow: 2px 4px 8px rgba(73, 218, 234, 0.7);
+}
+
+.emoji-button {
+  padding: 0%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.post-button {
+  background-color: white;
+  color: #49DADD;
+  border: none;
+  border-radius: 100px;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 60px;
+}
+
+/* Daily Practices Styling */
+.wellness-section {
+  margin-bottom: 20px;
+}
+
+.progress-bar {
+  position: relative;
+  overflow: visible;
+}
+
+.daily-practice-list {
+  border: 1px solid rgba(4, 196, 213, 0.3);
+}
+
+.practice-item {
+  transition: all 0.3s ease;
+}
+
+.practice-item:hover {
+  border-color: #04C4D5;
+  box-shadow: 0px 4px 8px rgba(73, 218, 234, 0.4);
+}
+
+/* Star points icon styling */
+.practice-item .practice-name > div > div:first-child {
+  position: relative;
+  width: 15px;
+  height: 15px;
+}
+
+.practice-item .practice-name > div > div:first-child > div {
+  position: absolute;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  background-color: #49DADD;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(0deg);
+}
+
+/* Duration button with dropdown indicator */
+.practice-item .box-border div {
+  position: relative;
+}
+
+.practice-item .box-border div::after {
+  content: "^";
+  position: absolute;
+  right: 2px;
+  top: 0;
+  transform: rotate(180deg);
+  font-size: 10px;
+}
+
+/* Checkmark animation */
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.practice-item button svg path {
+  transition: all 0.3s ease;
+}
+
+.practice-item button:active svg {
+  animation: checkmark 0.3s ease-in-out;
+}
+
+/* Progress bar styling */
+.progress-bar {
+  position: relative;
+  height: 24px;
+  margin-bottom: 10px;
+  overflow: visible;
+}
+
+/* Star styling for progress bar */
+.progress-bar .w-6.h-6 > div {
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Improved rotation for progress bar */
+.progress-bar .transform-gpu {
+  will-change: transform;
+}
+
+/* Responsive adjustments for different device sizes */
+@media (max-width: 375px) {
+  .delights-container {
+    width: calc(100vw - 20px);
+    max-height: 154px;
+    height: 154px;
+    padding: 0;
+  }
+  
+  .delight-bubble, .delight-bubble.add-delight {
+    width: 95%;
+    font-size: 13px; /* Slightly smaller font for very small screens */
+    padding: 8px 0; /* Vertical padding only, remove horizontal padding */
+    margin: 0; /* Ensure no margins */
+  }
+  
+  .hero-section {
+    max-height: 250px;
+    height: 249px;
+    padding: 10px 10px 20px;
+  }
+  
+  .delights-title {
+    margin-bottom: 8px;
+  }
+}
+
+@media (min-width: 480px) {
+  .delights-container {
+    width: calc(100vw - 20px);
+    max-height: 154px;
+    height: 154px;
+    padding: 0;
+  }
+  
+  .delight-bubble, .delight-bubble.add-delight {
+    width: 95%;
+    padding: 8px 0; /* Vertical padding only, remove horizontal padding */
+    margin: 0; /* Ensure no margins */
+  }
+  
+  .hero-section {
+    max-height: 250px;
+    height: 249px;
+  }
+  
+  .delights-title {
+    margin-bottom: 10px;
+  }
+}
+
+/* Floating add button that appears when input bar is hidden */
+.add-delight-floating-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: #FFD400;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
+  z-index: 100;
+  animation: fadeIn 0.3s ease-out;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.add-delight-floating-button:hover,
+.add-delight-floating-button:focus {
+  background-color: #FFC400;
+  transform: scale(1.1);
+}
+
+.add-delight-floating-button:active {
+  transform: scale(0.95);
+}
+
+.plus-icon {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: bold;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Swipe indicator for input bar */
+.swipe-indicator {
+  width: 40px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  margin: 0 auto 8px;
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Add extra padding at the top of the input bar for the swipe indicator */
+.input-bar {
+  padding-top: 15px;
+}

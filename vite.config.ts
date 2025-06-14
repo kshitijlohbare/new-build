@@ -17,7 +17,7 @@ export default defineConfig({
     host: 'localhost',
     port: 5173,
     open: true,
-    cors: true,
+    // Removed proxy - connecting directly to Supabase
   },
   build: {
     rollupOptions: {
@@ -33,4 +33,4 @@ export default defineConfig({
       }
     }
   }
-})
+});

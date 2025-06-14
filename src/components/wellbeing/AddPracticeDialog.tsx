@@ -59,22 +59,23 @@ const AddPracticeDialog: React.FC<AddPracticeDialogProps> = ({ isOpen, onClose }
   };
   
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 p-2 md:p-4">
-      <div className="bg-white rounded-lg p-3 md:p-5 max-w-md w-full max-h-[85vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-xl md:text-2xl font-semibold">Add New Practice</h2>
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 p-4">
+      <div className="bg-white rounded-xl p-4 md:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-xl">
+        <div className="flex justify-between items-center mb-4 md:mb-6">
+          <h2 className="text-xl md:text-2xl font-semibold text-[#148BAF]">Add New Practice</h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-200"
+            className="p-2 rounded-full hover:bg-gray-200 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Close dialog"
           >
             <X size={22} />
           </button>
         </div>
         
         <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
+          <div className="space-y-4 md:space-y-5">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                 Practice Name
               </label>
               <input
@@ -82,13 +83,14 @@ const AddPracticeDialog: React.FC<AddPracticeDialogProps> = ({ isOpen, onClose }
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-3 md:p-2 border border-gray-300 rounded-md text-base min-h-[44px] focus:outline-none focus:ring-2 focus:ring-[#04C4D5] focus:border-transparent"
                 required
+                placeholder="Enter practice name"
               />
             </div>
             
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
                 Description
               </label>
               <textarea
@@ -96,28 +98,29 @@ const AddPracticeDialog: React.FC<AddPracticeDialogProps> = ({ isOpen, onClose }
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-3 md:p-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-[#04C4D5] focus:border-transparent resize-none"
                 required
+                placeholder="Describe your practice"
               />
             </div>
             
             <div>
-              <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-2">
                 Duration (minutes)
               </label>
               <input
-                type="text" // Change type to text
+                type="text"
                 id="duration"
                 value={duration}
-                onChange={(e) => setDuration(e.target.value)} // Allow any text input
+                onChange={(e) => setDuration(e.target.value)}
                 placeholder="e.g., 5"
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-3 md:p-2 border border-gray-300 rounded-md text-base min-h-[44px] focus:outline-none focus:ring-2 focus:ring-[#04C4D5] focus:border-transparent"
                 required
               />
             </div>
             
             <div>
-              <label htmlFor="benefits" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="benefits" className="block text-sm font-medium text-gray-700 mb-2">
                 Benefits (comma separated)
               </label>
               <input
@@ -126,21 +129,21 @@ const AddPracticeDialog: React.FC<AddPracticeDialogProps> = ({ isOpen, onClose }
                 value={benefits}
                 onChange={(e) => setBenefits(e.target.value)}
                 placeholder="Improves focus, Reduces stress, etc."
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-3 md:p-2 border border-gray-300 rounded-md text-base min-h-[44px] focus:outline-none focus:ring-2 focus:ring-[#04C4D5] focus:border-transparent"
               />
             </div>
             
-            <div className="pt-3 flex gap-3 justify-end">
+            <div className="pt-4 md:pt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-all active:scale-95"
+                className="w-full sm:w-auto px-6 py-3 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all active:scale-95 font-medium min-h-[44px]"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-white bg-[#088BAF] rounded-md hover:bg-[#067a9c] transition-all hover:shadow-md active:scale-95"
+                className="w-full sm:w-auto px-6 py-3 text-white bg-[#088BAF] rounded-lg hover:bg-[#067a9c] transition-all hover:shadow-md active:scale-95 font-medium min-h-[44px]"
               >
                 Add Practice
               </button>

@@ -3,6 +3,7 @@ import { useAuth } from '@/context/AuthContext';
 import { savePracticeData, addToDailyPractices, removeFromDailyPractices, updateUserDailyPractices } from './practiceUtils.fixed';
 import { savePracticeDataToLocalStorage } from './practiceUtils.localStorage';
 import { loadPracticeData } from './practiceUtils.enhanced';
+import { diagnoseAndFixDatabaseIssues } from '../scripts/databaseDiagnostic';
 
 // --- Interfaces (Consider moving to a types file) ---
 export interface Practice { // Export the interface
@@ -495,10 +496,31 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
       setIsLoading(true);
       if (user?.id) {
         try {
+          // First, run diagnostics to ensure database tables exist and are properly configured
+          console.log("Running database diagnostics...");
+          
           // Use robust loader for user-specific practices and daily practices
           const loaded = await loadPracticeData(user.id);
           if (loaded && loaded.practices && loaded.practices.length > 0) {
-            setPractices(initializeStepsCompletion(loaded.practices));
+            // We have practice data, but let's also run diagnostics to ensure tables are in good shape
+            const practicesToUse = initializeStepsCompletion(loaded.practices);
+            
+            // Run diagnostics and fix any issues silently in the background
+            try {
+              const diagResults = await diagnoseAndFixDatabaseIssues(user.id, practicesToUse);
+              
+              if (diagResults && diagResults.success && 
+                  diagResults.results && 
+                  diagResults.results.fixesApplied && 
+                  diagResults.results.fixesApplied.length > 0) {
+                console.log("Database diagnostic applied fixes:", diagResults.results.fixesApplied);
+              }
+            } catch (diagError) {
+              console.error("Error running database diagnostics:", diagError);
+              // Continue with loading data - diagnostics are just a repair attempt
+            }
+            
+            setPractices(practicesToUse);
             setUserProgress(loaded.progress || {
               totalPoints: 0,
               level: 1,
@@ -510,7 +532,7 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
             // --- Ensure progress and badges are recalculated after loading ---
             recalculateProgressAndAchievements(
               (loaded.progress && loaded.progress.totalPoints) || 0,
-              initializeStepsCompletion(loaded.practices)
+              practicesToUse
             );
             console.log('Loaded practices and progress from robust loader');
           } else {
@@ -522,6 +544,15 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
               completed: false,
               streak: 0
             }));
+            
+            // Run database diagnostics to ensure tables exist before saving
+            try {
+              const diagResults = await diagnoseAndFixDatabaseIssues(user.id, defaultPractices);
+              console.log("Initial setup diagnostic results:", diagResults);
+            } catch (diagError) {
+              console.error("Error running initial setup diagnostics:", diagError);
+            }
+            
             setPractices(initializeStepsCompletion(defaultPractices));
             setUserProgress({
               totalPoints: 0,
@@ -542,6 +573,9 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
                 achievements: [],
               });
               console.log("Saved initial user data to localStorage");
+              
+              // Explicitly sync daily practices to make sure they're added to the database
+              await updateUserDailyPractices(user.id, defaultPractices);
             } catch (saveError) {
               console.error("Error saving initial user data:", saveError);
             }
@@ -682,6 +716,9 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
         
         // Always save to localStorage as a failsafe backup first
         savePracticeDataToLocalStorage(user.id, practicesCopy, progressCopy);
+        
+        // Add lastUpdatedAt timestamp to track most recent data
+        progressCopy.lastUpdatedAt = new Date().toISOString();
         
         // Then try to save to Supabase
         const success = await savePracticeData(user.id, practicesCopy, progressCopy);
@@ -1025,52 +1062,86 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
     let pointsDifference = 0;
     const updatedPractices = practices.map(practice => {
       if (practice.id === id) {
-        if (practice.completed) {
-          const oldPoints = practice.points ?? calculatePoints(practice.duration);
-          const newPoints = calculatePoints(duration); // Duration change implies calculated points
-          pointsDifference = newPoints - oldPoints;
-        }
-        // Update duration, potentially remove fixed points if duration is now set
-        return { ...practice, duration: duration, points: undefined };
+        // Calculate points difference between old and new duration
+        const oldPoints = calculatePoints(practice.duration);
+        const newPoints = calculatePoints(duration);
+        pointsDifference = newPoints - oldPoints;
+        
+        return {
+          ...practice,
+          duration: duration,
+          points: newPoints
+        };
       }
       return practice;
     });
+    
+    // Update practices state
     setPractices(updatedPractices);
-    if (pointsDifference !== 0) {
-       const newTotalPoints = userProgress.totalPoints + pointsDifference;
-       recalculateProgressAndAchievements(newTotalPoints, updatedPractices);
+    
+    // Only update points if this affects a completed practice
+    const practice = practices.find(p => p.id === id);
+    if (practice && practice.completed) {
+      // Update total points and recalculate achievements
+      const newTotalPoints = Math.max(0, userProgress.totalPoints + pointsDifference);
+      recalculateProgressAndAchievements(newTotalPoints, updatedPractices);
     }
-  }, [practices, userProgress.totalPoints, recalculateProgressAndAchievements]);
+    
+    // Save changes to storage
+    if (user?.id) {
+      savePracticeData(user.id, updatedPractices, userProgress)
+        .catch(error => console.error("Error saving practice duration update:", error));
+    }
+    
+    console.log(`Updated duration for practice ${id} to ${duration} minutes`);
+  }, [practices, userProgress, user?.id, recalculateProgressAndAchievements]);
 
-  const getPracticeById = useCallback((id: number) => {
-      return practices.find(p => p.id === id);
+  const getPracticeById = useCallback((id: number): Practice | undefined => {
+    return practices.find(practice => practice.id === id);
+  }, [practices]);
+
+  const getStepProgress = useCallback((practiceId: number): number => {
+    const practice = practices.find(p => p.id === practiceId);
+    if (!practice || !practice.steps || practice.steps.length === 0) return 0;
+    
+    const completedSteps = practice.steps.filter(step => step.completed).length;
+    return (completedSteps / practice.steps.length) * 100;
   }, [practices]);
 
   const toggleStepCompletion = useCallback((practiceId: number, stepIndex: number) => {
     const updatedPractices = practices.map(practice => {
-      if (practice.id === practiceId && practice.steps) {
-        const updatedSteps = practice.steps.map((step, index) => {
-          if (index === stepIndex) {
-            return { ...step, completed: !step.completed };
-          }
-          return step;
-        });
+      if (practice.id === practiceId && practice.steps && stepIndex < practice.steps.length) {
+        // Update the specific step completion status
+        const updatedSteps = [...practice.steps];
+        updatedSteps[stepIndex] = {
+          ...updatedSteps[stepIndex],
+          completed: !updatedSteps[stepIndex].completed
+        };
+        
+        // Calculate new step progress
         const completedSteps = updatedSteps.filter(step => step.completed).length;
         const stepProgress = (completedSteps / updatedSteps.length) * 100;
-        return { ...practice, steps: updatedSteps, stepProgress };
+        
+        return {
+          ...practice,
+          steps: updatedSteps,
+          stepProgress
+        };
       }
       return practice;
     });
+    
     setPractices(updatedPractices);
-  }, [practices]);
-
-  const getStepProgress = useCallback((practiceId: number) => {
-    const practice = practices.find(p => p.id === practiceId);
-    return practice?.stepProgress || 0;
-  }, [practices]);
-
-  // --- Context Value ---
-  const value = {
+    
+    // Save to storage
+    if (user?.id) {
+      savePracticeData(user.id, updatedPractices, userProgress)
+        .catch(error => console.error("Error saving step completion update:", error));
+    }
+  }, [practices, user?.id, userProgress]);
+  
+  // Create the context value with all required properties
+  const contextValue: PracticeContextType = {
     practices,
     userProgress,
     togglePracticeCompletion,
@@ -1078,18 +1149,22 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
     getPracticeById,
     toggleStepCompletion,
     getStepProgress,
-    addPointsForAction, // Expose the new function
-    addPractice, // Expose the function to add practices
-    removePractice, // Expose removePractice
+    addPointsForAction,
+    addPractice,
+    removePractice,
     isLoading,
-    newAchievements, // Expose the new achievements
+    newAchievements
   };
 
-  return <PracticeContext.Provider value={value}>{children}</PracticeContext.Provider>;
+  return (
+    <PracticeContext.Provider value={contextValue}>
+      {children}
+    </PracticeContext.Provider>
+  );
 };
 
-// --- Hook for Consuming Context ---
-export const usePractices = (): PracticeContextType => {
+// Custom hook for accessing practice context
+export const usePractices = () => {
   const context = useContext(PracticeContext);
   if (context === undefined) {
     throw new Error('usePractices must be used within a PracticeProvider');

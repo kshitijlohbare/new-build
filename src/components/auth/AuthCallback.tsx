@@ -1,90 +1,80 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase-simple';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { useToast } from '@/hooks/useToast';
 
-export const AuthCallback = () => {
+export function AuthCallback() {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { setAuthLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string>("Processing your login...");
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession();
+        // Set loading state in auth context
+        setAuthLoading(true);
         
-        if (error) {
-          console.error('Error during auth callback:', error);
-          setError(error.message);
-          toast({
-            title: "Authentication Error",
-            description: error.message,
-            variant: "destructive"
-          });
-          setTimeout(() => navigate('/login'), 2000);
-          return;
-        }
+        // Extract the hash or query params
+        const hashParams = window.location.hash;
+        const queryParams = window.location.search;
 
-        if (data.session) {
-          toast({
-            title: "Success",
-            description: "Email verified successfully. You can now log in."
-          });
-          navigate('/login');
-        } else {
-          navigate('/login');
+        console.log('Auth callback triggered');
+        setStatus("Establishing secure session...");
+
+        // Get the session from URL params (needed for OAuth)
+        if (hashParams || queryParams) {
+          const { data: { session }, error: sessionError } = 
+            await supabase.auth.getSession();
+
+          if (sessionError) {
+            throw sessionError;
+          }
+
+          if (session) {
+            setStatus("Session confirmed! Redirecting...");
+            console.log('Session established in callback');
+            
+            // Wait a moment for the session to be fully processed
+            setTimeout(() => navigate('/', { replace: true }), 1000);
+          } else {
+            throw new Error('No session found in auth callback');
+          }
         }
       } catch (err) {
-        console.error('Unexpected error during auth callback:', err);
-        setError('An unexpected error occurred');
+        console.error('Auth callback error:', err);
+        setError(`Authentication error: ${(err as Error).message}`);
+        setStatus("Authentication failed");
         setTimeout(() => navigate('/login'), 2000);
+      } finally {
+        setAuthLoading(false);
       }
     };
 
     handleAuthCallback();
-  }, [navigate, toast]);
+  }, [navigate, setAuthLoading]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#49DAEA] to-[rgba(196,254,255,0.2)]">
-      <div className="text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9FCFD]">
+      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
         {error ? (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto relative">
-            <button
-              onClick={() => navigate('/login')}
-              className="absolute right-3 top-3 p-1.5 rounded-full bg-red-100 hover:bg-red-200 transition-colors text-red-600 active:scale-95"
-              aria-label="Close and go to login"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <div className="text-red-600 font-happy-monkey mb-4 pr-8">
-              <h3 className="text-lg mb-2">Authentication Error</h3>
-              <p>{error}</p>
-            </div>
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={() => navigate('/login')}
-                className="bg-[#148BAF] text-white px-4 py-2 rounded font-happy-monkey hover:bg-[#1079A0] transition-colors"
-              >
-                Back to Login
-              </button>
-              <button
-                onClick={() => window.location.reload()}
-                className="text-[#148BAF] px-4 py-2 border border-[#148BAF] rounded font-happy-monkey hover:bg-[#148BAF] hover:text-white transition-colors"
-              >
-                Try Again
-              </button>
-            </div>
+          <div className="text-center">
+            <h2 className="text-xl text-red-600 font-happy-monkey">Authentication Error</h2>
+            <p className="mt-2 text-gray-600">{error}</p>
+            <p className="mt-4 text-sm text-gray-500">Redirecting you to login...</p>
           </div>
         ) : (
-          <>
-            <LoadingSpinner size="lg" />
-            <p className="mt-4 text-[#148BAF] font-happy-monkey">Verifying your account...</p>
-          </>
+          <div className="text-center">
+            <h2 className="text-xl text-[#06C4D5] font-happy-monkey">Completing Login</h2>
+            <div className="mt-4 flex justify-center">
+              <LoadingSpinner size="lg" />
+            </div>
+            <p className="mt-4 text-sm text-gray-700">{status}</p>
+            <p className="mt-2 text-xs text-gray-500">This will only take a moment</p>
+          </div>
         )}
       </div>
     </div>
   );
-};
+}

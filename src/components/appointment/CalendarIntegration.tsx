@@ -34,6 +34,8 @@ const CalendarIntegration: React.FC<CalendarIntegrationProps> = ({
   const fetchAvailableTimeSlots = async (date: string) => {
     setLoading(true);
     try {
+      // Mock API call with the date parameter for practitioner
+      console.log(`Fetching time slots for practitioner ${practitionerId} on date:`, date);
       // Mock API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       

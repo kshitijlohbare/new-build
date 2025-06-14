@@ -102,12 +102,12 @@ const Profile = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-2 sm:px-4">
-      <h1 className="text-2xl sm:text-3xl font-happy-monkey lowercase text-[#148BAF] mb-6 sm:mb-8">profile</h1>
+      <h1 className="text-2xl sm:text-3xl font-happy-monkey lowercase text-[#208EB1] mb-6 sm:mb-8">profile</h1>
       
       {profileLoading ? (
         <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#04C4D5]"></div>
-          <span className="ml-3 text-[#04C4D5] font-happy-monkey">Loading profile...</span>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#06C4D5]"></div>
+          <span className="ml-3 text-[#06C4D5] font-happy-monkey">Loading profile...</span>
         </div>
       ) : (
         <Tabs defaultValue="profile" value={activeTab} onValueChange={setActiveTab} className="mb-8">
@@ -138,7 +138,7 @@ const Profile = () => {
             <Card className="p-4 sm:p-6">
               <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 <div>
-                  <label htmlFor="displayName" className="block text-sm font-happy-monkey lowercase text-[#148BAF] mb-1">
+                  <label htmlFor="displayName" className="block text-sm font-happy-monkey lowercase text-[#208EB1] mb-1">
                     display name
                   </label>
                   <input
@@ -146,13 +146,13 @@ const Profile = () => {
                     type="text"
                     value={formData.displayName}
                     onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
-                    className="mt-1 block w-full rounded-lg border border-[rgba(4,196,213,0.3)] px-3 py-2 sm:py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#04C4D5] focus:border-transparent"
+                    className="mt-1 block w-full rounded-lg border border-[rgba(6,196,213,0.3)] px-3 py-2 sm:py-3 text-sm placeholder-[#F7FFFF] focus:outline-none focus:ring-2 focus:ring-[#06C4D5] focus:border-transparent"
                     placeholder="Enter your display name"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="bio" className="block text-sm font-happy-monkey lowercase text-[#148BAF] mb-1">
+                  <label htmlFor="bio" className="block text-sm font-happy-monkey lowercase text-[#208EB1] mb-1">
                     bio
                   </label>
                   <textarea
@@ -160,14 +160,14 @@ const Profile = () => {
                     value={formData.bio}
                     onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                     rows={3}
-                    className="mt-1 block w-full rounded-lg border border-[rgba(4,196,213,0.3)] px-3 py-2 sm:py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#04C4D5] focus:border-transparent resize-none"
+                    className="mt-1 block w-full rounded-lg border border-[rgba(6,196,213,0.3)] px-3 py-2 sm:py-3 text-sm placeholder-[#F7FFFF] focus:outline-none focus:ring-2 focus:ring-[#06C4D5] focus:border-transparent resize-none"
                     placeholder="Tell us about yourself"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <label htmlFor="location" className="block text-sm font-happy-monkey lowercase text-[#148BAF] mb-1">
+                    <label htmlFor="location" className="block text-sm font-happy-monkey lowercase text-[#208EB1] mb-1">
                       location
                     </label>
                     <input
@@ -175,13 +175,13 @@ const Profile = () => {
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                      className="mt-1 block w-full rounded-lg border border-[rgba(4,196,213,0.3)] px-3 py-2 sm:py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#04C4D5] focus:border-transparent"
+                      className="mt-1 block w-full rounded-lg border border-[rgba(6,196,213,0.3)] px-3 py-2 sm:py-3 text-sm placeholder-[#F7FFFF] focus:outline-none focus:ring-2 focus:ring-[#06C4D5] focus:border-transparent"
                       placeholder="Where are you located?"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="website" className="block text-sm font-happy-monkey lowercase text-[#148BAF] mb-1">
+                    <label htmlFor="website" className="block text-sm font-happy-monkey lowercase text-[#208EB1] mb-1">
                       website
                     </label>
                     <input
@@ -189,7 +189,7 @@ const Profile = () => {
                       type="text"
                       value={formData.website}
                       onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-                      className="mt-1 block w-full rounded-lg border border-[rgba(4,196,213,0.3)] px-3 py-2 sm:py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#04C4D5] focus:border-transparent"
+                      className="mt-1 block w-full rounded-lg border border-[rgba(6,196,213,0.3)] px-3 py-2 sm:py-3 text-sm placeholder-[#F7FFFF] focus:outline-none focus:ring-2 focus:ring-[#06C4D5] focus:border-transparent"
                       placeholder="Your website (optional)"
                     />
                   </div>
@@ -197,17 +197,17 @@ const Profile = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <label className="block text-sm font-happy-monkey lowercase text-[#148BAF] mb-1">
+                    <label className="block text-sm font-happy-monkey lowercase text-[#208EB1] mb-1">
                       email
                     </label>
-                    <p className="mt-1 text-gray-500 text-sm break-all">{user?.email}</p>
+                    <p className="mt-1 text-[#000000] text-sm break-all">{user?.email}</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-happy-monkey lowercase text-[#148BAF] mb-1">
+                    <label className="block text-sm font-happy-monkey lowercase text-[#208EB1] mb-1">
                       member since
                     </label>
-                    <p className="mt-1 text-gray-500 text-sm">
+                    <p className="mt-1 text-[#000000] text-sm">
                       {new Date(user?.created_at || '').toLocaleDateString()}
                     </p>
                   </div>
@@ -229,12 +229,12 @@ const Profile = () => {
           
           <TabsContent value="followers">
             <Card className="p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-happy-monkey lowercase text-[#148BAF] mb-4">people following you</h2>
+              <h2 className="text-lg sm:text-xl font-happy-monkey lowercase text-[#208EB1] mb-4">people following you</h2>
               
               {followersList.length > 0 ? (
                 <div className="space-y-3 sm:space-y-4">
                   {followersList.map((follower) => (
-                    <div key={follower.id} className="flex items-center justify-between p-3 border rounded-lg border-[rgba(4,196,213,0.2)] hover:bg-[rgba(4,196,213,0.05)]">
+                    <div key={follower.id} className="flex items-center justify-between p-3 border rounded-lg border-[rgba(6,196,213,0.2)] hover:bg-[rgba(6,196,213,0.05)]">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <UserAvatar 
                           src={follower.avatar_url}
@@ -243,7 +243,7 @@ const Profile = () => {
                         />
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-sm sm:text-base truncate">{follower.display_name}</p>
-                          <p className="text-xs sm:text-sm text-gray-500 truncate">@{follower.username}</p>
+                          <p className="text-xs sm:text-sm text-[#000000] truncate">@{follower.username}</p>
                         </div>
                       </div>
                     </div>
@@ -251,7 +251,7 @@ const Profile = () => {
                 </div>
               ) : (
                 <EmptyState
-                  icon={<Users className="h-12 w-12 text-[#148BAF] opacity-40" />}
+                  icon={<Users className="h-12 w-12 text-[#208EB1] opacity-40" />}
                   title="No followers yet"
                   message="When someone follows you, they'll appear here." 
                 />
@@ -261,12 +261,12 @@ const Profile = () => {
           
           <TabsContent value="following">
             <Card className="p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-happy-monkey lowercase text-[#148BAF] mb-4">people you follow</h2>
+              <h2 className="text-lg sm:text-xl font-happy-monkey lowercase text-[#208EB1] mb-4">people you follow</h2>
               
               {followingList.length > 0 ? (
                 <div className="space-y-3 sm:space-y-4">
                   {followingList.map((following) => (
-                    <div key={following.id} className="flex items-center justify-between p-3 border rounded-lg border-[rgba(4,196,213,0.2)] hover:bg-[rgba(4,196,213,0.05)] gap-3">
+                    <div key={following.id} className="flex items-center justify-between p-3 border rounded-lg border-[rgba(6,196,213,0.2)] hover:bg-[rgba(6,196,213,0.05)] gap-3">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <UserAvatar
                           src={following.avatar_url}
@@ -275,7 +275,7 @@ const Profile = () => {
                         />
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-sm sm:text-base truncate">{following.display_name}</p>
-                          <p className="text-xs sm:text-sm text-gray-500 truncate">@{following.username}</p>
+                          <p className="text-xs sm:text-sm text-[#000000] truncate">@{following.username}</p>
                         </div>
                       </div>
                       <Button
@@ -291,7 +291,7 @@ const Profile = () => {
                 </div>
               ) : (
                 <EmptyState
-                  icon={<UserCheck className="h-12 w-12 text-[#148BAF] opacity-40" />}
+                  icon={<UserCheck className="h-12 w-12 text-[#208EB1] opacity-40" />}
                   title="Not following anyone yet"
                   message="People you follow will appear here."
                   action={
@@ -312,23 +312,23 @@ const Profile = () => {
           
           <TabsContent value="discover">
             <Card className="p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-happy-monkey lowercase text-[#148BAF] mb-4">discover people to follow</h2>
+              <h2 className="text-lg sm:text-xl font-happy-monkey lowercase text-[#208EB1] mb-4">discover people to follow</h2>
               
               {suggestedUsers.length > 0 ? (
                 <div className="space-y-3 sm:space-y-4">
                   {suggestedUsers.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg border-[rgba(4,196,213,0.2)] hover:bg-[rgba(4,196,213,0.05)] gap-3">
+                    <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg border-[rgba(6,196,213,0.2)] hover:bg-[rgba(6,196,213,0.05)] gap-3">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         {user.avatar_url ? (
                           <img src={user.avatar_url} alt={user.display_name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full" />
                         ) : (
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#04C4D5] flex items-center justify-center text-white text-sm">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#06C4D5] flex items-center justify-center text-[#FFFFFF] text-sm">
                             {user.display_name.charAt(0)}
                           </div>
                         )}
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-sm sm:text-base truncate">{user.display_name}</p>
-                          <p className="text-xs sm:text-sm text-gray-500 truncate">@{user.username}</p>
+                          <p className="text-xs sm:text-sm text-[#000000] truncate">@{user.username}</p>
                         </div>
                       </div>
                       <Button
@@ -344,7 +344,7 @@ const Profile = () => {
                 </div>
               ) : (
                 <EmptyState
-                  icon={<UserPlus className="h-12 w-12 text-[#148BAF] opacity-40" />}
+                  icon={<UserPlus className="h-12 w-12 text-[#208EB1] opacity-40" />}
                   title="No suggested users right now"
                   message="Check back later for new people to follow."
                 />

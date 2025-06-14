@@ -14,8 +14,16 @@ export const TagList = ({ tags, selectedTags, onTagToggle, className = "" }: Tag
         <Badge
           key={tag}
           variant={selectedTags.includes(tag) ? "secondary" : "outline"}
-          className="cursor-pointer font-happy-monkey lowercase hover:bg-moody-light"
+          className="cursor-pointer font-happy-monkey lowercase hover:bg-moody-light touch-target"
           onClick={() => onTagToggle(tag)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onTagToggle(tag);
+            }
+          }}
         >
           {tag}
         </Badge>

@@ -4,7 +4,11 @@ import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Add timestamp for cache busting
   plugins: [react()],
+  optimizeDeps: {
+    force: true // Force dependency pre-bundling
+  },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src')
@@ -26,7 +30,29 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html')
-      }
-    }
+      },
+      output: {
+        manualChunks: {
+          // Split vendor chunks
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ui': ['@radix-ui/react-avatar', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-label', '@radix-ui/react-tabs'],
+          'vendor-charts': ['recharts'],
+          'vendor-emoji': ['@emoji-mart/data', '@emoji-mart/react'],
+          'vendor-tanstack': ['@tanstack/react-query'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+          // Split app chunks by feature
+          'feature-auth': [
+            './src/components/auth/AuthCallback.tsx', 
+            './src/components/auth/Login.tsx', 
+            './src/components/auth/Register.tsx',
+            './src/components/auth/ProtectedRoute.tsx'
+          ],
+          'feature-meditation': ['./src/pages/Meditation.tsx'],
+          'feature-practices': ['./src/pages/Practices.tsx'],
+        },
+      },
+    },
+    // Increase the warning limit for bundle size
+    chunkSizeWarningLimit: 800,
   }
 })

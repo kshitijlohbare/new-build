@@ -1,5 +1,5 @@
 // Email service utility for sending notifications
-import { supabase } from './supabase';
+import { supabase } from '@/lib/supabase';
 
 // Function to send an email notification
 // In a real implementation, this would integrate with an email service provider like SendGrid or AWS SES

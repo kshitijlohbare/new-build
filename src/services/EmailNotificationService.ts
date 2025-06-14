@@ -370,13 +370,13 @@ export class EmailNotificationService {
         // Get user email from auth.users (would need to join or separate query)
         // For demo purposes, using placeholder email
         const reminderData: EmailNotificationData = {
-          appointmentId: appointment.id,
+          appointmentId: appointment.id as number,
           recipientEmail: 'user@example.com', // Would fetch from user profile
           recipientName: 'User', // Would fetch from user profile
-          practitionerName: appointment.practitioner_name,
-          date: appointment.date,
-          time: appointment.time,
-          sessionType: appointment.session_type,
+          practitionerName: appointment.practitioner_name as string,
+          date: appointment.date as string,
+          time: appointment.time as string,
+          sessionType: appointment.session_type as string,
           notificationType: 'reminder'
         };
 

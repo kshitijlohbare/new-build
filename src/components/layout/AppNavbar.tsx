@@ -68,7 +68,7 @@ function resolveSvgUrl(svgImport: string, base64: string) {
 }
 
 const unifiedBadgeClass =
-  "relative bg-white bg-opacity-80 rounded-[10px] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] flex items-center justify-center w-[36px] h-[36px] transition-all transform hover:scale-105 hover:shadow-[1px_3px_6px_rgba(73,218,234,0.6)] border border-[#49DADD] p-0";
+  "relative bg-white bg-opacity-80 rounded-[10px] shadow-[1px_2px_4px_rgba(21,169,214,0.5)] flex items-center justify-center transition-all transform hover:scale-105 hover:shadow-[1px_3px_6px_rgba(21,169,214,0.6)] border border-[#15A9D6] p-0 touch-action-manipulation active:scale-95";
 
 const AppNavbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -112,12 +112,12 @@ const AppNavbar = () => {
   console.log("Badge icon path:", BadgeTitleIcon);
 
   return (
-    <nav className="bg-[#9CE7F9] sticky top-0 z-50 py-2 shadow-md">
-      <div className="container flex h-12 items-center justify-between px-4">
-        {/* Left: Badges */}
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          {/* Level Badge */}
-          <div className={unifiedBadgeClass} title={`Level ${userProgress?.level || 1}`}>
+    <nav style={{backgroundColor: "#15A9D6"}} className="app-navbar bg-[#15A9D6] sticky top-0 z-50 py-2 sm:py-2.5 shadow-md">
+      <div className="container flex h-12 sm:h-14 items-center justify-between px-3 sm:px-4">
+        {/* Left: Mobile-optimized badges */}
+        <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
+          {/* Level Badge - Mobile-first responsive */}
+          <div className={`${unifiedBadgeClass} w-[32px] sm:w-[36px] h-[32px] sm:h-[36px] min-h-[44px] sm:min-h-auto`} title={`Level ${userProgress?.level || 1}`}>
             <div className="absolute inset-0 rounded-[10px]" style={{background: 'rgba(255,255,255,0.8)'}}></div>
             <div className="absolute inset-0 flex items-center justify-center p-1.5">
               <img 
@@ -127,13 +127,13 @@ const AppNavbar = () => {
                 onError={(e) => { e.currentTarget.src = BADGE_TITLE_SVG_BASE64; }}
               />
             </div>
-            <span className="relative z-10 text-[#088BAF] text-sm font-happy-monkey font-bold" style={{ textShadow: '0px 1px 2px rgba(0,0,0,0.3)', WebkitTextStroke: '0.2px #088BAF' }}>
+            <span className="relative z-10 text-[#15A9D6] text-xs sm:text-sm font-happy-monkey font-bold" style={{ textShadow: '0px 1px 2px rgba(0,0,0,0.3)', WebkitTextStroke: '0.2px #15A9D6' }}>
               {userProgress?.level || 1}
             </span>
           </div>
-          {/* Streak Badge */}
-          <div className={unifiedBadgeClass} title={`${userProgress?.streakDays || 0} day streak`}>
-            <div className="h-6 w-6 flex items-center justify-center">
+          {/* Streak Badge - Enhanced mobile touch */}
+          <div className={`${unifiedBadgeClass} w-[40px] sm:w-[44px] h-[32px] sm:h-[36px] min-h-[44px] sm:min-h-auto`} title={`${userProgress?.streakDays || 0} day streak`}>
+            <div className="h-4 sm:h-6 w-4 sm:w-6 flex items-center justify-center">
               <img 
                 src={resolveSvgUrl(TitleStreakIcon, TitleStreakIconBase64)} 
                 alt="Streak" 
@@ -141,56 +141,66 @@ const AppNavbar = () => {
                 onError={e => { e.currentTarget.src = TitleStreakIconBase64; }}
               />
             </div>
-            <span className="ml-1 text-[#088BAF] font-happy-monkey text-sm font-bold">
+            <span className="ml-0.5 sm:ml-1 text-[#15A9D6] font-happy-monkey text-xs sm:text-sm font-bold">
               {userProgress?.streakDays || 0}
             </span>
           </div>
-          {/* Points Badge */}
-          <div className={unifiedBadgeClass} title={`${userProgress?.totalPoints || 0} total points`}>
-            <div className="h-6 w-6 flex items-center justify-center">
+          {/* Points Badge - Mobile-optimized */}
+          <div className={`${unifiedBadgeClass} w-[40px] sm:w-[44px] h-[32px] sm:h-[36px] min-h-[44px] sm:min-h-auto`} title={`${userProgress?.totalPoints || 0} total points`}>
+            <div className="h-4 sm:h-6 w-4 sm:w-6 flex items-center justify-center">
               {icons.star}
             </div>
-            <span className="ml-1 text-[#088BAF] font-happy-monkey text-sm font-bold">
+            <span className="ml-0.5 sm:ml-1 text-[#15A9D6] font-happy-monkey text-xs sm:text-sm font-bold">
               {userProgress?.totalPoints || 0}
             </span>
           </div>
         </div>
-        {/* Center: Logo */}
-        <div className="flex-1 flex justify-center min-w-0">
+        {/* Center: Mobile-responsive logo */}
+        <div className="flex-1 flex justify-center min-w-0 max-w-[200px] sm:max-w-none">
           <Link to="/" className="flex items-center">
-            <span className="font-happy-monkey text-2xl font-bold text-base cursor-pointer select-none">CACTUS COCO</span>
+            <span className="font-happy-monkey text-lg sm:text-xl md:text-2xl font-bold text-base cursor-pointer select-none">CACTUS COCO</span>
           </Link>
         </div>
-        {/* Right: User controls and notifications */}
-        <div className="flex items-center space-x-3 flex-1 justify-end min-w-0">
-          {/* Notification icons (unchanged) */}
-          <div className="w-9 h-9 bg-white rounded-md flex items-center justify-center shadow-sm transition-all hover:shadow-md hover:scale-105 active:scale-95 cursor-pointer hover:bg-gray-50 relative">
-            <span className="text-gray-600 text-lg" style={{ fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📝</span>
-          </div>
-          <div className="w-9 h-9 bg-white rounded-md flex items-center justify-center shadow-sm transition-all hover:shadow-md hover:scale-105 active:scale-95 cursor-pointer hover:bg-gray-50 relative">
-            <span className="text-gray-600 text-lg" style={{ fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🔔</span>
-          </div>
-          {/* User dropdown (unchanged) */}
+        {/* Right: Enhanced mobile-responsive user controls and notifications */}
+        <div className="flex items-center space-x-2 sm:space-x-3 flex-1 justify-end min-w-0">
+          {/* Notification icons - enhanced mobile touch targets */}
+          <button className="w-8 sm:w-9 h-8 sm:h-9 bg-white rounded-md flex items-center justify-center shadow-sm transition-all hover:shadow-md hover:scale-105 active:scale-95 cursor-pointer hover:bg-gray-50 relative min-h-[44px] sm:min-h-auto touch-action-manipulation" aria-label="Notes">
+            <span className="text-gray-600 text-base sm:text-lg" style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📝</span>
+          </button>
+          <button className="w-8 sm:w-9 h-8 sm:h-9 bg-white rounded-md flex items-center justify-center shadow-sm transition-all hover:shadow-md hover:scale-105 active:scale-95 cursor-pointer hover:bg-gray-50 relative min-h-[44px] sm:min-h-auto touch-action-manipulation" aria-label="Notifications">
+            <span className="text-gray-600 text-base sm:text-lg" style={{ fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🔔</span>
+          </button>
+          {/* Enhanced mobile-responsive user dropdown */}
           <div className="relative" ref={dropdownRef}>
-            <div 
-              className="flex items-center bg-[#088BAF] text-white text-base px-4 py-2 rounded-full cursor-pointer transition-all hover:bg-[#0779A0] active:scale-98 shadow-sm hover:shadow"
+            <button 
+              className="flex items-center bg-[#15A9D6] text-white text-sm sm:text-base px-3 sm:px-4 py-2 rounded-full cursor-pointer transition-all hover:bg-[#1298C0] active:scale-98 shadow-sm hover:shadow min-h-[44px] sm:min-h-auto touch-action-manipulation"
               onClick={toggleDropdown}
+              aria-label="User menu"
             >
-              <span className="mr-1 text-base font-medium truncate max-w-[100px]">hi, {user?.user_metadata?.name || 'user'}</span>
+              <span className="mr-1 text-sm sm:text-base font-medium truncate max-w-[80px] sm:max-w-[100px]">hi, {user?.user_metadata?.name || 'user'}</span>
               <ChevronDown 
-                size={16} 
+                size={14} 
                 className={`transition-transform duration-300 ${isDropdownOpen ? "transform rotate-180" : ""}`} 
               />
-            </div>
+            </button>
+            {/* Enhanced mobile-responsive dropdown menu */}
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-50 overflow-hidden border border-gray-100 animate-fadeIn">
-                {/* ...dropdown content unchanged... */}
+              <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-md shadow-lg z-50 overflow-hidden border border-gray-100 animate-fadeIn">
                 <div className="py-1">
-                  <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
+                  <div className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 border-b border-gray-100">
                     <p className="text-sm font-medium text-gray-700">{user?.user_metadata?.name || 'User'}</p>
                     <p className="text-xs text-gray-500 truncate">{user?.email || 'No email'}</p>
                   </div>
-                  {/* ...rest of dropdown... */}
+                  {/* Enhanced touch-friendly dropdown items */}
+                  <button className="block w-full text-left px-3 sm:px-4 py-3 sm:py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors min-h-[44px] sm:min-h-auto touch-action-manipulation">
+                    Profile
+                  </button>
+                  <button className="block w-full text-left px-3 sm:px-4 py-3 sm:py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors min-h-[44px] sm:min-h-auto touch-action-manipulation">
+                    Settings
+                  </button>
+                  <button className="block w-full text-left px-3 sm:px-4 py-3 sm:py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors min-h-[44px] sm:min-h-auto touch-action-manipulation">
+                    Sign out
+                  </button>
                 </div>
               </div>
             )}

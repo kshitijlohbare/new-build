@@ -42,10 +42,6 @@
   --primary: #04C4D5;
   --font-happy-monkey: 'Happy Monkey', cursive;
   --font-righteous: 'Righteous', cursive;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
   --card: 0 0% 100%;
@@ -66,6 +62,9 @@
   --input: 214.3 31.8% 91.4%;
   --ring: 221.2 83.2% 53.3%;
   --radius: 0.5rem;
+  --timer-progress-color: #148BAF; /* Main progress color */
+  --timer-progress-bg: rgba(20, 139, 175, 0.15); /* Lighter background for the track */
+  --timer-border-thickness: 15px; /* Control thickness of the visual border - increased for visibility */
 }
 
 * {
@@ -112,6 +111,15 @@ body {
 @media (max-width: 768px) {
   .slider-container {
     margin: 15px auto;
+    height: 140px; /* Slightly taller for better touch interaction */
+    width: 70px; /* Wider for better touch target */
+  }
+  
+  .vertical-rotated-slider {
+    width: 140px; /* Longer slider for mobile */
+    height: 12px; /* Thicker track for better touch */
+    top: 70px; /* Adjust positioning */
+    left: -35px;
   }
 }
 
@@ -127,6 +135,7 @@ input[type="range"]::-ms-thumb {
   border: 2px solid #04C4D5 !important;
   cursor: pointer !important;
   box-shadow: 0 2px 4px rgba(4, 196, 213, 0.3) !important;
+  touch-action: manipulation !important;
 }
 
 .vertical-rotated-slider::-webkit-slider-thumb {
@@ -160,26 +169,48 @@ input[type="range"]::-ms-thumb {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Custom timer styles */
+/* Custom timer styles - precisely matching the design */
 .timer-container {
   position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.75rem !important; /* Add more space between timer and main content */
+  z-index: 10; /* Ensure timer is visually on top */
 }
 
 .timer-display {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background: white;
-  box-shadow: 0 4px 20px rgba(4, 196, 213, 0.2);
-  border: 2px solid rgba(4, 196, 213, 0.3);
-  overflow: hidden;
-  z-index: 1;
+  box-shadow: 0px 4px 20px rgba(4, 196, 213, 0.25) !important; /* Enhanced shadow */
+  overflow: visible;
+  z-index: 10;
 }
 
+/* Updated timer inner to work with progress */
+.timer-inner {
+  position: absolute;
+  top: var(--timer-border-thickness);
+  left: var(--timer-border-thickness);
+  width: calc(100% - var(--timer-border-thickness) * 2) !important;
+  height: calc(100% - var(--timer-border-thickness) * 2) !important;
+  border-radius: 50%;
+  background: white;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Fixed timer progress tracker */
 .timer-progress {
   position: absolute;
   top: 0;
@@ -188,65 +219,112 @@ input[type="range"]::-ms-thumb {
   height: 100%;
   border-radius: 50%;
   background: conic-gradient(
-    #04C4D5 var(--progress-percentage), 
-    rgba(4, 196, 213, 0.1) var(--progress-percentage)
+    var(--timer-progress-color) var(--progress-percentage), 
+    var(--timer-progress-bg) var(--progress-percentage)
   );
-  z-index: 0;
+  transform: rotate(-90deg); /* Start from the top */
+  z-index: 0; /* Behind timer-inner */
+  border: none !important;
 }
 
-.timer-inner {
+/* Animation for floating effect */
+@keyframes float-subtle {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+.timer-display {
+  animation: float-subtle 6s ease-in-out infinite;
+}
+
+/* Override to remove red border from timer */
+.timer-display {
   position: relative;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
+  overflow: hidden;
+  border: none !important;
 }
 
-/* Breathing animation for active session */
-@keyframes breathing {
-  0% {
-    box-shadow: 0 0 0 0 rgba(4, 196, 213, 0.7);
+.timer-progress {
+  border: none !important;
+}
+
+/* Custom text shadow for the logo */
+.text-shadow-md {
+  text-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
+}
+
+/* Custom text shadow for the main title */
+.text-shadow-custom {
+  text-shadow: 1px 1px 2px rgba(0, 59, 74, 0.2); /* Subtle shadow for title */
+}
+
+/* Mobile responsive styles for timer */
+@media (max-width: 480px) {
+  :root {
+    --timer-border-thickness: 12px; /* Slightly thinner border for smaller screens but still visible */
   }
-  70% {
-    box-shadow: 0 0 0 10px rgba(4, 196, 213, 0);
+  
+  .timer-display {
+    width: 260px; /* Further reduce size on small mobile */
+    height: 260px;
   }
-  100% {
-    box-shadow: 0 0 0 0 rgba(4, 196, 213, 0);
+  
+  .timer-inner > div { /* Target the div holding the time text */
+    font-size: 56px !important; /* Adjust font size for smaller circle */
+    line-height: normal !important; /* Adjust line height */
+  }
+
+  /* Adjust preset button text sizes for mobile if needed */
+  .grid button .text-lg {
+    font-size: 1rem; /* Example: 16px */
+  }
+  .grid button .text-xs {
+    font-size: 0.65rem; /* Example: 10.4px */
   }
 }
 
-.breathing-animation {
-  animation: breathing 4s infinite;
+/* Responsive container adjustments */
+@media (max-width: 480px) {
+  [data-testid="focus-timer-container"] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 1rem !important;
+  }
+  
+  [data-testid="focus-timer-main-content"] {
+    border-radius: 1.25rem !important;
+    margin-top: 1rem !important;
+  }
+  
+  /* Adjust controls inside timer for better touch targets */
+  [data-testid="work-break-controls"] {
+    gap: 1rem !important;
+  }
+  
+  [data-testid="cycles-control-section"] button {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
 }
 
-/* Hide scrollbar but allow scrolling */
-.scrollbar-hide {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+/* Better layout for medium screens */
+@media (min-width: 481px) and (max-width: 768px) {
+  .timer-display-responsive {
+    margin-bottom: 2rem !important;
+  }
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+/* Ensure fonts are correctly applied */
+body {
+  font-family: 'Happy Monkey', cursive; /* Default body font */
 }
 
-/* Card hover effects */
-.preset-card {
-  transition: all 0.3s ease;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Righteous', cursive !important; /* Override for headings */
 }
 
-.preset-card:hover {
-  transform: translateY(-3px);
-}
-
-.preset-card.active {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(4, 196, 213, 0.2);
-}
-
+/* Additional global styles or overrides if necessary */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -577,54 +655,163 @@ h1, h2, h3, h4, h5, h6 {
   .gap-reduced-mobile > * + * {
     margin-top: 0.5rem !important;
   }
+  
+  /* Better text truncation for mobile */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Touch target enhancement */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+  }
 }
 
-/* Custom scrollbar for better UX */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Mobile-specific enhancements for FocusTimer and other components */
+
+/* Enhanced mobile slider thumb for better touch interaction */
+@media (max-width: 768px) {
+  input[type="range"]::-webkit-slider-thumb,
+  input[type="range"]::-moz-range-thumb,
+  input[type="range"]::-ms-thumb {
+    width: 28px !important;
+    height: 28px !important;
+    border-width: 3px !important;
+  }
+  
+  .vertical-rotated-slider::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+    border-width: 3px;
+    margin-top: -10px;
+  }
+  
+  .vertical-rotated-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+    border-width: 3px;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
+/* Mobile-first responsive timer display */
+@media (max-width: 640px) {
+  .timer-display {
+    width: 180px !important;
+    height: 180px !important;
+  }
+  
+  .timer-inner {
+    width: 160px !important;
+    height: 160px !important;
+  }
+  
+  .timer-inner > div {
+    font-size: 2.5rem !important; /* Smaller on mobile */
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+/* Responsive timer display that takes full width of circular-timer-section */
+.timer-display-responsive {
+  width: 100% !important; /* Full width of parent container */
+  height: 100% !important; /* Full height of parent container */
+  margin: 0 auto; /* Center horizontally */
+  max-width: 100vw; /* Prevent overflow */
+  max-height: 100vw; /* Keep it proportional */
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+/* Adjust timer contents for larger size */
+.timer-display-responsive .timer-inner {
+  width: calc(100% - var(--timer-border-thickness) * 2) !important;
+  height: calc(100% - var(--timer-border-thickness) * 2) !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Responsive container classes */
-.container-sm {
-  width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 0 1rem;
+/* Media queries for better responsiveness */
+@media (max-width: 480px) {
+  .timer-display-responsive {
+    width: 95% !important;
+    height: 95% !important;
+  }
+  
+  .timer-display-responsive .timer-time {
+    font-size: 3rem !important; /* Adjust font size for smaller screens */
+  }
 }
 
-.container-md {
-  width: 100%;
-  max-width: 768px;
-  margin: 0 auto;
-  padding: 0 1rem;
+/* Mobile scrollbar optimization */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.container-lg {
-  width: 100%;
-  max-width: 1024px;
-  margin: 0 auto;
-  padding: 0 1rem;
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-.container-xl {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 1rem;
+/* Mobile-optimized preset cards */
+@media (max-width: 640px) {
+  .preset-card {
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+/* Mobile-friendly focus history chart */
+@media (max-width: 768px) {
+  .recharts-wrapper {
+    font-size: 12px !important;
+  }
+  
+  .recharts-cartesian-axis-tick-value {
+    font-size: 11px !important;
+  }
+}
+
+/* Enhanced mobile touch feedback */
+@media (hover: none) and (pointer: coarse) {
+  .touch-target:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  .preset-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Improved mobile layout spacing */
+@media (max-width: 1024px) {
+  .lg\:flex-row {
+    gap: 1rem !important;
+  }
+  
+  .lg\:w-1\/3 {
+    width: 100% !important;
+    max-width: none !important;
+  }
 }
 
 /* Animation helpers */
@@ -646,134 +833,290 @@ h1, h2, h3, h4, h5, h6 {
   animation: slide-up 0.4s ease-out forwards;
 }
 
-/* Fix for flexbox gap on Safari */
-@supports not (gap: 1rem) {
-  .flex > * + * {
-    margin-left: 1rem;
+/* Mobile-optimized React-Select styles */
+.basic-select .react-select__control,
+.basic-multi-select .react-select__control {
+  min-height: 48px !important;
+  border-radius: 8px !important;
+  border: 1px solid #d1d5db !important;
+  box-shadow: none !important;
+  font-size: 16px !important; /* Prevents zoom on iOS */
+  touch-action: manipulation;
+}
+
+@media (min-width: 640px) {
+  .basic-select .react-select__control,
+  .basic-multi-select .react-select__control {
+    min-height: 40px !important;
+    font-size: 14px !important;
   }
 }
 
-/* Badge Achievement Animation Styles */
-@keyframes confetti-fall {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(360deg);
-    opacity: 0;
-  }
+.basic-select .react-select__control:hover,
+.basic-multi-select .react-select__control:hover {
+  border-color: #04C4D5 !important;
 }
 
-@keyframes badge-pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
+.basic-select .react-select__control--is-focused,
+.basic-multi-select .react-select__control--is-focused {
+  border-color: #148BAF !important;
+  box-shadow: 0 0 0 2px rgba(20, 139, 175, 0.2) !important;
 }
 
-.badge-confetti {
-  position: relative;
-  width: 100%;
-  height: 100%;
+.basic-select .react-select__value-container,
+.basic-multi-select .react-select__value-container {
+  padding: 8px 12px !important;
 }
 
-.badge-confetti::before,
-.badge-confetti::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  animation: confetti-fall 3s ease-out infinite;
-}
-
-.badge-confetti::before {
-  background-color: #49DADD;
-  animation-delay: 0.2s;
-  left: 30%;
-}
-
-.badge-confetti::after {
-  background-color: #FFC700;
-  animation-delay: 0.5s;
-  left: 70%;
-}
-
-/* Generate multiple confetti pieces with different colors */
-.badge-confetti::before,
-.badge-confetti::after {
-  box-shadow:
-    /* Blue confetti */
-    10px 0 0 #49DADD,
-    -20px 0 0 #49DADD,
-    30px 0 0 #49DADD,
-    -40px 0 0 #49DADD,
-    50px 0 0 #49DADD,
-    /* Yellow confetti */
-    -10px 0 0 #FFC700,
-    20px 0 0 #FFC700,
-    -30px 0 0 #FFC700,
-    40px 0 0 #FFC700,
-    -50px 0 0 #FFC700,
-    /* Pink confetti */
-    15px 0 0 #FF8A9A,
-    -25px 0 0 #FF8A9A,
-    35px 0 0 #FF8A9A,
-    -45px 0 0 #FF8A9A;
-}
-
-/* Badge achievement popup entrance/exit animations */
-@keyframes badge-popup-in {
-  0% {
-    transform: translateY(20px) scale(0.9);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
+@media (min-width: 640px) {
+  .basic-select .react-select__value-container,
+  .basic-multi-select .react-select__value-container {
+    padding: 6px 8px !important;
   }
 }
 
-@keyframes badge-popup-out {
-  0% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
+.basic-select .react-select__placeholder,
+.basic-multi-select .react-select__placeholder {
+  color: #9ca3af !important;
+  font-size: 16px !important;
+}
+
+@media (min-width: 640px) {
+  .basic-select .react-select__placeholder,
+  .basic-multi-select .react-select__placeholder {
+    font-size: 14px !important;
   }
-  100% {
-    transform: translateY(20px) scale(0.9);
-    opacity: 0;
+}
+
+.basic-select .react-select__dropdown-indicator,
+.basic-multi-select .react-select__dropdown-indicator {
+  padding: 8px !important;
+}
+
+.basic-select .react-select__indicator-separator,
+.basic-multi-select .react-select__indicator-separator {
+  display: none !important;
+}
+
+.basic-select .react-select__menu,
+.basic-multi-select .react-select__menu {
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #e5e7eb !important;
+  z-index: 1000 !important;
+}
+
+.basic-select .react-select__menu-list,
+.basic-multi-select .react-select__menu-list {
+  padding: 4px !important;
+  max-height: 200px !important;
+}
+
+@media (max-width: 640px) {
+  .basic-select .react-select__menu-list,
+  .basic-multi-select .react-select__menu-list {
+    max-height: 150px !important;
   }
 }
 
-.badge-popup-enter {
-  animation: badge-popup-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+.basic-select .react-select__option,
+.basic-multi-select .react-select__option {
+  padding: 12px !important;
+  border-radius: 6px !important;
+  margin: 2px 0 !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  touch-action: manipulation;
+  min-height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
-.badge-popup-exit {
-  animation: badge-popup-out 0.4s ease-in forwards;
+@media (min-width: 640px) {
+  .basic-select .react-select__option,
+  .basic-multi-select .react-select__option {
+    padding: 8px !important;
+    font-size: 14px !important;
+    min-height: 36px !important;
+  }
 }
 
-/* Shimmer effect for badge icon */
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+.basic-select .react-select__option--is-focused,
+.basic-multi-select .react-select__option--is-focused {
+  background-color: #f0f9ff !important;
+  color: #148BAF !important;
 }
 
-.shimmer-effect {
-  background: linear-gradient(
-    90deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.8) 50%,
-    rgba(255,255,255,0) 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite linear;
+.basic-select .react-select__option--is-selected,
+.basic-multi-select .react-select__option--is-selected {
+  background-color: #148BAF !important;
+  color: white !important;
+}
+
+.basic-multi-select .react-select__multi-value {
+  background-color: #e6f3f7 !important;
+  border-radius: 6px !important;
+  margin: 2px !important;
+}
+
+.basic-multi-select .react-select__multi-value__label {
+  color: #148BAF !important;
+  font-size: 14px !important;
+  padding: 4px 6px !important;
+}
+
+.basic-multi-select .react-select__multi-value__remove {
+  color: #148BAF !important;
+  border-radius: 0 6px 6px 0 !important;
+  padding: 4px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+}
+
+.basic-multi-select .react-select__multi-value__remove:hover {
+  background-color: #ff6b6b !important;
+  color: white !important;
+}
+
+/* Enhanced mobile touch targets for React-Select */
+@media (hover: none) and (pointer: coarse) {
+  .basic-select .react-select__option:active,
+  .basic-multi-select .react-select__option:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  .basic-multi-select .react-select__multi-value__remove:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Custom utility class for hiding scrollbars while maintaining scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Make circular-timer-section height equal to width */
+[data-testid="circular-timer-section"] {
+  aspect-ratio: 1/1; /* This will make height equal to width */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100vw - 2rem) !important; /* Full viewport width minus some padding */
+  height: calc(100vw - 2rem) !important; /* Equal to width */
+  max-width: 600px; /* Maximum size limit */
+  max-height: 600px; /* Maximum size limit */
+  margin: 0 auto; /* Center horizontally */
+}
+
+/* Adjust for various screen sizes */
+@media (max-width: 480px) {
+  [data-testid="circular-timer-section"] {
+    width: calc(100vw - 1rem) !important; /* Slightly more width on mobile */
+    height: calc(100vw - 1rem) !important;
+    max-width: 450px;
+    max-height: 450px;
+  }
+}
+
+@media (min-width: 768px) {
+  [data-testid="circular-timer-section"] {
+    width: min(75vw, 600px) !important; /* Slightly less width on larger screens */
+    height: min(75vw, 600px) !important;
+  }
+}
+
+/* Improved spacing for overall layout with taller timer section */
+[data-testid="focus-timer-header"] {
+  margin-bottom: 1rem !important;
+}
+
+[data-testid="focus-timer-page"] {
+  display: flex;
+  flex-direction: column;
+}
+
+/[data-testid="focus-timer-container"] {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+[data-testid="circular-timer-section"] {
+  flex: 1;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Ensure proper spacing in flex layout */
+@media (min-height: 800px) {
+  [data-testid="circular-timer-section"] {
+    margin-top: 2rem !important;
+  }
+}
+
+/* Focus preset button styles */
+[data-testid^="focus-preset-button-"],
+[data-testid="create-preset-button"] {
+  transition: all 0.2s ease-in-out;
+}
+
+[data-testid^="focus-preset-button-"]:hover,
+[data-testid="create-preset-button"]:hover {
+  border-color: #04C4D5 !important;
+}
+
+/* Reduced spacing for focus timer components */
+*[data-testid="focus-timer-page"] {
+  padding-bottom: 1.5rem !important;
+}
+
+*[data-testid="focus-presets-grid"] {
+  margin-bottom: 0.5rem !important;
+}
+
+/* Compact button styles */
+button[data-testid^="focus-preset-button-"],
+button[data-testid="create-preset-button"] {
+  padding: 0.5rem 0.25rem !important;
+}
+
+/* Adjust spacing between components */
+div[data-testid="focus-timer-container"] {
+  row-gap: 0.5rem !important;
+}
+
+div[data-testid="circular-timer-section"] {
+  margin-bottom: 1rem !important;
+}
+
+/* Mobile Practices Listing Redesign - Only valid custom styles */
+.bg-gradient-to-b {
+  background: linear-gradient(180deg, #6EEAFF 0%, #1CB5E0 100%);
+}
+.font-luckiest-guy {
+  font-family: 'Luckiest Guy', cursive;
+}
+.font-happy-monkey {
+  font-family: 'Happy Monkey', cursive;
+}
+
+/* Hide scrollbars for horizontal chips */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Responsive font sizes for mobile */
+@media (max-width: 480px) {
+  .text-3xl { font-size: 2rem !important; }
+  .text-2xl { font-size: 1.5rem !important; }
+  .text-base { font-size: 1rem !important; }
+  .text-lg { font-size: 1.125rem !important; }
+  .text-sm { font-size: 0.95rem !important; }
+  .px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
 }

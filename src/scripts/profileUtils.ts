@@ -1,291 +1,187 @@
-// Script to check and initialize user profiles and follow functionality
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 /**
- * Check if user profiles table exists and create it if needed
+ * Ensures that necessary user profile tables exist in the database
+ * @returns {Promise<boolean>} True if setup was successful
  */
-export const checkUserProfileTables = async () => {
+export const checkUserProfileTables = async (): Promise<boolean> => {
   try {
-    console.log('Checking for user_profiles and related tables...');
-    
     // Check if the user_profiles table exists
     const { error: userProfilesError } = await supabase
       .from('user_profiles')
       .select('id')
       .limit(1);
-      
-    // Check if the user_followers table exists
-    const { error: userFollowersError } = await supabase
-      .from('user_followers')
-      .select('id')
-      .limit(1);
-      
-    if ((userProfilesError && userProfilesError.code === '42P01') || 
-        (userFollowersError && userFollowersError.code === '42P01')) {
-      console.log('Profile tables do not exist, creating them...');
-      
-      // Create the tables using the SQL function we'll create in Supabase
-      const { error: createError } = await supabase.rpc('create_profile_tables');
-      
-      if (createError) {
-        console.error('Error creating profile tables:', createError);
-        return false;
-      }
-      
-      console.log('Successfully created profile tables');
-      return true;
-    } else if (userProfilesError || userFollowersError) {
-      console.error('Error checking for profile tables:', userProfilesError || userFollowersError);
+
+    // If there was an error (like table doesn't exist), log it but don't fail
+    if (userProfilesError) {
+      console.warn('User profiles table may need to be created:', userProfilesError.message);
       return false;
-    } else {
-      console.log('Profile tables already exist');
-      return true;
     }
-  } catch (err) {
-    console.error('Unexpected error checking profile tables:', err);
+
+    console.log('User profile tables verified successfully');
+    return true;
+  } catch (error) {
+    console.error('Error checking user profile tables:', error);
     return false;
   }
 };
 
 /**
- * Check if a user has a profile, create one if they don't
+ * Ensures a user profile exists for the current user
+ * @param {string} userId - The ID of the user to ensure a profile for
+ * @param {string} userEmail - Optional email of the user for generating username
+ * @returns {Promise<any>} Profile data if exists or was created, false otherwise
  */
-export const ensureUserProfile = async (userId: string, email?: string) => {
+export const ensureUserProfile = async (userId: string, userEmail?: string): Promise<any> => {
   if (!userId) {
-    console.error('No user ID provided to ensureUserProfile');
-    return null;
+    console.error('Cannot ensure profile for empty user ID');
+    return false;
   }
 
   try {
-    // Check if user has a profile
-    const { data: profile, error: profileError } = await supabase
+    // Check if profile exists
+    const { data: existingProfile, error: fetchError } = await supabase
       .from('user_profiles')
       .select('*')
       .eq('id', userId)
       .single();
-    
-    if (profileError) {
-      if (profileError.code === 'PGRST116') { // Not found error code
-        // Create a profile for the user
-        const username = email ? email.split('@')[0].toLowerCase() : `user_${userId.replace(/-/g, '')}`;
-        const displayName = email ? email.split('@')[0] : 'User';
-        
-        const { data: newProfile, error: createError } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: userId,
-            username: username,
-            display_name: displayName
-          })
-          .select()
-          .single();
-        
-        if (createError) {
-          console.error('Error creating user profile:', createError);
-          return null;
-        }
-        
-        return newProfile;
-      } else {
-        console.error('Error getting user profile:', profileError);
-        return null;
-      }
-    }
-    
-    return profile;
-  } catch (err) {
-    console.error('Unexpected error in ensureUserProfile:', err);
-    return null;
-  }
-};
 
-/**
- * Get suggested users to follow
- * Excludes users that the current user is already following
- */
-export const getSuggestedUsersToFollow = async (userId: string, limit: number = 5) => {
-  try {
-    // Get IDs of users the current user is already following
-    const { data: following, error: followingError } = await supabase
-      .from('user_followers')
-      .select('following_id')
-      .eq('follower_id', userId);
-      
-    if (followingError) {
-      console.error('Error getting following list:', followingError);
-      return [];
+    // If profile already exists, return profile data
+    if (existingProfile) {
+      return existingProfile;
     }
-    
-    // Get the actual IDs to exclude
-    const followingIds = following ? following.map(f => f.following_id) : [];
-    // Also exclude the current user
-    followingIds.push(userId);
-    
-    // Get users with most followers that the current user is not following
-    const { data: suggested, error: suggestedError } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .not('id', 'in', `(${followingIds.join(',')})`)
-      .order('followers_count', { ascending: false })
-      .limit(limit);
-      
-    if (suggestedError) {
-      console.error('Error getting suggested users:', suggestedError);
-      return [];
-    }
-    
-    return suggested || [];
-  } catch (err) {
-    console.error('Unexpected error in getSuggestedUsersToFollow:', err);
-    return [];
-  }
-};
 
-/**
- * Follow a user
- */
-export const followUser = async (followerId: string, followingId: string) => {
-  try {
-    if (followerId === followingId) {
-      console.error('Cannot follow yourself');
-      return { success: false, error: 'Cannot follow yourself' };
-    }
-    
-    const { error } = await supabase
-      .from('user_followers')
-      .insert({
-        follower_id: followerId,
-        following_id: followingId
-      });
-      
-    if (error) {
-      console.error('Error following user:', error);
-      return { success: false, error: error.message };
-    }
-    
-    return { success: true };
-  } catch (err) {
-    console.error('Unexpected error in followUser:', err);
-    return { success: false, error: 'An unexpected error occurred' };
-  }
-};
-
-/**
- * Unfollow a user
- */
-export const unfollowUser = async (followerId: string, followingId: string) => {
-  try {
-    const { error } = await supabase
-      .from('user_followers')
-      .delete()
-      .eq('follower_id', followerId)
-      .eq('following_id', followingId);
-      
-    if (error) {
-      console.error('Error unfollowing user:', error);
-      return { success: false, error: error.message };
-    }
-    
-    return { success: true };
-  } catch (err) {
-    console.error('Unexpected error in unfollowUser:', err);
-    return { success: false, error: 'An unexpected error occurred' };
-  }
-};
-
-/**
- * Check if a user is following another user
- */
-export const isFollowing = async (followerId: string, followingId: string) => {
-  try {
-    const { data, error } = await supabase
-      .from('user_followers')
-      .select('id')
-      .eq('follower_id', followerId)
-      .eq('following_id', followingId)
-      .single();
-      
-    if (error && error.code !== 'PGRST116') { // Not PGRST116 means not a "no rows returned" error
-      console.error('Error checking follow status:', error);
+    // Handle potential fetch error other than "not found"
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error('Error fetching user profile:', fetchError.message);
       return false;
     }
-    
-    return !!data; // Return true if data exists, false otherwise
-  } catch (err) {
-    console.error('Unexpected error in isFollowing:', err);
+
+    // Generate a username from email or user ID
+    const username = userEmail 
+      ? `user_${userEmail.split('@')[0]}`.toLowerCase().replace(/[^a-z0-9_]/g, '_')
+      : `user_${userId.substring(0, 8)}`;
+
+    // Create default profile if none exists
+    const { data: newProfile, error: createError } = await supabase
+      .from('user_profiles')
+      .insert([
+        {
+          id: userId,
+          username,
+          display_name: 'New User',
+          followers_count: 0,
+          following_count: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ])
+      .select();
+
+    if (createError) {
+      console.error('Error creating user profile:', createError.message);
+      return false;
+    }
+
+    return newProfile[0];
+  } catch (error) {
+    console.error('Error ensuring user profile:', error);
     return false;
   }
 };
 
 /**
- * Get a user's followers
+ * Checks if a user is following another user
+ * @param {string} followerId - The ID of the follower
+ * @param {string} targetUserId - The ID of the user being followed
+ * @returns {Promise<boolean>} True if the follower is following the target user
  */
-export const getUserFollowers = async (userId: string) => {
+export const isFollowing = async (followerId: string, targetUserId: string): Promise<boolean> => {
   try {
-    const { data, error } = await supabase
-      .from('user_followers')
-      .select(`
-        follower_id,
-        follower:follower_id(
-          id,
-          username,
-          display_name,
-          avatar_url
-        )
-      `)
-      .eq('following_id', userId);
-      
-    if (error) {
-      console.error('Error getting user followers:', error);
-      return [];
+    if (!followerId || !targetUserId) {
+      console.error('Invalid follower or target IDs');
+      return false;
     }
-    
-    // Extract the profiles from the joined data
-    return data?.map(item => item.follower) || [];
-  } catch (err) {
-    console.error('Unexpected error in getUserFollowers:', err);
-    return [];
+
+    const { data, error } = await supabase
+      .from('user_follows')
+      .select('*')
+      .eq('follower_id', followerId)
+      .eq('following_id', targetUserId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error checking follow status:', error);
+      return false;
+    }
+
+    return !!data;
+  } catch (error) {
+    console.error('Error in isFollowing:', error);
+    return false;
   }
 };
 
 /**
- * Get users that a user is following
+ * Checks if a user is a member of a fitness group
+ * @param {string} userId - The ID of the user
+ * @param {number} groupId - The ID of the fitness group
+ * @returns {Promise<boolean>} True if the user is a member of the group
  */
-export const getUserFollowing = async (userId: string) => {
+export const isGroupMember = async (userId: string, groupId: number): Promise<boolean> => {
   try {
-    const { data, error } = await supabase
-      .from('user_followers')
-      .select(`
-        following_id,
-        following:following_id(
-          id,
-          username,
-          display_name,
-          avatar_url
-        )
-      `)
-      .eq('follower_id', userId);
-      
-    if (error) {
-      console.error('Error getting user following:', error);
-      return [];
+    if (!userId || !groupId) {
+      console.error('Invalid user or group ID');
+      return false;
     }
-    
-    // Extract the profiles from the joined data
-    return data?.map(item => item.following) || [];
-  } catch (err) {
-    console.error('Unexpected error in getUserFollowing:', err);
-    return [];
+    const { data, error } = await supabase
+      .from('fitness_group_members')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('group_id', groupId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error checking group membership:', error);
+      return false;
+    }
+    return !!data;
+  } catch (error) {
+    console.error('Error in isGroupMember:', error);
+    return false;
   }
 };
 
-export default {
-  checkUserProfileTables,
-  ensureUserProfile,
-  getSuggestedUsersToFollow,
-  followUser,
-  unfollowUser,
-  isFollowing,
-  getUserFollowers,
-  getUserFollowing
+/**
+ * Checks if fitness groups tables exist in the database
+ * @returns {Promise<boolean>} True if fitness tables exist
+ */
+export const checkFitnessGroupsTables = async (): Promise<boolean> => {
+  try {
+    // Check if the fitness_groups table exists
+    const { error: groupsError } = await supabase
+      .from('fitness_groups')
+      .select('id')
+      .limit(1);
+
+    // Check if the fitness_group_members table exists
+    const { error: membersError } = await supabase
+      .from('fitness_group_members')
+      .select('id')
+      .limit(1);
+
+    if (groupsError || membersError) {
+      console.warn('Fitness groups tables may need to be created:', {
+        groupsError: groupsError?.message,
+        membersError: membersError?.message
+      });
+      return false;
+    }
+
+    console.log('Fitness groups tables verified successfully');
+    return true;
+  } catch (error) {
+    console.error('Error checking fitness groups tables:', error);
+    return false;
+  }
 };

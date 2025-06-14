@@ -124,7 +124,8 @@ const TherapyBooking = () => {
               placeholder="TRY 'ANGER MANAGEMENT'"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 p-2 sm:p-0 text-[#49DADD] text-sm sm:text-[16px] font-happy-monkey lowercase bg-transparent focus:outline-none border-b sm:border-b-0 border-[#04C4D5] sm:border-0"
+              className="flex-1 px-4 py-3 sm:py-2 text-[#49DADD] bg-transparent focus:outline-none border-b sm:border-b-0 border-[#04C4D5] sm:border-0 min-h-[48px] sm:min-h-[40px] touch-action-manipulation"
+              style={{ fontSize: '16px' }}
             />
             <div className="hidden sm:block text-[#49DADD] text-[32px] font-happy-monkey">|</div>
             <input
@@ -132,13 +133,14 @@ const TherapyBooking = () => {
               placeholder="where do you want the therapy"
               value={locationQuery}
               onChange={(e) => setLocationQuery(e.target.value)}
-              className="flex-1 p-2 sm:p-0 text-[#49DADD] text-sm sm:text-[16px] font-happy-monkey lowercase bg-transparent focus:outline-none border-b sm:border-b-0 border-[#04C4D5] sm:border-0"
+              className="flex-1 px-4 py-3 sm:py-2 text-[#49DADD] bg-transparent focus:outline-none border-b sm:border-b-0 border-[#04C4D5] sm:border-0 min-h-[48px] sm:min-h-[40px] touch-action-manipulation"
+              style={{ fontSize: '16px' }}
             />
             <button 
               onClick={handleSearch}
-              className="bg-[#148BAF] text-white py-2 px-3 sm:py-[10px] sm:px-[10px] rounded-[10px] border border-[#04C4D5] flex justify-center items-center w-full sm:w-auto"
+              className="bg-[#148BAF] text-white py-3 px-4 sm:py-[10px] sm:px-[10px] rounded-[10px] border border-[#04C4D5] flex justify-center items-center w-full sm:w-auto min-h-[48px] touch-action-manipulation transition-all duration-300 active:scale-95"
             >
-              <span className="text-center text-sm sm:text-[16px] font-happy-monkey lowercase">SEARCH</span>
+              <span className="text-center font-happy-monkey lowercase" style={{ fontSize: '16px' }}>SEARCH</span>
             </button>
           </div>
           
@@ -148,13 +150,13 @@ const TherapyBooking = () => {
               <div
                 key={condition.id}
                 onClick={() => handleToggleCondition(condition.id)}
-                className={`min-w-0 flex-1 max-w-full sm:max-w-[205.5px] py-2 px-3 sm:py-[10px] sm:px-[10px] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)] overflow-hidden rounded-[8px] border border-[#04C4D5] flex justify-center items-center cursor-pointer transition-colors ${
+                className={`min-w-0 flex-1 max-w-full sm:max-w-[205.5px] py-3 px-4 sm:py-[10px] sm:px-[10px] shadow-[1px_2px_4px_rgba(73,217.90,234,0.50)] overflow-hidden rounded-[8px] border border-[#04C4D5] flex justify-center items-center cursor-pointer transition-colors min-h-[48px] sm:min-h-[40px] touch-action-manipulation active:scale-95 ${
                   selectedConditions.includes(condition.id) 
                     ? 'bg-[#148BAF] text-white' 
                     : 'bg-white text-[#04C4D5] hover:bg-gray-50'
                 }`}
               >
-                <span className="text-center font-happy-monkey text-xs sm:text-sm lg:text-[16px] lowercase truncate">{condition.label}</span>
+                <span className="text-center font-happy-monkey lowercase truncate" style={{ fontSize: '16px' }}>{condition.label}</span>
               </div>
             ))}
           </div>
@@ -260,7 +262,7 @@ const TherapyBooking = () => {
                   </div>
                   
                   {/* Book button */}
-                  <button className="w-full py-2 bg-[#148BAF] text-white rounded-[10px] font-happy-monkey lowercase text-sm hover:bg-[#127a9a] transition-colors">
+                  <button className="w-full py-3 bg-[#148BAF] text-white rounded-[10px] font-happy-monkey lowercase hover:bg-[#127a9a] transition-colors min-h-[48px] touch-action-manipulation active:scale-95" style={{ fontSize: '16px' }}>
                     Book session
                   </button>
                 </div>
