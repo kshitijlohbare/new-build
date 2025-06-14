@@ -22,17 +22,17 @@ const Sidebar = ({ onNavigate }: SidebarProps) => {
   };
 
   return (
-    <nav className="h-full py-6 px-3 flex flex-col items-center bg-[#F7FFFF] gap-2 md:gap-3 overflow-y-auto">
+    <nav className="h-full py-4 sm:py-6 px-2 sm:px-3 flex flex-col items-center bg-[#F7FFFF] gap-1 sm:gap-2 md:gap-3 overflow-y-auto">
       {navItems.map((item) => (
         <NavLink
           key={item.path}
           to={item.path}
           onClick={handleNavigate}
           className={({ isActive }) => 
-            `w-full py-2 px-2 flex md:flex-col items-center md:text-center font-medium lowercase ${
+            `w-full py-3 sm:py-2 px-3 sm:px-2 flex md:flex-col items-center md:text-center font-medium lowercase min-h-[48px] sm:min-h-auto transition-all ${
               isActive 
                 ? 'text-black border border-[#04C4D5] rounded-[10px] bg-white shadow-[1px_2px_4px_rgba(4,196,213,0.5)]' 
-                : 'text-[#148BAF] hover:text-[#0A7A9A]'
+                : 'text-[#148BAF] hover:text-[#0A7A9A] hover:bg-white/50 rounded-[8px]'
             }`
           }
         >
@@ -41,9 +41,9 @@ const Sidebar = ({ onNavigate }: SidebarProps) => {
               <img 
                 src={isActive ? item.selectedIcon : item.nonSelectedIcon} 
                 alt={item.name}
-                className="w-6 h-6 md:mb-1 mr-3 md:mr-0"
+                className="w-5 h-5 sm:w-6 sm:h-6 md:mb-1 mr-3 md:mr-0 flex-shrink-0"
               />
-              <span className={`text-xs mt-0 md:mt-1 whitespace-pre-wrap ${isActive ? 'text-black' : 'text-[#148BAF]'}`}>{item.name}</span>
+              <span className={`text-xs sm:text-xs mt-0 md:mt-1 whitespace-pre-wrap ${isActive ? 'text-black' : 'text-[#148BAF]'}`}>{item.name}</span>
             </>
           )}
         </NavLink>

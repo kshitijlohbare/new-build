@@ -57,7 +57,7 @@ const practitioners: Practitioner[] = [
 const BookSession = () => {
   return (
     <div className="flex flex-col items-start gap-5 w-full">
-      <div className="flex flex-nowrap gap-2.5 w-full overflow-y-auto overflow-x-auto pb-4 max-w-full">
+      <div className="flex flex-nowrap gap-2.5 w-full overflow-y-auto overflow-x-auto max-w-full">
         {/* First banner with max-width 200px */}
         <div className="flex-shrink-0 w-full sm:w-auto max-w-[200px] bg-gradient-to-b from-[#49DADD] to-[rgba(195.50,253.79,255,0.20)] p-2.5 rounded-[10px] flex flex-col justify-between shadow-[1px_2px_4px_rgba(73,218,234,0.5)]">
           <p className="text-[#148BAF] font-happy-monkey lowercase">

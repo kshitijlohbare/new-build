@@ -147,6 +147,10 @@ const TherapistListing = () => {
     }
   };
 
+  const handleCardClick = (practitionerId: number) => {
+    navigate(`/therapist/${practitionerId}`);
+  };
+
   const getBadgeColor = (badge: string | null) => {
     switch (badge) {
       case 'top rated': return 'bg-yellow-100 text-yellow-800';
@@ -304,64 +308,139 @@ const TherapistListing = () => {
                 <p className="text-gray-500">Try adjusting your search criteria or filters.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {practitioners.map((practitioner) => (
-                  <div key={practitioner.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                    <div className="p-6">
-                      <div className="flex items-start space-x-4">
+                  <div 
+                    key={practitioner.id} 
+                    onClick={() => handleCardClick(practitioner.id)}
+                    className="bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group border border-[rgba(4,196,213,0.2)] hover:border-[rgba(4,196,213,0.4)] min-h-[280px] sm:min-h-[320px]"
+                  >
+                    {/* Enhanced mobile-first card header */}
+                    <div className="p-4 sm:p-6">
+                      <div className="flex items-start space-x-3 sm:space-x-4 mb-4">
                         <img
                           src={practitioner.image_url || '/api/placeholder/64/64'}
                           alt={practitioner.name}
-                          className="w-16 h-16 rounded-lg object-cover"
+                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover border-2 border-[rgba(4,196,213,0.2)]"
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <h3 className="text-lg font-semibold text-gray-900 truncate">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1 pr-2">
+                              <h3 className="text-lg sm:text-xl font-happy-monkey text-[#148BAF] lowercase leading-tight truncate">
                                 {practitioner.name}
                               </h3>
-                              <p className="text-sm text-gray-600 mb-1">{practitioner.specialty}</p>
-                              <div className="flex items-center space-x-2 mb-2">
-                                <div className="flex items-center">
-                                  <span className="text-yellow-400">★</span>
-                                  <span className="text-sm text-gray-600 ml-1">
-                                    {practitioner.rating} ({practitioner.reviews} reviews)
-                                  </span>
-                                </div>
-                              </div>
+                              <p className="text-sm text-gray-600 font-happy-monkey lowercase leading-relaxed truncate">
+                                {practitioner.specialty}
+                              </p>
                             </div>
                             {practitioner.badge && (
-                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${getBadgeColor(practitioner.badge)}`}>
+                              <span className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${getBadgeColor(practitioner.badge)}`}>
                                 {practitioner.badge}
                               </span>
                             )}
                           </div>
                           
-                          <div className="space-y-2 mb-4">
-                            <p className="text-sm text-gray-600">
-                              <span className="font-medium">{practitioner.degree}</span> • {practitioner.education}
-                            </p>
-                            <div className="flex items-center text-sm text-gray-600">
-                              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                              {practitioner.location_type === 'online' ? 'Online' : 'In-Person'}
+                          {/* Enhanced mobile rating display */}
+                          <div className="flex items-center space-x-2 mb-3">
+                            <div className="flex items-center space-x-1">
+                              {[...Array(5)].map((_, i) => (
+                                <svg 
+                                  key={i} 
+                                  className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${i < Math.floor(practitioner.rating) ? 'text-yellow-400' : 'text-gray-200'}`} 
+                                  fill="currentColor" 
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                              ))}
                             </div>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <div className="text-lg font-semibold text-gray-900">
-                              ${practitioner.price}/session
-                            </div>
-                            <button
-                              onClick={() => handleBookNow(practitioner)}
-                              className="px-4 py-2 bg-sage-600 text-white rounded-lg hover:bg-sage-700 transition-colors text-sm font-medium"
-                            >
-                              Book Now
-                            </button>
+                            <span className="text-xs sm:text-sm text-gray-600 font-happy-monkey">
+                              {practitioner.rating} ({practitioner.reviews} reviews)
+                            </span>
                           </div>
                         </div>
+                      </div>
+
+                      {/* Enhanced mobile-first credentials */}
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#04C4D5] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                          </svg>
+                          <span className="font-happy-monkey truncate">
+                            <span className="font-medium">{practitioner.degree}</span> • {practitioner.education}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center text-xs sm:text-sm text-gray-600">
+                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[#04C4D5] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span className="font-happy-monkey lowercase">
+                            {practitioner.location_type === 'online' ? 'Online Sessions Available' : 'In-Person Sessions'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Mobile-optimized specialties */}
+                      {practitioner.conditions && practitioner.conditions.length > 0 && (
+                        <div className="mb-4">
+                          <p className="text-xs text-gray-500 font-happy-monkey lowercase mb-2">Specializes in:</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {practitioner.conditions.slice(0, 2).map((condition, index) => (
+                              <span 
+                                key={index} 
+                                className="px-2 py-1 text-xs bg-[rgba(4,196,213,0.1)] text-[#148BAF] rounded-full font-happy-monkey lowercase"
+                              >
+                                {condition}
+                              </span>
+                            ))}
+                            {practitioner.conditions.length > 2 && (
+                              <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full font-happy-monkey">
+                                +{practitioner.conditions.length - 2} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Enhanced mobile-first price and book section */}
+                      <div className="flex items-center justify-between pt-4 border-t border-[rgba(4,196,213,0.1)]">
+                        <div>
+                          <div className="text-xl sm:text-2xl font-happy-monkey text-[#148BAF] font-bold">
+                            ${practitioner.price}
+                          </div>
+                          <div className="text-xs text-gray-500 font-happy-monkey lowercase">
+                            per session
+                          </div>
+                        </div>
+                        
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBookNow(practitioner);
+                          }}
+                          className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white rounded-xl hover:from-[#148BAF] hover:to-[#04C4D5] transition-all duration-300 text-sm font-happy-monkey lowercase shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2 min-h-[44px] min-w-[100px] justify-center"
+                        >
+                          <span>Book Now</span>
+                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Enhanced mobile hover effects */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[rgba(4,196,213,0.02)] to-[rgba(20,139,175,0.02)] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl sm:rounded-2xl"></div>
+                    
+                    {/* Mobile-optimized click indicator */}
+                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2 shadow-lg">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 text-[#148BAF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
                       </div>
                     </div>
                   </div>
