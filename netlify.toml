@@ -4,3 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "18"  # Using Node 18 instead of 22 for better compatibility
+  
+[[headers]]
+  for = "/*"
+    [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

@@ -28,7 +28,7 @@ nav.app-navbar * {
 .mobile-home-container {
   display: flex;
   flex-direction: column;
-  align-items: center/* Add extra padding at the top of the input bar for the swipe indicator */
+  align-items: center; /* Add extra padding at the top of the input bar for the swipe indicator */
 .input-bar {
   padding-top: 20px;
   padding-bottom: 15px;

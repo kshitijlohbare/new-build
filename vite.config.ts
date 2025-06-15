@@ -10,9 +10,6 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  css: {
-    postcss: './postcss.config.cjs'
-  },
   server: {
     host: 'localhost',
     port: 5173,
@@ -22,6 +19,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
+        entryFileNames: '[name]-[hash]-' + Date.now() + '.js', // Add timestamp for cache busting
+        chunkFileNames: '[name]-[hash]-' + Date.now() + '.js', // Add timestamp for cache busting
+        assetFileNames: '[name]-[hash]-' + Date.now() + '.[ext]', // Add timestamp for cache busting
         manualChunks(id) {
           if (id.includes('node_modules')) {
             if (id.includes('react')) return 'vendor-react';

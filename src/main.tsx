@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import './index.css';
+import './index.css'; // CSS with timestamp will be handled in the build
 
 // Simple favicon injector (acts as a fallback if public/favicon.ico is missing or not picked up)
 const injectFavicon = () => {
