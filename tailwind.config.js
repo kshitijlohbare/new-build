@@ -14,6 +14,12 @@ export default {
         'righteous': ['Righteous', 'cursive'],
         'luckiest-guy': ['"Luckiest Guy"', 'cursive'],
       },
+      scrollBehavior: {
+        'smooth': 'smooth',
+        'auto': 'auto',
+        'initial': 'initial',
+        'inherit': 'inherit',
+      },
     },
   },
   plugins: [

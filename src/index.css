@@ -5,6 +5,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Custom animations for nav elements */
 @keyframes pulse-subtle {
   0% { transform: scale(1); }
@@ -1109,6 +1119,19 @@ div[data-testid="circular-timer-section"] {
 /* Hide scrollbars for horizontal chips */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Custom scrolling utility classes */
+.scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-container {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
 
 /* Responsive font sizes for mobile */
 @media (max-width: 480px) {
