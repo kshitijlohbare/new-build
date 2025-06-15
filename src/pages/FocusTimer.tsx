@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import PlayIconPath from '../assets/icons/play.svg';
-import PauseIconPath from '../assets/icons/pause.svg';
+import PauseIconPath from '../assets/icons/Pause.svg';
 import StopIconPath from '../assets/icons/stop.svg';
 
 // Music options array with SVG icons that match the reference image
