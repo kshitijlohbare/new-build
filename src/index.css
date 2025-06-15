@@ -1110,7 +1110,7 @@ div[data-testid="circular-timer-section"] {
 
 /* Mobile Practices Listing Redesign - Only valid custom styles */
 .bg-gradient-to-b {
-  background: linear-gradient(180deg, #6EEAFF 0%, #1CB5E0 100%);
+  background: linear-gradient(0deg, #6EEAFF 0%, #1CB5E0 100%);
 }
 .font-luckiest-guy {
   font-family: 'Luckiest Guy', cursive;

@@ -1,25 +1,19 @@
 import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { usePractices } from '@/context/PracticeContext';
 import { useSidebar } from '@/context/SidebarContext';
 import streakIcon from '@/assets/icons/Streak_lesser_than_10_title.svg';
 import badgeIcon from '@/assets/icons/badge_title.svg';
 import starIcon from '@/assets/icons/Star_title.svg';
-import hamburgerIcon from '@/assets/icons/hamburger1.svg';
-import logoIcon from '@/assets/icons/Vector.svg';
+import hamburgerIcon from '@/assets/icons/hamburger.svg';
+import logoIcon from '@/assets/icons/CAKTUS COCO.svg';
 
-const HeaderBar: React.FC = () => {
-  const location = useLocation();
+const HomeHeader: React.FC = () => {
   const { userProgress } = usePractices();
   const { toggleSidebar } = useSidebar();
   
-  // Check if we're on the homepage - if yes, we shouldn't show the header
-  if (location.pathname === '/' || location.pathname === '/dashboard') {
-    return null;
-  }
-
   return (
-   <div className="flex flex-row items-center p-[10px] gap-[10px] w-full h-[52px] bg-gradient-to-b from-[#06C4D5] to-[#04C4D5]">
+    <div className="flex flex-row items-center p-[10px] gap-[10px] w-full h-[52px] bg-[#FCDF4D]">
       {/* Menu Button */}
       <div 
         className="flex items-center justify-center w-[24px] h-[24px] rounded-[8px] cursor-pointer"
@@ -85,4 +79,4 @@ const HeaderBar: React.FC = () => {
   );
 };
 
-export default HeaderBar;
+export default HomeHeader;

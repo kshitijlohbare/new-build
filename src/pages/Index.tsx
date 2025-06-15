@@ -2,10 +2,13 @@ import { ShareDelights } from "@/components/wellbeing/ShareDelights";
 import WellbeingTipsSection from "@/components/wellbeing/WellbeingTipsSection";
 import NewDailyPractices from "@/components/wellbeing/NewDailyPractices";
 import BookSessionSimple from "@/components/wellbeing/BookSessionSimple";
+import HomeHeader from "@/components/layout/HomeHeader";
 
 const Index = () => {
   return (
-    <div className="space-y-6 sm:space-y-8 md:space-y-10 px-2 sm:px-3 md:px-5">
+    <>
+      <HomeHeader />
+      <div className="space-y-6 sm:space-y-8 md:space-y-10 px-2 sm:px-3 md:px-5">
       {/* Share Delights Section - With Styled Container */}
       <section className="bg-[rgba(6,196,213,0.10)] rounded-2xl shadow-lg overflow-hidden p-4 md:p-6">
         <div className="mb-4">
@@ -77,6 +80,7 @@ const Index = () => {
         <BookSessionSimple />
       </section>
     </div>
+    </>
   );
 };
 

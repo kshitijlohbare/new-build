@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { PracticeProvider } from "./context/PracticeContext"; // Import the new provider
 import { AchievementProvider } from "./context/AchievementContext"; // Import the achievement provider
 import { ProfileProvider } from "./context/ProfileContext"; // Import the profile provider
+import { SidebarProvider } from "./context/SidebarContext"; // Import the sidebar provider
 import { useEffect, useState } from "react";
 import { checkUserProfileTables } from "./scripts/profileUtils";
 import { ensureDatabaseTables } from "./scripts/ensureDatabaseTables";
@@ -215,6 +216,7 @@ const App = () => {
                 <PracticeProvider> {/* Wrap with PracticeProvider */}
                   <AchievementProvider> {/* Wrap with AchievementProvider */}
                     <ProfileProvider> {/* Wrap with ProfileProvider */}
+                      <SidebarProvider> {/* Wrap with SidebarProvider */}
                       <Routes>
                         {/* Landing page for non-logged-in users */}
                         <Route path="/welcome" element={<LandingPage />} />
@@ -258,6 +260,7 @@ const App = () => {
                         {/* Redirect root for non-authenticated users to landing page */}
                         <Route path="*" element={<Navigate to="/welcome" replace />} />
                       </Routes>
+                      </SidebarProvider>
                     </ProfileProvider>
                   </AchievementProvider>
                 </PracticeProvider>

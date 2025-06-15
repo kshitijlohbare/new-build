@@ -5,6 +5,7 @@ import "@/styles/mobileHome.css";
 import MobileWellbeingTipsSection from "../components/wellbeing/MobileWellbeingTipsSection";
 import MobileDailyPractices from "../components/wellbeing/MobileDailyPractices";
 import MobileBookSessionSection from "../components/wellbeing/MobileBookSessionSection";
+import HomeHeader from "@/components/layout/HomeHeader";
 import emojiButtonIcon from "../assets/emoji button.svg";
 
 const MobileHome = () => {
@@ -330,6 +331,9 @@ const MobileHome = () => {
   return (
     <div className="mobile-home-container" id="mobile-home-root">
       <MobileViewport />
+      
+      {/* Custom HomeHeader for header bar - only on homepage */}
+      <HomeHeader />
       
       {/* Combined welcome header and delights section - flush with top nav */}
       <div className="hero-section" id="mobile-hero-section">

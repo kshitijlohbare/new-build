@@ -1,18 +1,17 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import HeaderBar from "./HeaderBar"; // Import our new HeaderBar component
+import { useSidebar } from "@/context/SidebarContext";
 
 const AppLayout = () => {
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const { sidebarVisible, toggleSidebar } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  const toggleSidebar = () => {
-    setSidebarVisible(!sidebarVisible);
-  };  return (
+  return (
     <div className="flex flex-col h-screen w-full bg-white overflow-hidden">
       {/* Add the new HeaderBar component - it will hide itself on the homepage */}
-      <HeaderBar toggleSidebar={toggleSidebar} />
+      <HeaderBar />
 
       {/* content-body container - takes remaining height */}
       <div className="content-body flex flex-1 overflow-hidden">
@@ -20,7 +19,7 @@ const AppLayout = () => {
         {sidebarVisible && (
           <div 
             className="fixed inset-0 bg-black bg-opacity-30 z-20 md:hidden"
-            onClick={() => setSidebarVisible(false)}
+            onClick={toggleSidebar}
           />
         )}
         
@@ -32,7 +31,7 @@ const AppLayout = () => {
             ${sidebarVisible ? 'fixed inset-y-0 left-0 w-[220px] sm:w-[200px] z-30' : 'hidden'}
           `}
         >
-          <Sidebar onNavigate={() => setSidebarVisible(false)} />
+          <Sidebar onNavigate={toggleSidebar} />
         </aside>
 
         {/* Enhanced main content area with improved mobile padding */}
