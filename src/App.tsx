@@ -20,7 +20,6 @@ import AppLayout from "./components/layout/AppLayout";
 import ResponsiveHome from "./pages/ResponsiveHome"; // Import the new responsive home component
 import Practices from "./pages/Practices";
 import Progress from "./pages/Progress";
-import Meditation from "./pages/Meditation";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Appointments from "./pages/Appointments";
@@ -35,10 +34,10 @@ import TherapistRegistration from "./pages/TherapistRegistration";
 import FocusTimer from "./pages/FocusTimer";
 import PractitionerOnboarding from "./pages/PractitionerOnboarding"; // Import PractitionerOnboarding
 import PractitionerEditProfile from "./pages/PractitionerEditProfile"; // Import PractitionerEditProfile
-import Learn from "./pages/Learn"; // Import Learn
+import { Home as Learn } from "./pages/Learn"; // Import Learn using named import
 import TestPage from "./pages/TestPage"; // Import TestPage for debugging
 import LandingPage from "./pages/LandingPage"; // Import the new LandingPage
-import SplashScreen from './components/ui/SplashScreen';
+import FlashScreen from './pages/FlashScreen';
 import './App.css';
 import React from "react"; // Make sure React is imported
 
@@ -126,14 +125,18 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
 }
 
 const App = () => {
-  // Splash screen state
-  const [showSplash, setShowSplash] = useState(true);
+  // Flash screen state
+  const [showFlash, setShowFlash] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
 
   // Always call all hooks at the top level, before any conditional return
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 1500);
-    return () => clearTimeout(timer);
+    // Show flash screen then main content
+    const flashTimer = setTimeout(() => {
+      setShowFlash(false);
+    }, 2000); // Flash screen duration
+    
+    return () => clearTimeout(flashTimer);
   }, []);
 
   // Initialize necessary tables when app loads
@@ -194,9 +197,10 @@ const App = () => {
       </div>
     );
   }
-
-  if (showSplash) {
-    return <SplashScreen />;
+  
+  // Show flash screen
+  if (showFlash) {
+    return <FlashScreen />;
   }
 
   return (
@@ -232,7 +236,6 @@ const App = () => {
                           <Route path="dashboard" element={<Navigate to="/" replace />} />
                           <Route path="practices" element={<Practices />} />
                           <Route path="progress" element={<Progress />} />
-                          <Route path="meditation" element={<Meditation />} />
                           <Route path="profile" element={<Profile />} />
                           <Route path="settings" element={<Settings />} />
                           <Route path="appointments" element={<Appointments />} />
@@ -249,6 +252,7 @@ const App = () => {
                           <Route path="learn" element={<Learn />} /> {/* Add the learn page route */}
                           <Route path="fitness-groups" element={<Community />} /> {/* Add the fitness groups route */}
                           <Route path="test" element={<TestPage />} /> {/* Add the test page route for debugging */}
+                          <Route path="flash" element={<FlashScreen />} /> {/* Temporary route to view the FlashScreen component */}
                         </Route>
                         
                         {/* Redirect root for non-authenticated users to landing page */}

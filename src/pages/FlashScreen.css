@@ -1,0 +1,27 @@
+.flash-screen__container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.flash-screen__moving-rect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100vh;
+  background: #ffe066;
+  /* Masking with SVG */
+  -webkit-mask-image: url('../assets/Frame 143.svg');
+  mask-image: url('../assets/Frame 143.svg');
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  transition: left 0.1s linear;
+}

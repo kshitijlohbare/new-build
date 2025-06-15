@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { KeyboardAwareInput } from "@/components/ui/KeyboardAwareInput";
 
 interface Practitioner {
   id: number;
@@ -119,7 +120,7 @@ const TherapyBooking = () => {
         <div className="Frame70 self-stretch flex flex-col justify-start items-start gap-4 sm:gap-5 lg:gap-[20px]">
           {/* Search bar - Mobile Responsive */}
           <div className="Frame27 self-stretch p-2 sm:p-[4px_10px] bg-white rounded-[10px] border border-[#04C4D5] flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-2 sm:gap-[10px]">
-            <input
+            <KeyboardAwareInput
               type="text"
               placeholder="TRY 'ANGER MANAGEMENT'"
               value={searchQuery}
@@ -128,7 +129,7 @@ const TherapyBooking = () => {
               style={{ fontSize: '16px' }}
             />
             <div className="hidden sm:block text-[#49DADD] text-[32px] font-happy-monkey">|</div>
-            <input
+            <KeyboardAwareInput
               type="text"
               placeholder="where do you want the therapy"
               value={locationQuery}

@@ -8,6 +8,7 @@ export const moreConcepts: PsychTerm[] = [
     explanation: "The halo effect is the tendency for positive impressions of a person in one area to positively influence our opinion of them in other areas.",
     category: "Social Perception",
     icon: "social",
+    keywords: ["first impression", "judgment", "stereotype", "positive bias", "perception", "image", "charisma", "attractiveness", "bias", "favoritism"],
   },
   {
     term: "Framing Effect",
@@ -15,6 +16,7 @@ export const moreConcepts: PsychTerm[] = [
     explanation: "The framing effect is our tendency to react differently to information depending on whether it's presented as a gain or a loss, even when the underlying facts are the same.",
     category: "Decision Making",
     icon: "cognitive",
+    keywords: ["perspective", "wording", "language", "presentation", "context", "positive vs negative", "glass half full", "glass half empty", "communication", "marketing", "persuasion", "manipulation"],
   },
   {
     term: "Availability Bias",
@@ -22,12 +24,14 @@ export const moreConcepts: PsychTerm[] = [
     explanation: "Availability bias leads us to overestimate the likelihood of events that come readily to mind, like those that are recent, unusual, or emotionally charged.",
     category: "Cognitive Biases",
     icon: "cognitive",
+    keywords: ["recency bias", "media influence", "fear", "anxiety", "risk assessment", "probability", "news bias", "vividness", "memorable events", "danger perception", "worry", "overthinking"],
   },
   {
     term: "Zeigarnik Effect",
     story: "Even though it was 11 PM, Carlos couldn't stop thinking about the unfinished project on his desk. Only after making a detailed plan to complete it tomorrow did his mind finally relax.",
     explanation: "The Zeigarnik Effect is our tendency to remember interrupted or incomplete tasks better than completed ones. Our brains tend to focus on unfinished business until it's resolved.",
     category: "Memory",
+    keywords: ["unfinished business", "incomplete tasks", "open loops", "rumination", "overthinking", "anxiety", "procrastination", "distraction", "focus", "productivity", "to-do list", "mental load"],
     icon: "cognitive",
   },
   {

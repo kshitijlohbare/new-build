@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ThumbsUp, MessageCircle, Link2, Paperclip, X, Pin } from 'lucide-react';
+import { KeyboardAwareInput, KeyboardAwareTextarea } from "@/components/ui/KeyboardAwareInput";
 
 // Define a custom User interface
 interface User {
@@ -142,7 +143,7 @@ export default function GroupFeed({ groupId, user }: GroupFeedProps) {
     <div className="w-full max-w-2xl mx-auto mt-4 mb-8">
       {/* Post creation */}
       <div className="bg-white rounded-xl shadow p-4 mb-6 flex flex-col gap-3">
-        <textarea
+        <KeyboardAwareTextarea
           className="w-full border rounded-lg p-3 font-happy-monkey text-base resize-none focus:ring-2 focus:ring-[#04C4D5]"
           placeholder="Share something with your group..."
           value={newPost}
@@ -155,7 +156,7 @@ export default function GroupFeed({ groupId, user }: GroupFeedProps) {
             <input type="file" accept="image/*" className="hidden" onChange={e => setImage(e.target.files?.[0] || null)} />
             <span className="text-xs">Image</span>
           </label>
-          <input
+          <KeyboardAwareInput
             type="url"
             className="border rounded px-2 py-1 text-xs font-happy-monkey w-40"
             placeholder="Add a link (optional)"

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/useToast";
+import { KeyboardAwareInput, KeyboardAwareTextarea } from "@/components/ui/KeyboardAwareInput";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Select from 'react-select';
@@ -790,7 +791,7 @@ const PractitionerOnboarding = () => {
             
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Full Name*</label>
-              <input 
+              <KeyboardAwareInput 
                 type="text"
                 name="name"
                 value={formData.name}
@@ -848,13 +849,13 @@ const PractitionerOnboarding = () => {
             
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Professional Bio*</label>
-              <textarea 
+              <KeyboardAwareTextarea
                 name="bio"
                 value={formData.bio}
                 onChange={handleInputChange}
                 placeholder="Tell clients about yourself, your background, and approach to therapy (minimum 50 characters)"
                 className={`w-full min-h-[120px] sm:min-h-[80px] px-4 sm:px-3 py-3 sm:py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#148BAF] text-base touch-manipulation resize-y ${formErrors.bio ? 'border-red-500' : ''}`}
-              ></textarea>
+              ></KeyboardAwareTextarea>
               {formErrors.bio && <p className="text-red-500 text-sm mt-1">{formErrors.bio}</p>}
               <p className="text-gray-500 text-xs mt-1">{formData.bio.length}/50 characters minimum</p>
             </div>

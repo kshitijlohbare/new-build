@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import MobileViewport from "@/components/ui/MobileViewport";
+import { KeyboardAwareInput } from "@/components/ui/KeyboardAwareInput";
 import "@/styles/mobileHome.css";
 import MobileWellbeingTipsSection from "../components/wellbeing/MobileWellbeingTipsSection";
 import MobileDailyPractices from "../components/wellbeing/MobileDailyPractices";
@@ -436,7 +437,7 @@ const MobileHome = () => {
           <div className="swipe-indicator" aria-hidden="true"></div>
           <p className="text-[8px] text-white text-opacity-70 text-center -mt-1 mb-1" aria-hidden="true">swipe down to dismiss</p>
           <form onSubmit={handleSubmitDelight} className="flex items-center gap-2 w-full" id="delight-submit-form">
-            <input
+            <KeyboardAwareInput
               type="text"
               id="delight-input-field"
               value={newDelight}

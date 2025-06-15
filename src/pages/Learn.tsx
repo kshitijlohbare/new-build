@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { Search, BookOpen, Lightbulb, Heart, Brain, Zap, Anchor } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { BookOpen, Lightbulb, Heart, Brain, Zap, Anchor } from "lucide-react";
 import { moreConcepts } from "./MoreConcepts";
 import { moreConcepts2 } from "./MoreConcepts2";
 import { moreConcepts3 } from "./MoreConcepts3";
@@ -65,11 +64,31 @@ const animationStyles = `
 }
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(6, 196, 213, 0.15);
+  box-shadow: 0 8px 20px rgba(6,196,213,0.15);
 }
 
 .animate-slide-down {
   animation: slide-down 0.3s ease-out forwards;
+}
+
+@media (min-width: 640px) {
+  .card-expanded {
+    height: 188.7px;
+    transition: height 0.3s ease-out;
+  }
+
+  .card-collapsed {
+    height: 92.7px;
+    transition: height 0.3s ease-out;
+  }
+}
+
+@media (max-width: 639px) {
+  .card-expanded,
+  .card-collapsed {
+    height: auto;
+    transition: height 0.3s ease-out;
+  }
 }
 `;
 
@@ -79,6 +98,7 @@ export interface PsychTerm {
   explanation: string;
   category: string;
   icon: "mindfulness" | "cognitive" | "emotional" | "behavioral" | "social" | "neuroscience" | "naval";
+  keywords?: string[]; // Optional array of related search keywords
 }
 
 const getIconComponent = (iconType: string) => {
@@ -157,641 +177,550 @@ const terms: PsychTerm[] = [
     explanation: "Cognitive dissonance is the tension that arises when our actions conflict with our beliefs or values. We often try to reduce this discomfort by changing our beliefs or rationalizing our actions.",
     category: "Thought Patterns",
     icon: "cognitive",
+    keywords: ["inner conflict", "contradicting beliefs", "mental discomfort", "rationalization", "justification", "guilt", "inconsistent beliefs", "hypocrisy", "conflicted feelings", "decision regret", "value conflict", "internal contradiction"]
   },
   {
-    term: "Halo Effect",
-    story: "After seeing a charismatic presenter give an excellent talk, Kim immediately assumed he must be intelligent, honest, and kind—without any evidence of these other traits.",
-    explanation: "The halo effect is the tendency for positive impressions of a person in one area to positively influence our opinion of them in other areas.",
-    category: "Social Perception",
-    icon: "social",
+    term: "Generalized Anxiety Disorder (GAD)",
+    story: "Liam constantly worried about everything – his job, his health, his family – even when there was no specific reason to worry. He often felt restless, had trouble sleeping, and couldn't concentrate. His doctor explained this persistent, excessive worry might be GAD.",
+    explanation: "Generalized Anxiety Disorder (GAD) is characterized by persistent and excessive worry about a number of different things. People with GAD may anticipate disaster and may be overly concerned about money, health, family, work, or other issues. Individuals with GAD find it difficult to control their worry.",
+    category: "Mental Health Conditions",
+    icon: "emotional",
+    keywords: ["anxiety", "worry", "chronic stress", "restlessness", "fatigue", "difficulty concentrating", "irritability", "muscle tension", "sleep disturbance", "panic attacks", "anxious", "overthinking", "fear", "nervousness"]
   },
   {
-    term: "Framing Effect",
-    story: "The doctor told Lin she had a 90% survival rate with the treatment. When she got a second opinion, another doctor said there was a 10% mortality rate. Though the statistics were identical, Lin felt much more optimistic after the first consultation.",
-    explanation: "The framing effect is our tendency to react differently to information depending on whether it's presented as a gain or a loss, even when the underlying facts are the same.",
-    category: "Decision Making",
+    term: "Major Depressive Disorder (MDD)",
+    story: "For weeks, Sarah felt a profound sadness she couldn't shake. She lost interest in her hobbies, struggled to get out of bed, and felt a deep sense of hopelessness. Her friends noticed she wasn't herself and encouraged her to seek help for what might be MDD.",
+    explanation: "Major Depressive Disorder (MDD) is a common and serious medical illness that negatively affects how you feel, the way you think and how you act. Fortunately, it is also treatable. MDD causes feelings of sadness and/or a loss of interest in activities once enjoyed. It can lead to a variety of emotional and physical problems and can decrease a person’s ability to function at work and at home.",
+    category: "Mental Health Conditions",
+    icon: "emotional",
+    keywords: ["depression", "sadness", "hopelessness", "loss of interest", "anhedonia", "fatigue", "sleep problems", "appetite changes", "concentration difficulties", "worthlessness", "suicidal thoughts", "low mood", "persistent sadness", "empty feeling", "irritability"]
+  },
+  {
+    term: "Stress Response (Fight or Flight)",
+    story: "Walking home late at night, Ben heard footsteps behind him. His heart started racing, his palms got sweaty, and he felt a surge of adrenaline. This was his body's stress response kicking in, preparing him to either confront the potential threat or run away.",
+    explanation: "The stress response, often called the 'fight or flight' response, is a physiological reaction that occurs in response to a perceived harmful event, attack, or threat to survival. The body releases hormones like adrenaline and cortisol, which cause physical changes like increased heart rate, rapid breathing, and heightened senses, preparing the body to either fight or flee.",
+    category: "Biological Psychology",
+    icon: "neuroscience",
+    keywords: ["fight or flight", "adrenaline", "cortisol", "stress hormones", "sympathetic nervous system", "physiological arousal", "threat response", "survival mechanism", "acute stress", "anxiety response", "panic", "danger", "emergency response", "stress reaction"]
+  },
+  {
+    term: "Coping Mechanisms",
+    story: "After a particularly stressful week at work, Maria decided to go for a long run (problem-focused coping) and then called her best friend to talk about her feelings (emotion-focused coping). These were her ways of dealing with the stress.",
+    explanation: "Coping mechanisms are strategies people often use in the face of stress and/or trauma to help manage painful or difficult emotions. Coping mechanisms can be adaptive (healthy) or maladaptive (unhealthy). Problem-focused coping aims to resolve the stressful situation, while emotion-focused coping aims to manage the emotional response to the stressor.",
+    category: "Wellbeing Practices",
+    icon: "mindfulness",
+    keywords: ["stress management", "emotional regulation", "problem solving", "resilience", "adaptive strategies", "maladaptive coping", "self-soothing", "emotional support", "healthy habits", "unhealthy habits", "dealing with stress", "mental health tools", "psychological well-being", "emotional health", "self-care"]
+  },
+  {
+    term: "Cognitive Behavioral Therapy (CBT)",
+    story: "David struggled with negative thought patterns that often led to feelings of anxiety. His therapist introduced him to CBT, helping him identify, challenge, and reframe these unhelpful thoughts, which gradually reduced his anxiety levels.",
+    explanation: "Cognitive Behavioral Therapy (CBT) is a type of psychotherapeutic treatment that helps people learn how to identify and change destructive or disturbing thought patterns that have a negative influence on behavior and emotions. CBT focuses on changing the automatic negative thoughts that can contribute to and worsen emotional difficulties, depression, and anxiety.",
+    category: "Therapeutic Approaches",
     icon: "cognitive",
+    keywords: ["psychotherapy", "mental health treatment", "negative thoughts", "thought patterns", "behavior change", "anxiety treatment", "depression treatment", "emotional regulation", "problem-solving skills", "cognitive restructuring", "behavioral activation", "therapy", "counseling", "mental wellness", "thought challenging"]
   },
   {
-    term: "Halo Effect",
-    story: "After seeing a charismatic presenter give an excellent talk, Kim immediately assumed he must be intelligent, honest, and kind—without any evidence of these other traits.",
-    explanation: "The halo effect is the tendency for positive impressions of a person in one area to positively influence our opinion of them in other areas.",
-    category: "Social Perception",
-    icon: "social",
+    term: "Burnout",
+    story: "After months of working long hours without a break, Alex felt emotionally exhausted, cynical about his job, and noticed his performance declining. He realized he was experiencing burnout.",
+    explanation: "Burnout is a state of emotional, physical, and mental exhaustion caused by excessive and prolonged stress. It occurs when you feel overwhelmed, emotionally drained, and unable to meet constant demands. As the stress continues, you begin to lose the interest and motivation that led you to take on a certain role in the first place.",
+    category: "Work & Lifestyle",
+    icon: "emotional",
+    keywords: ["exhaustion", "chronic stress", "work stress", "cynicism", "reduced efficacy", "overwhelm", "emotional drain", "job dissatisfaction", "fatigue", "depersonalization", "stress management", "self-care", "work-life balance", "mental exhaustion", "physical exhaustion"]
   },
   {
-    term: "Framing Effect",
-    story: "The doctor told Lin she had a 90% survival rate with the treatment. When she got a second opinion, another doctor said there was a 10% mortality rate. Though the statistics were identical, Lin felt much more optimistic after the first consultation.",
-    explanation: "The framing effect is our tendency to react differently to information depending on whether it's presented as a gain or a loss, even when the underlying facts are the same.",
-    category: "Decision Making",
+    term: "Self-Compassion",
+    story: "When Maya made a mistake at work, instead of berating herself, she remembered that everyone makes mistakes and treated herself with the same kindness and understanding she would offer a friend in a similar situation. This is self-compassion.",
+    explanation: "Self-compassion involves treating yourself with kindness and understanding when confronted with personal failings, inadequacy, or suffering. It has three main components: self-kindness (being gentle with yourself), common humanity (recognizing that suffering and personal inadequacy are part of the shared human experience), and mindfulness (holding painful thoughts and feelings in balanced awareness).",
+    category: "Wellbeing Practices",
+    icon: "mindfulness",
+    keywords: ["kindness to self", "self-acceptance", "mindfulness", "common humanity", "emotional resilience", "self-care", "mental well-being", "reducing self-criticism", "emotional healing", "self-love", "inner critic", "positive self-talk", "self-esteem", "emotional support", "gentleness"]
+  },
+  {
+    term: "Rumination",
+    story: "After an argument with a friend, Sarah found herself replaying the conversation over and over in her head for days, analyzing every word and gesture, which only made her feel worse. This repetitive thinking is called rumination.",
+    explanation: "Rumination is the compulsively focused attention on the symptoms of one's distress, and on its possible causes and consequences, as opposed to its solutions. It involves repetitively going over a thought or a problem without completion. Rumination can be a symptom of anxiety, depression, and other mental health issues.",
+    category: "Thought Patterns",
     icon: "cognitive",
+    keywords: ["overthinking", "repetitive thoughts", "worry loop", "anxiety", "depression", "negative thinking", "intrusive thoughts", "mental replay", "obsessive thoughts", "problem focus", "stuck in thoughts", "mental chatter", "brooding", "dwelling on problems", "thought cycle"]
   },
   {
-    term: "Availability Bias",
-    story: "After watching news coverage of a plane crash, Jordan became afraid of flying, even though statistics show it's far safer than driving, which he does daily without worry.",
-    explanation: "Availability bias leads us to overestimate the likelihood of events that come readily to mind, like those that are recent, unusual, or emotionally charged.",
+    term: "Attachment Styles",
+    story: "Liam tends to be anxious in relationships, constantly seeking reassurance. His partner, Chloe, is more avoidant and needs space. Understanding their different attachment styles helped them navigate their conflicts more effectively.",
+    explanation: "Attachment styles (e.g., secure, anxious, avoidant, disorganized) describe how people relate to others in close relationships, based on early experiences with caregivers. These styles influence expectations, behaviors, and emotional responses in adult relationships.",
+    category: "Social Relationships",
+    icon: "social",
+    keywords: ["secure attachment", "anxious attachment", "avoidant attachment", "disorganized attachment", "relationships", "intimacy", "connection", "love", "dating", "childhood experiences", "relationship patterns", "emotional bonding", "interpersonal dynamics", "trust issues", "fear of abandonment"]
+  },
+  {
+    term: "Maslow's Hierarchy of Needs",
+    story: "Aisha was struggling to focus on her career goals (self-actualization) because she was worried about job security (safety needs) and felt isolated (love and belonging needs). She realized she needed to address her more fundamental needs first.",
+    explanation: "Maslow\'s Hierarchy of Needs is a theory of motivation proposing that people are driven to fulfill basic needs (like food, safety) before moving on to more advanced needs (like esteem, self-actualization). The hierarchy is often depicted as a pyramid.",
+    category: "Motivation & Needs",
+    icon: "behavioral",
+    keywords: ["motivation", "human needs", "physiological needs", "safety needs", "love and belonging", "esteem needs", "self-actualization", "personal growth", "humanistic psychology", "fulfillment", "potential", "life goals", "psychological development", "well-being pyramid", "priorities"]
+  },
+  {
+    term: "Defense Mechanisms",
+    story: "When criticized at work, Mark often used humor (a defense mechanism) to deflect the feedback instead of addressing it directly. This helped him avoid discomfort in the moment but didn\'t solve the underlying issue.",
+    explanation: "Defense mechanisms are unconscious psychological strategies used to cope with reality and maintain self-image. Common examples include denial, repression, projection, displacement, rationalization, and sublimation. While they can be temporarily helpful, over-reliance can hinder growth.",
+    category: "Self Perception",
+    icon: "emotional",
+    keywords: ["coping", "unconscious mind", "ego defense", "denial", "repression", "projection", "rationalization", "sublimation", "stress response", "emotional protection", "psychological defenses", "Freudian psychology", "self-deception", "avoidance", "mental blocks"]
+  },
+  {
+    term: "Placebo Effect",
+    story: "In a clinical trial, some patients given a sugar pill (placebo) reported significant improvement in their symptoms, simply because they believed they were receiving real treatment. This demonstrates the power of belief on health outcomes.",
+    explanation: "The placebo effect occurs when a person experiences a real improvement in their condition after receiving a treatment with no therapeutic effect (like a sugar pill). It highlights the powerful connection between mind and body, and the role of expectation in healing.",
     category: "Cognitive Biases",
     icon: "cognitive",
+    keywords: ["mind-body connection", "belief", "expectation", "healing", "medical treatment", "psychosomatic", "suggestion", "clinical trials", "health psychology", "power of mind", "fake treatment", "psychological phenomenon", "pain relief", "symptom improvement", "nocebo effect"]
   },
   {
-    term: "Sunk Cost Fallacy",
-    story: "Priya continued watching a three-hour movie she wasn't enjoying because she'd already invested an hour and paid for the ticket, thinking, 'I've come this far, I might as well finish it.'",
-    explanation: "The sunk cost fallacy is our tendency to continue an endeavor once we've invested resources in it, even when continuing clearly costs more than it benefits us.",
-    category: "Decision Making",
+    term: "Learned Helplessness",
+    story: "After failing several job interviews despite his best efforts, Tom started to believe he would never find a job and stopped trying. He had developed learned helplessness.",
+    explanation: "Learned helplessness occurs when a person or animal endures repeatedly painful or otherwise aversive stimuli which it is unable to escape or avoid. After such experience, the organism often fails to learn escape or avoidance in new situations where such behavior would be effective. In essence, the organism learns that it is helpless.",
+    category: "Behavioral Patterns",
     icon: "behavioral",
+    keywords: ["giving up", "passivity", "depression", "lack of control", "motivation loss", "apathy", "pessimism", "resignation", "failure cycle", "victim mentality", "empowerment", "self-efficacy", "overcoming adversity", "psychological state", "behavioral conditioning"]
   },
   {
-    term: "Growth Mindset",
-    story: "When Sam failed his first driving test, he felt disappointed. But instead of giving up, he saw it as a chance to learn and improve. He practiced more and passed the next time. This attitude is called a growth mindset.",
-    explanation: "A growth mindset is the belief that abilities and intelligence can be developed through effort, learning, and persistence. It helps people embrace challenges and learn from setbacks.",
-    category: "Self Development",
+    term: "Trauma",
+    story: "After a serious car accident, Maria experienced flashbacks, nightmares, and intense anxiety for months. She was diagnosed with PTSD, a condition that can develop after experiencing or witnessing a traumatic event.",
+    explanation: "Psychological trauma is an emotional response to a deeply distressing or life-threatening event. It can lead to long-term reactions such as unpredictable emotions, flashbacks, strained relationships, and even physical symptoms. Examples include accidents, abuse, natural disasters, or combat.",
+    category: "Mental Health Conditions",
+    icon: "emotional",
+    keywords: ["PTSD", "post-traumatic stress", "flashbacks", "nightmares", "anxiety", "emotional distress", "abuse", "accidents", "disaster", "coping with trauma", "healing", "mental health support", "psychological injury", "stress disorders", "emotional shock"]
+  },
+  {
+    term: "Stigma (Mental Health)",
+    story: "John was hesitant to tell his friends about his struggles with depression because he feared they would judge him or treat him differently. This fear was due to the social stigma surrounding mental illness.",
+    explanation: "Mental health stigma refers to societal disapproval, or when society places shame on people who live with a mental illness or seek help for emotional distress. Stigma can lead to discrimination, reluctance to seek help, and social isolation.",
+    category: "Social Issues",
+    icon: "social",
+    keywords: ["discrimination", "shame", "judgment", "social exclusion", "mental illness awareness", "anti-stigma", "support seeking", "mental health advocacy", "societal attitudes", "prejudice", "misconceptions", "mental wellness", "openness", "acceptance", "community support"]
+  },
+  {
+    term: "Mind-Body Connection",
+    story: "Sarah noticed that when she was stressed about exams (mind), she often got headaches and stomach issues (body). Recognizing this connection helped her manage stress better to improve her physical well-being.",
+    explanation: "The mind-body connection refers to the complex interplay between an individual's mental and emotional state and their physical health. Psychological factors can directly influence physiological processes, and vice-versa.",
+    category: "Wellbeing",
+    icon: "neuroscience",
+    keywords: ["psychosomatic", "stress and health", "holistic health", "mental influence on physical", "wellness", "psychoneuroimmunology", "biofeedback", "health psychology", "emotional health", "physical symptoms", "well-being", "integrated health", "somatic experience", "body awareness", "mental well-being"]
+  },
+  {
+    term: "Emotional Regulation",
+    story: "When Mark felt a surge of anger after a disagreement, instead of lashing out, he took a few deep breaths and consciously decided to express his frustration calmly. This is an example of emotional regulation.",
+    explanation: "Emotional regulation is the ability to respond to the ongoing demands of experience with the range of emotions in a manner that is socially tolerable and sufficiently flexible to permit spontaneous reactions as well as the ability to delay spontaneous reactions as needed. It can also be defined as extrinsic and intrinsic processes responsible for monitoring, evaluating, and modifying emotional reactions.",
+    category: "Coping Skills",
+    icon: "emotional",
+    keywords: ["self-control", "managing emotions", "coping strategies", "emotional intelligence", "impulse control", "anger management", "anxiety management", "stress reduction", "emotional balance", "mood regulation", "psychological flexibility", "mindfulness", "emotional resilience", "self-awareness", "emotional health"]
+  },
+  {
+    term: "Grief",
+    story: "After losing her beloved pet, Maria experienced a period of intense sadness, denial, and eventually, acceptance. She learned that grief is a complex process with many different emotions and stages, unique to each person.",
+    explanation: "Grief is the natural emotional, physical, and spiritual response to loss. It can be triggered by various events, such as the death of a loved one, the end of a significant relationship, job loss, or other major life changes. Grief is a personal and multifaceted experience.",
+    category: "Emotional Experiences",
+    icon: "emotional",
+    keywords: ["bereavement", "loss", "mourning", "sadness", "coping with loss", "stages of grief", "emotional pain", "healing", "acceptance", "bereavement support", "life changes", "emotional processing", "sorrow", "heartbreak", "letting go"]
+  },
+  {
+    term: "Self-Efficacy",
+    story: "Despite never having coded before, Sarah believed she could learn and successfully build a website for her project. This belief in her own ability to succeed is called self-efficacy.",
+    explanation: "Self-efficacy is an individual's belief in their capacity to execute behaviors necessary to produce specific performance attainments. It reflects confidence in the ability to exert control over one's own motivation, behavior, and social environment.",
+    category: "Self Perception",
     icon: "cognitive",
+    keywords: ["confidence", "belief in abilities", "competence", "mastery", "achievement", "goal setting", "motivation", "personal agency", "resilience", "empowerment", "can-do attitude", "performance", "skill development", "self-belief", "psychological strength"]
+  },
+  {
+    term: "Social Comparison Theory",
+    story: "Tom often felt inadequate after scrolling through social media and seeing curated posts of his friends' successes and perfect lives. He was engaging in upward social comparison, which negatively impacted his self-esteem.",
+    explanation: "Social comparison theory, initially proposed by Leon Festinger, centers on the belief that individuals determine their own social and personal worth based on how they stack up against others. People compare themselves to others to make accurate evaluations of themselves, but this can also lead to feelings of envy or inadequacy (upward comparison) or superiority (downward comparison).",
+    category: "Social Perception",
+    icon: "social",
+    keywords: ["comparing to others", "self-esteem", "social media effects", "envy", "self-evaluation", "peer influence", "upward comparison", "downward comparison", "social psychology", "identity", "self-worth", "keeping up with the Joneses", "social influence", "perception of others", "relative deprivation"]
+  },
+  {
+    term: "Bystander Effect",
+    story: "When someone fainted on a busy street, many people just walked by, assuming someone else would help. This diffusion of responsibility, where individuals are less likely to help when others are present, is known as the bystander effect.",
+    explanation: "The bystander effect is a social psychological phenomenon in which individuals are less likely to offer help to a victim when there are other people present. The greater the number of bystanders, the less likely it is that any one of them will help, due to diffusion of responsibility and social influence.",
+    category: "Social Influence",
+    icon: "social",
+    keywords: ["diffusion of responsibility", "helping behavior", "social inaction", "group behavior", "emergency situations", "social psychology", "prosocial behavior", "apathy", "social conformity", "pluralistic ignorance", "group dynamics", "moral responsibility", "social intervention", "Kitty Genovese", "social inhibition"]
+  },
+  {
+    term: "Intrinsic and Extrinsic Motivation",
+    story: "Maria paints because she loves the creative process and the joy it brings her (intrinsic motivation). John, on the other hand, works extra hours primarily to earn a bonus (extrinsic motivation).",
+    explanation: "Intrinsic motivation involves engaging in a behavior because it is personally rewarding; essentially, performing an activity for its own sake rather than the desire for some external reward. Extrinsic motivation occurs when we are motivated to perform a behavior or engage in an activity to earn a reward or avoid punishment.",
+    category: "Motivation & Needs",
+    icon: "behavioral",
+    keywords: ["motivation types", "rewards", "personal satisfaction", "goal achievement", "passion", "incentives", "punishment avoidance", "internal drive", "external factors", "job satisfaction", "learning", "performance", "autonomy", "mastery", "purpose"]
+  },
+  {
+    term: "Operant Conditioning",
+    story: "A dog learns to sit (behavior) when its owner says \"sit\" because it receives a treat (positive reinforcement) each time it performs the action correctly. This learning through consequences is operant conditioning.",
+    explanation: "Operant conditioning is a method of learning that employs rewards and punishments for behavior. Through operant conditioning, an association is made between a behavior and a consequence (whether negative or positive) for that behavior.",
+    category: "Learning Theories",
+    icon: "behavioral",
+    keywords: ["behaviorism", "reinforcement", "punishment", "B.F. Skinner", "learning by consequence", "behavior modification", "training", "rewards system", "positive reinforcement", "negative reinforcement", "shaping behavior", "animal training", "child development", "habit formation"]
+  },
+  {
+    term: "Classical Conditioning",
+    story: "Every time a specific jingle played on TV (neutral stimulus), it was followed by a funny cartoon (unconditioned stimulus) that made a child laugh (unconditioned response). Soon, just hearing the jingle (conditioned stimulus) made the child feel happy (conditioned response), even before the cartoon appeared. This is classical conditioning.",
+    explanation: "Classical conditioning (also known as Pavlovian conditioning) is a learning process in which an association is made between a previously neutral stimulus and a stimulus that naturally evokes a response. After repeated pairings, the neutral stimulus alone can evoke the response.",
+    category: "Learning Theories",
+    icon: "behavioral",
+    keywords: ["Pavlov\'s dogs", "associative learning", "stimulus-response", "conditioned reflex", "unconditioned stimulus", "conditioned stimulus", "learning by association", "phobias", "advertising techniques", "emotional responses", "behavioral psychology", "Ivan Pavlov", "neutral stimulus", "automatic response"]
+  },
+  {
+    term: "Observational Learning",
+    story: "A child watches their older sibling politely ask for a toy and then get to play with it. The child then imitates this polite behavior, hoping for the same outcome. This is observational learning.",
+    explanation: "Observational learning, also called social learning theory, occurs when an observer\'s behavior changes after viewing the behavior of a model. An observer\'s behavior can be affected by the positive or negative consequences—called vicarious reinforcement or vicarious punishment— of a model\'s behavior.",
+    category: "Learning Theories",
+    icon: "social",
+    keywords: ["social learning", "modeling", "imitation", "Albert Bandura", "vicarious reinforcement", "role models", "learning by watching", "behavior acquisition", "social behavior", "child development", "skill learning", "cultural transmission", "mirror neurons", "social influence"]
+  },
+  {
+    term: "Erikson's Stages of Psychosocial Development",
+    story: "Throughout his life, from infancy (trust vs. mistrust) to old age (integrity vs. despair), Alex faced different psychosocial crises that shaped his personality and sense of self. Understanding Erikson's stages helped him make sense of these developmental challenges.",
+    explanation: "Erik Erikson proposed a theory of psychosocial development comprising eight stages from infancy to adulthood. During each stage, the person experiences a psychosocial crisis which could have a positive or negative outcome for personality development. Successfully navigating these crises leads to the development of psychological virtues.",
+    category: "Developmental Psychology",
+    icon: "social",
+    keywords: ["lifespan development", "personality development", "psychosocial crises", "identity formation", "trust vs mistrust", "autonomy vs shame", "initiative vs guilt", "industry vs inferiority", "identity vs role confusion", "intimacy vs isolation", "generativity vs stagnation", "integrity vs despair", "human development", "life stages"]
+  },
+  {
+    term: "Piaget's Stages of Cognitive Development",
+    story: "A teacher observed that younger children in her class struggled with abstract concepts (concrete operational stage), while older students could think hypothetically (formal operational stage). This aligns with Piaget\'s theory of how children's thinking develops.",
+    explanation: "Jean Piaget\'s theory of cognitive development suggests that children move through four different stages of mental development. His theory focuses not only on understanding how children acquire knowledge, but also on understanding the nature of intelligence. The stages are: sensorimotor, preoperational, concrete operational, and formal operational.",
+    category: "Developmental Psychology",
+    icon: "cognitive",
+    keywords: ["child psychology", "cognitive growth", "intellectual development", "sensorimotor stage", "preoperational stage", "concrete operational stage", "formal operational stage", "learning in children", "thinking skills", "problem solving development", "Jean Piaget", "constructivism", "schemas", "assimilation", "accommodation"]
+  },
+  {
+    term: "Nature vs. Nurture",
+    story: "Two identical twins were raised in different environments. While they shared many genetic traits (nature), their personalities and interests varied significantly due to their different upbringings and experiences (nurture).",
+    explanation: "The nature versus nurture debate involves the extent to which particular aspects of behavior are a product of either inherited (i.e., genetic) or acquired (i.e., learned) characteristics. Most psychologists now agree that both nature and nurture interact to shape an individual.",
+    category: "Core Concepts",
+    icon: "cognitive", // Changed "brain" to "cognitive"
+    keywords: ["genetics", "environment", "heredity", "learned behavior", "innate traits", "developmental influences", "behavioral genetics", "epigenetics", "twin studies", "psychological traits", "personality origins", "intelligence debate", "human development", "biology vs experience"]
+  },
+  {
+    term: "Correlation vs. Causation",
+    story: "A study found that ice cream sales and crime rates are correlated (both increase in summer). However, this doesn\'t mean eating ice cream causes crime (causation). A third factor, warm weather, likely influences both.",
+    explanation: "A common error in reasoning is to confuse correlation with causation. Correlation indicates that two variables tend to occur together, but it does not imply that one causes the other. Causation means that a change in one variable directly produces a change in another. Establishing causation requires controlled experiments.",
+    category: "Research Methods",
+    icon: "cognitive",
+    keywords: ["statistical reasoning", "research bias", "logical fallacies", "critical thinking", "scientific method", "data interpretation", "spurious correlation", "experimental design", "third variable problem", "cause and effect", "misinterpretation", "research literacy", "psychological research", "data analysis"]
+  },
+  {
+    term: "Emotional Labor",
+    story: "As a customer service representative, Maria had to maintain a cheerful and helpful demeanor all day, even when dealing with angry customers. This effort to manage her emotions as part of her job is known as emotional labor.",
+    explanation: "Emotional labor refers to the process of managing feelings and expressions to fulfill the emotional requirements of a job. More specifically, workers are expected to regulate their emotions during interactions with customers, co-workers and superiors. This includes analysis and decision making in terms of the expression of emotion, whether or not it is actually felt.",
+    category: "Work & Lifestyle",
+    icon: "social",
+    keywords: ["work stress", "customer service", "emotion management", "job demands", "burnout risk", "professionalism", "interpersonal skills", "workplace well-being", "emotional exhaustion", "surface acting", "deep acting", "emotional dissonance", "people-facing roles", "emotional toll"]
   },
   {
     term: "Imposter Syndrome",
-    story: "Maya started a new job and felt like she didn't belong, even though she was qualified. She worried others would find out she was a 'fraud.' This feeling is known as imposter syndrome.",
-    explanation: "Imposter syndrome is the persistent feeling of self-doubt and fear of being exposed as a fraud, despite evidence of competence. It's common among high achievers and can be managed by recognizing and challenging these thoughts.",
+    story: "Despite numerous accolades and positive feedback, Dr. Chen often felt like a fraud, fearing that someday everyone would discover she wasn't as competent as they thought. This persistent self-doubt is characteristic of imposter syndrome.",
+    explanation: "Imposter syndrome is an internal experience of believing that you are not as competent as others perceive you to be. While this definition is usually narrowly applied to intelligence and achievement, it has links to perfectionism and the social context. It is often accompanied by feelings of anxiety and fear of being 'found out'.", // Corrected syntax and removed invalid characters
     category: "Self Perception",
     icon: "emotional",
+    keywords: ["self-doubt", "fraud", "inadequacy", "perfectionism", "fear of failure", "achievement anxiety", "competence", "high-achievers", "workplace anxiety", "academic anxiety", "feeling like a fake", "validation seeking", "overcoming self-doubt", "professional insecurity"]
   },
   {
-    term: "Resilience",
-    story: "After losing his job, Alex felt lost. But he reached out for support, learned new skills, and eventually found a new opportunity. His ability to bounce back is called resilience.",
-    explanation: "Resilience is the capacity to recover from difficulties and adapt to change. It involves emotional strength, support systems, and a positive outlook.",
-    category: "Coping Skills",
-    icon: "emotional",
-  },
-  {
-    term: "Mindfulness",
-    story: "During a stressful day, Tara took a few minutes to focus on her breath and notice her surroundings. She felt calmer and more present. This practice is called mindfulness.",
-    explanation: "Mindfulness is the practice of paying attention to the present moment, non-judgmentally. It can reduce stress, improve focus, and enhance well-being.",
+    term: "Mindfulness-Based Stress Reduction (MBSR)",
+    story: "To cope with chronic pain and stress, David enrolled in an MBSR program. Through guided meditation, body scans, and gentle yoga, he learned to relate differently to his pain and experienced a significant reduction in stress.",
+    explanation: "Mindfulness-Based Stress Reduction (MBSR) is an eight-week evidence-based program that offers secular, intensive mindfulness training to assist people with stress, anxiety, depression and pain. Developed by Jon Kabat-Zinn, MBSR uses a combination of mindfulness meditation, body awareness, yoga and exploration of patterns of thinking, feeling and action.",
     category: "Wellbeing Practices",
     icon: "mindfulness",
+    keywords: ["stress reduction", "meditation", "mindfulness training", "Jon Kabat-Zinn", "chronic pain management", "anxiety relief", "depression support", "body scan", "mindful movement", "well-being program", "mental health", "self-care", "awareness practice", "therapeutic mindfulness", "holistic health"]
   },
   {
-    term: "Confirmation Bias",
-    story: "John firmly believed that his coworkers didn't like him. Whenever someone didn't smile at him, he saw it as proof. But he ignored all the times they invited him to lunch or asked for his input. This selective attention is called confirmation bias.",
-    explanation: "Confirmation bias is our tendency to search for, interpret, and remember information that confirms our existing beliefs while ignoring contradicting evidence.",
-    category: "Thought Patterns",
+    term: "Positive Psychology",
+    story: "Instead of only focusing on what was wrong, Sarah\\'s therapist also helped her identify and cultivate her strengths, positive emotions, and meaningful engagement in life. This approach is central to positive psychology.",
+    explanation: "Positive psychology is the scientific study of what makes life most worth living – focusing on both individual and societal well-being. It seeks to understand and help people to live a flourishing life, by focusing on strengths, positive emotions, meaning, relationships, and accomplishment (PERMA model by Martin Seligman).",
+    category: "Therapeutic Approaches",
     icon: "cognitive",
+    keywords: ["strengths", "well-being", "happiness", "flourishing", "Martin Seligman", "PERMA model", "optimism", "resilience", "gratitude", "meaning in life", "positive emotions", "human potential", "life satisfaction", "mental wellness", "thriving"]
   },
   {
-    term: "Emotional Intelligence",
-    story: "When Emma's friend was upset about failing an exam, she listened without judgment, validated their feelings, and only then gently suggested study strategies. Her ability to understand and respond appropriately demonstrates emotional intelligence.",
-    explanation: "Emotional intelligence is the ability to recognize, understand and manage our own emotions, as well as recognize, understand and influence the emotions of others.",
-    category: "Social Skills",
-    icon: "social",
-  },
-  {
-    term: "Anchoring Bias",
-    story: "When buying a car, Alex saw the sticker price of $30,000. After negotiating, he felt triumphant getting it for $27,000, not realizing the dealer's cost was only $23,000. The initial price 'anchored' his perception of value.",
-    explanation: "Anchoring is our tendency to rely too heavily on the first piece of information we encounter (the 'anchor') when making decisions, even when the anchor has little relevance to the decision at hand.",
-    category: "Cognitive Biases",
-    icon: "cognitive",
-  },
-  {
-    term: "Paradox of Choice",
-    story: "Michelle stood frozen in the cereal aisle, overwhelmed by 50 different options. After 10 minutes of comparing, she left without buying anything. Too many choices had paralyzed her decision-making.",
-    explanation: "The paradox of choice suggests that while freedom of choice is positive, too many options can lead to decision paralysis, anxiety, and dissatisfaction with our eventual choice.",
-    category: "Decision Making",
-    icon: "behavioral",
-  },
-  {
-    term: "Loss Aversion",
-    story: "James refused to sell his old watch for $200, even though he never wore it and a new model costs $150. The pain of losing the watch outweighed the rational financial benefit.",
-    explanation: "Loss aversion describes our tendency to prefer avoiding losses over acquiring equivalent gains. The psychological impact of losing is typically twice as powerful as the pleasure of gaining.",
-    category: "Behavioral Economics",
-    icon: "behavioral",
-  },
-  {
-    term: "Social Proof",
-    story: "Lisa was undecided about a restaurant until she saw a long line outside. 'It must be good if so many people are waiting,' she thought, joining the queue without checking reviews.",
-    explanation: "Social proof is our tendency to adopt the beliefs or actions of a group of people we trust or identify with. We assume others' collective actions reflect correct behavior in situations of uncertainty.",
-    category: "Social Influence",
-    icon: "social",
-  },
-  {
-    term: "Dunning-Kruger Effect",
-    story: "After one programming class, David felt he could build a professional app and was confused when companies wouldn't hire him. His limited knowledge prevented him from understanding how much more he needed to learn.",
-    explanation: "The Dunning-Kruger effect is a cognitive bias where people with limited knowledge in a domain overestimate their competence, while experts tend to underestimate their abilities relative to others.",
-    category: "Self Perception",
-    icon: "cognitive",
-  },
-  {
-    term: "Reciprocity",
-    story: "When the waiter brought Sarah a free dessert sample, she felt obligated to order a full dessert even though she was already full.",
-    explanation: "Reciprocity is our tendency to feel obligated to return favors after receiving something, even when unsolicited. This powerful social norm underlies much human cooperation and social exchange.",
-    category: "Social Influence",
-    icon: "social",
-  },
-  {
-    term: "Scarcity Principle",
-    story: "Tim wasn't interested in the concert until he heard 'Only 10 tickets left!' Suddenly, he urgently wanted to go and bought a ticket immediately.",
-    explanation: "The scarcity principle refers to our tendency to value things more when they are rare or in limited supply. Opportunities seem more valuable when their availability is limited.",
-    category: "Behavioral Economics",
-    icon: "behavioral",
-  },
-  {
-    term: "Habit Loop",
-    story: "Every time Jenny felt stressed (cue), she checked social media (routine), which gave her temporary distraction (reward). This cycle repeated automatically whenever stress appeared.",
-    explanation: "The habit loop is a neurological pattern consisting of a cue (trigger), routine (behavior), and reward. Understanding this loop is key to forming new habits or breaking unwanted ones.",
-    category: "Behavioral Patterns",
-    icon: "behavioral",
-  },
-  {
-    term: "Fundamental Attribution Error",
-    story: "When a colleague missed a deadline, Ryan thought, 'She's so lazy and disorganized.' When he missed a deadline the following week, he explained, 'I had so many unexpected emergencies this week.'",
-    explanation: "The fundamental attribution error is our tendency to attribute others' behavior to their character while explaining our own behavior based on situational factors.",
-    category: "Social Perception",
-    icon: "social",
-  },
-  {
-    term: "Hedonic Adaptation",
-    story: "After years of dreaming about it, Maria finally got her luxury car. She felt ecstatic for weeks, but within months, the car just felt normal and no longer brought the same joy.",
-    explanation: "Hedonic adaptation is our tendency to quickly return to a relatively stable level of happiness despite major positive or negative life changes. We adapt to new situations, possessions, or life circumstances.",
-    category: "Wellbeing",
-    icon: "emotional",
-  },
-  {
-    term: "Spotlight Effect",
-    story: "After spilling water on his shirt, Michael felt everyone at the meeting was staring at the stain. In reality, hardly anyone noticed.",
-    explanation: "The spotlight effect is the tendency to overestimate how much others notice about us, including our appearance, performance, and mistakes. We feel more observed than we actually are.",
-    category: "Self Perception",
-    icon: "social",
-  },
-  {
-    term: "Hindsight Bias",
-    story: "After the stock market crashed, Paula claimed, 'I knew that was going to happen!' In truth, she had been just as surprised as everyone else.",
-    explanation: "Hindsight bias is our tendency to perceive past events as having been predictable, despite having little or no objective basis for predicting them before they occurred.",
-    category: "Memory Biases",
-    icon: "cognitive",
-  },
-  {
-    term: "Halo Effect",
-    story: "After seeing a charismatic presenter give an excellent talk, Kim immediately assumed he must be intelligent, honest, and kind—without any evidence of these other traits.",
-    explanation: "The halo effect is the tendency for positive impressions of a person in one area to positively influence our opinion of them in other areas.",
-    category: "Social Perception",
-    icon: "social",
-  },
-  {
-    term: "Framing Effect",
-    story: "The doctor told Lin she had a 90% survival rate with the treatment. When she got a second opinion, another doctor said there was a 10% mortality rate. Though the statistics were identical, Lin felt much more optimistic after the first consultation.",
-    explanation: "The framing effect is our tendency to react differently to information depending on whether it's presented as a gain or a loss, even when the underlying facts are the same.",
-    category: "Decision Making",
-    icon: "cognitive",
-  },
-  {
-    term: "Availability Bias",
-    story: "After watching news coverage of a plane crash, Jordan became afraid of flying, even though statistics show it's far safer than driving, which he does daily without worry.",
-    explanation: "Availability bias leads us to overestimate the likelihood of events that come readily to mind, like those that are recent, unusual, or emotionally charged.",
-    category: "Cognitive Biases",
-    icon: "cognitive",
-  },
-  {
-    term: "Zeigarnik Effect",
-    story: "Even though it was 11 PM, Carlos couldn't stop thinking about the unfinished project on his desk. Only after making a detailed plan to complete it tomorrow did his mind finally relax.",
-    explanation: "The Zeigarnik Effect is our tendency to remember interrupted or incomplete tasks better than completed ones. Our brains tend to focus on unfinished business until it's resolved.",
-    category: "Memory",
-    icon: "cognitive",
-  },
-  {
-    term: "Pygmalion Effect",
-    story: "When Mr. Chen told Sam he had great potential in mathematics, Sam started studying harder and eventually excelled in the subject, despite his previous average performance.",
-    explanation: "The Pygmalion Effect occurs when higher expectations lead to an increase in performance. When others believe in our abilities, we often rise to meet those expectations.",
-    category: "Self Development",
-    icon: "social",
-  },
-  {
-    term: "Sunk Cost Fallacy",
-    story: "Priya continued watching a three-hour movie she wasn't enjoying because she'd already invested an hour and paid for the ticket, thinking, 'I've come this far, I might as well finish it.'",
-    explanation: "The sunk cost fallacy is our tendency to continue an endeavor once we've invested resources in it, even when continuing clearly costs more than it benefits us.",
-    category: "Decision Making",
-    icon: "behavioral",
-  },
-  {
-    term: "Peak-End Rule",
-    story: "Despite standing in line for 45 minutes at the amusement park, Daniel remembered the experience fondly because the ride was thrilling (the peak) and the exit led through a gift shop where he found a souvenir he loved (the end).",
-    explanation: "The peak-end rule suggests that people judge experiences primarily based on how they felt at the most intense point and at the end, rather than the average of every moment.",
-    category: "Memory",
-    icon: "cognitive",
-  },
-  {
-    term: "Mere Exposure Effect",
-    story: "Initially, Leila disliked the new song on the radio, but after hearing it play several times over the week, she found herself humming along and eventually downloading it.",
-    explanation: "The mere exposure effect is the tendency to develop a preference for things simply because we are familiar with them. Repeated exposure increases liking.",
-    category: "Social Influence",
-    icon: "behavioral",
-  },
-  {
-    term: "Self-Serving Bias",
-    story: "After acing the exam, Marcus attributed his success to his intelligence and hard work. When he failed the next one, he blamed the unclear questions and noisy testing environment.",
-    explanation: "Self-serving bias is our tendency to attribute positive events to our own character but attribute negative events to external factors.",
-    category: "Self Perception",
-    icon: "cognitive",
-  },
-  {
-    term: "Barnum Effect",
-    story: "Reading her horoscope, Rachel was amazed at how accurately it described her as 'sometimes outgoing, sometimes reserved,' not realizing the description was vague enough to apply to almost anyone.",
-    explanation: "The Barnum Effect occurs when individuals believe that personality descriptions apply specifically to them, despite the fact that the description is vague and general enough to apply to a wide range of people.",
-    category: "Self Perception",
-    icon: "cognitive",
-  },
-  {
-    term: "Ikea Effect",
-    story: "Even though professionally made furniture was available at a similar price, Tyler valued his wobbly bookshelf more because he had spent a whole weekend building it himself.",
-    explanation: "The Ikea Effect is the tendency for people to place higher value on things they partially created themselves, regardless of the quality of the end result.",
-    category: "Behavioral Economics",
-    icon: "behavioral",
-  },
-  {
-    term: "Dunbar's Number",
-    story: "Although Maya had 1,500 social media connections, she realized she only maintained meaningful relationships with about 150 people, and truly close connections with far fewer.",
-    explanation: "Dunbar's Number suggests that humans can maintain stable social relationships with only about 150 people due to cognitive limitations. Beyond this number, the relationships become less stable and meaningful.",
-    category: "Social Relationships",
-    icon: "social",
-  },
-  {
-    term: "Impostor Phenomenon",
-    story: "Despite receiving a promotion, Eliot worried that he had fooled everyone and would eventually be exposed as not qualified for the job, even though his work consistently received praise.",
-    explanation: "Impostor phenomenon involves persistent feelings of self-doubt and fear of being exposed as a fraud despite evidence of competence and accomplishment.",
-    category: "Self Perception",
-    icon: "emotional",
-  },
-  {
-    term: "Cognitive Load",
-    story: "While trying to follow a complex recipe, respond to text messages, and watch her toddler, Sofia made several cooking mistakes that she wouldn't normally make.",
-    explanation: "Cognitive load refers to the total amount of mental effort being used in working memory. When cognitive load exceeds our capacity, performance suffers and errors increase.",
-    category: "Cognitive Processes",
-    icon: "cognitive",
-  },
-  {
-    term: "Decoy Effect",
-    story: "The coffee shop offered a small drink for $3 and a large for $4.50. After adding a medium for $4.25, sales of the large drink increased dramatically.",
-    explanation: "The decoy effect occurs when preferences between two options change due to the addition of a third (decoy) option that is designed to make one of the original options look more attractive by comparison.",
-    category: "Decision Making",
-    icon: "behavioral",
-  },
-  {
-    term: "Flow State",
-    story: "While painting, Ana lost track of time completely. Hours passed without her noticing as she worked in a state of energized focus, fully immersed in the creative process.",
-    explanation: "Flow is the mental state where a person is fully immersed and engaged in an activity, with energized focus and enjoyment in the process. Time seems to distort and self-consciousness disappears.",
-    category: "Wellbeing",
-    icon: "mindfulness",
-  },
-  {
-    term: "Boundary Setting",
-    story: "After feeling overwhelmed by constant work emails on weekends, Raj informed his colleagues he wouldn't be responding until Monday. Despite initial anxiety about setting this limit, his stress levels decreased dramatically.",
-    explanation: "Boundary setting involves defining what behavior you will accept from others and what you will not. Healthy boundaries protect your wellbeing and help clarify expectations in relationships.",
-    category: "Wellbeing Practices",
-    icon: "mindfulness",
-  },
-  {
-    term: "Diffusion of Responsibility",
-    story: "When a man collapsed on the crowded train, everyone looked around expecting someone else to help. Only when one person took action did others join in to assist.",
-    explanation: "Diffusion of responsibility occurs when individuals are less likely to take action or feel responsibility in the presence of others. The larger the group, the less personal responsibility each individual feels.",
-    category: "Social Influence",
-    icon: "social",
-  },
-  {
-    term: "Priming",
-    story: "Before taking an exam, Talia read inspirational quotes about intelligence and potential. She felt more confident and performed better than when she hadn't done this preparation.",
-    explanation: "Priming is when exposure to one stimulus influences how we respond to a subsequent, related stimulus. These cues can be subtle yet significantly impact our thoughts and behaviors.",
-    category: "Cognitive Processes",
-    icon: "cognitive",
+    term: "Music Therapy",
+    story: "To manage her anxiety and improve her mood, Emma started listening to classical music and practicing piano regularly. This use of music as a therapeutic tool is similar to what music therapy offers.",
+    explanation: "Music therapy is an established health profession that uses music interventions to address physical, emotional, cognitive, and social needs of individuals. It can promote healing and enhance quality of life.",
+    category: "Psychological Approaches",
+    icon: "cognitive", // Corrected syntax
+    keywords: [ // Corrected and updated keywords for Music Therapy
+      "music intervention",
+      "sound therapy",
+      "expressive arts",
+      "emotional regulation",
+      "cognitive support",
+      "social engagement",
+      "therapeutic music",
+      "vibrational healing",
+      "alternative medicine",
+      "non-verbal communication",
+      "stress relief",
+      "well-being"
+    ]
   }
 ];
 
-export default function Learn() {
-  const navigate = useNavigate();
+export function Home() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [selected, setSelected] = useState<number | null>(null);
-  const storyRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Initialize with all terms by combining them here
+  const [filteredTerms, setFilteredTerms] = useState<PsychTerm[]>([...terms, ...moreConcepts, ...moreConcepts2, ...moreConcepts3, ...neuroscienceConcepts, ...navalConcepts]);
+  // const containerRef = useRef<HTMLDivElement | null>(null);
+  // Add a state to track which cards are expanded
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+  // Add a state to track which filter is active
+  const [activeFilter, setActiveFilter] = useState<string>('all');
 
-  // Combine all concepts from different files
-  const allTerms = [...terms, ...moreConcepts, ...moreConcepts2, ...moreConcepts3, ...neuroscienceConcepts, ...navalConcepts];
-  
-  // Remove duplicate terms (based on the term name)
-  const uniqueTerms = allTerms.filter((term, index, self) => 
-    index === self.findIndex((t) => t.term === term.term)
-  );
-  
-  // Get all unique categories for the filter
-  const categories = Array.from(new Set(uniqueTerms.map(term => term.category)));
-  
-  // Filter terms based on search and category
-  const filteredTerms = uniqueTerms.filter(term => {
-    const matchesSearch = term.term.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                        term.explanation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        term.category.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = activeCategory ? term.category === activeCategory : true;
-    
-    return matchesSearch && matchesCategory;
-  });
+  // Categories for filtering defined in component usage
 
-  // Auto-scroll to the story when expanded
+  // Function to toggle card expansion
+  const toggleCardExpansion = (term: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent card click from navigating
+    setExpandedCards(prev => ({
+      ...prev,
+      [term]: !prev[term]
+    }));
+  };
+
   useEffect(() => {
-    if (selected !== null && storyRefs.current[selected]) {
-      setTimeout(() => {
-        storyRefs.current[selected]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 300);
-    }
-  }, [selected]);
+    // Apply CSS animation styles to the document
+    const styleSheet = document.createElement("style");
+    styleSheet.type = "text/css";
+    styleSheet.innerText = animationStyles;
+    document.head.appendChild(styleSheet);
 
-  // Navigate to practices page
-  const goToPractices = () => {
-    navigate('/practices');
+    // Initial focus on the search input
+    const timer = setTimeout(() => {
+      const input = document.querySelector("input[name='search']") as HTMLElement;
+      input?.focus({ preventScroll: true });
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // Filter terms based on search query and active filter
+    const allTermsForFiltering = [...terms, ...moreConcepts, ...moreConcepts2, ...moreConcepts3, ...neuroscienceConcepts, ...navalConcepts]; 
+    const filtered = allTermsForFiltering.filter(term => {
+      // Apply search query filter
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = query === '' || 
+        term.term.toLowerCase().includes(query) ||
+        term.explanation.toLowerCase().includes(query) ||
+        term.story.toLowerCase().includes(query) ||
+        term.category.toLowerCase().includes(query) ||
+        (term.keywords?.some(keyword => keyword.toLowerCase().includes(query)) ?? false);
+      
+      // Also apply category filter if not 'all'
+      if (!matchesSearch) return false;
+      
+      if (activeFilter === 'all') return true;
+      if (activeFilter === 'naval' && term.icon === 'naval') return true;
+      if (activeFilter === 'neuroscience' && term.icon === 'neuroscience') return true;
+      if (activeFilter === 'habits' && (term.category.toLowerCase().includes('habit') || 
+                                       (term.keywords?.some(k => k.toLowerCase().includes('habit')) ?? false))) return true;
+      if (activeFilter === 'huberman' && (term.keywords?.some(k => k.toLowerCase().includes('huberman')) ?? false)) return true;
+      if (activeFilter === 'wisdom' && (term.category.toLowerCase().includes('wisdom') || 
+                                      (term.keywords?.some(k => k.toLowerCase().includes('wisdom')) ?? false))) return true;
+      if (activeFilter === 'psychology' && term.category.toLowerCase().includes('psycholog')) return true;
+      if (activeFilter === 'wellbeing' && (term.category.toLowerCase().includes('wellbeing') || 
+                                        term.category.toLowerCase().includes('well-being'))) return true;
+      
+      return false;
+    });
+
+    setFilteredTerms(filtered);
+  }, [searchQuery, activeFilter]);
+
+  // Modified to handle card expansion/collapse instead of navigation
+  const handleTermSelect = (term: PsychTerm, event: React.MouseEvent) => {
+    // Toggle card expansion instead of navigating
+    toggleCardExpansion(term.term, event);
   };
 
   return (
-    <div className="py-4 sm:py-8 mx-auto px-2 sm:px-4">
-      <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
-      
-      <div className="mx-auto max-w-6xl">
-        {/* Header with title and search */}
-        <div className="mb-6 sm:mb-8 px-2 sm:px-8">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl text-center font-bold text-[#06C4D5] font-happy-monkey lowercase mb-2">
+    <div className="min-h-screen flex flex-col p-[20px] bg-white" id="learn-page" aria-label="Psychology Concepts Learning Page">
+      {/* Title and Filters Container (copied from Practices) */}
+      <div className="flex flex-col justify-center items-center p-0 gap-[20px] w-full h-[74px] bg-white mb-4" id="learn-title-filters-container">
+        {/* Page Title */}
+        <div className="w-full h-[18px] text-center" id="learn-page-title">
+          <span className="font-['Happy_Monkey'] font-normal text-[16px] leading-[18px] text-center lowercase text-[#04C4D5]">
             psychology, neuroscience & wisdom
-          </h1>
-          <p className="text-black text-center font-happy-monkey lowercase mb-4 sm:mb-6 text-sm sm:text-base">
-            explore key concepts to understand yourself and the world
-          </p>
-          
-          {/* Search input - Mobile responsive */}
-          <div className="flex align-center flex-col sm:flex-row justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[10px] max-w-3xl mx-auto bg-white border border-[rgba(6,196,213,0.3)] shadow-[1px_2px_4px_rgba(6,196,213,0.5)] rounded-[10px]">
-            <input
-              type="text"
-              className={`flex-1 bg-transparent border-none text-center text-sm sm:text-base ${searchQuery ? 'text-[#06C4D5]' : 'text-[#06C4D5]'} placeholder-[#06C4D5] font-happy-monkey lowercase focus:outline-none w-full min-h-[44px] px-2`}
-              placeholder="search concepts..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <div className="flex items-center justify-center p-2 sm:p-0">
-              <Search className="text-[#06C4D5]" size={18} />
-            </div>
-          </div>
+          </span>
         </div>
-        
-        {/* Category filters - Enhanced mobile scrolling */}
-        <div className="mb-4 sm:mb-6 px-1 sm:px-3">
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            <button 
-              className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
-                activeCategory === null 
-                  ? 'bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] text-white shadow-sm' 
-                  : 'text-[#06C4D5] border border-[rgba(6,196,213,0.3)] hover:bg-[rgba(6,196,213,0.1)]'
-              }`}
-              onClick={() => setActiveCategory(null)}
-            >
-              all categories
-            </button>
-          
-          {/* Featured categories */}
+        {/* Filter Chips - Horizontal scrolling categories */}
+        <div className="flex flex-row items-start p-0 gap-[4px] w-full h-[36px] overflow-x-auto scrollbar-hide" id="learn-filter-chips-container">
           <button 
-            className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
-              activeCategory === 'Neuroscience' 
-                ? 'bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] text-white shadow-sm' 
-                : 'text-[#06C4D5] border border-[rgba(6,196,213,0.3)] hover:bg-[rgba(6,196,213,0.1)]'
-            }`}
-            onClick={() => setActiveCategory('Neuroscience')}
-          >
-            <span className="flex items-center gap-1">
-              <Zap size={12} className="sm:w-3.5 sm:h-3.5" />
-              neuroscience
-            </span>
+            onClick={() => setActiveFilter('all')} 
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === 'all' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
+            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">all</span>
           </button>
-          
           <button 
-            className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
-              activeCategory === 'Naval Philosophy' 
-                ? 'bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] text-white shadow-sm' 
-                : 'text-[#06C4D5] border border-[rgba(6,196,213,0.3)] hover:bg-[rgba(6,196,213,0.1)]'
-            }`}
-            onClick={() => setActiveCategory('Naval Philosophy')}
-          >
-            <span className="flex items-center gap-1">
-              <Anchor size={12} className="sm:w-3.5 sm:h-3.5" />
-              naval philosophy
-            </span>
+            onClick={() => setActiveFilter('habits')}
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === 'habits' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
+            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">habits</span>
           </button>
-          
-          {/* Other categories */}
-          {categories
-            .filter(category => category !== 'Neuroscience' && category !== 'Naval Philosophy')
-            .map((category) => (
-            <button 
-              key={category}
-              className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all font-happy-monkey lowercase flex-shrink-0 ${
-                activeCategory === category 
-                  ? 'bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] text-white shadow-sm' 
-                  : 'text-[#06C4D5] border border-[rgba(6,196,213,0.3)] hover:bg-[rgba(6,196,213,0.1)]'
-              }`}
-              onClick={() => setActiveCategory(category)}
-            >
-              {category.toLowerCase()}
-            </button>
-          ))}
+          <button 
+            onClick={() => setActiveFilter('naval')}
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === 'naval' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
+            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">naval ravikant</span>
+          </button>
+          <button 
+            onClick={() => setActiveFilter('huberman')}
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === 'huberman' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
+            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">andrew huberman</span>
+          </button>
+          <button 
+            onClick={() => setActiveFilter('neuroscience')}
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === 'neuroscience' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
+            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">neuroscience</span>
+          </button>
+        </div>
+      </div>
+      {/* Search Bar (fixed to bottom, like Practices) */}
+      <div className="fixed bottom-[20px] left-0 w-full flex justify-center z-[2]" id="learn-search-bar-container">
+        <div 
+          className="box-border flex flex-row justify-center items-center px-[20px] py-[10px] gap-[10px] w-full max-w-[380px] h-[52px] bg-[#148BAF] border border-white rounded-[100px]" 
+          id="learn-search-bar"
+          style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+        >
+          <input
+            type="text"
+            placeholder="search concepts"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="flex-grow bg-transparent outline-none font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] lowercase text-[#F7FFFF] placeholder-[#F7FFFF]"
+            id="learn-search-input"
+          />
+          <div className="flex flex-row justify-center items-center w-[31px] h-[32px] flex-none" id="learn-search-button">
+            <svg className="w-[19.28px] h-[20px] text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
           </div>
         </div>
       </div>
-      <div className="max-w-4xl mx-auto">
-      {/* Display count of results - changed from gray to black */}
-      {filteredTerms.length > 0 && (
-        <p className="text-black font-happy-monkey lowercase text-sm mb-4 px-3">
-          showing {filteredTerms.length} {filteredTerms.length === 1 ? 'concept' : 'concepts'}
-          {activeCategory && ` in ${activeCategory.toLowerCase()}`}
-        </p>
-      )}
-      
-      {/* List of concept items */}
-      <div>
-        {filteredTerms.length > 0 ? (
-          filteredTerms.map((term, idx) => {
-            // Determine color shadow and styling based on icon type or category
-            let shadowColor, borderColor, labelColor, labelText, labelBg;
-            
-            // Set default values
-            shadowColor = "rgba(6, 196, 213, 0.2)";  // default teal-ish
-            borderColor = "rgba(6,196,213,0.1)";
-            labelColor = "#06C4D5";
-            labelBg = "rgba(6,196,213,0.15)";
-            
-            // Set icon-specific colors
-            switch(term.icon) {
-              case "cognitive": 
-                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
-                break;
-              case "emotional": 
-                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
-                break;
-              case "behavioral": 
-                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
-                break;
-              case "social": 
-                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
-                break;
-              case "mindfulness": 
-                shadowColor = "rgba(6, 196, 213, 0.2)"; // teal
-                break;
-              case "neuroscience": 
-                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
-                borderColor = "rgba(32, 142, 177, 0.15)";
-                labelColor = "#208EB1";
-                labelBg = "rgba(32, 142, 177, 0.15)";
-                labelText = "Neuroscience";
-                break;
-              case "naval": 
-                shadowColor = "rgba(32, 142, 177, 0.2)"; // blue
-                borderColor = "rgba(32, 142, 177, 0.15)";
-                labelColor = "#208EB1";
-                labelBg = "rgba(32, 142, 177, 0.15)";
-                labelText = "Naval Ravikant";
-                break;
-            }
-            
-            return (
-              <div 
-                key={`${term.term}-${idx}`}
-                className="mb-2 last:mb-0"
-                style={{animation: `fadeIn 0.5s ease-out ${Math.min(idx * 0.05, 1)}s both`}}
+
+      {/* Concepts Grid Container */}
+      <div className="max-w-3xl mx-auto" id="concepts-container">
+        {filteredTerms.length === 0 ? (
+          <p className="text-center text-gray-500 py-4" id="no-results-message">No concepts found. Try a different search term.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-2 sm:px-0" id="concepts-grid" role="list" aria-label="Psychology concepts">
+            {filteredTerms.map((term, index) => (
+              <div
+                key={term.term}
+                id={`concept-card-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
+                className={`box-border flex flex-col justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[8px] w-full
+                  ${expandedCards[term.term] 
+                    ? 'h-auto sm:h-[188.7px] bg-white' 
+                    : 'h-auto sm:h-[92.7px] bg-[#F5F5F5]'} 
+                  border border-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[10px] card-hover cursor-pointer 
+                  ${index === 0 ? 'animate-slide-down' : ''} transition-all duration-300`}
+                onClick={(event) => handleTermSelect(term, event)}
+                role="listitem"
+                aria-expanded={expandedCards[term.term]}
+                aria-label={`${term.term} concept card`}
               >
-                <div className={`p-4 rounded-xl bg-white border transition-all ${
-                  selected === idx ? 'shadow-lg' : 'shadow-md'
-                }`} style={{
-                  boxShadow: `0 4px 20px ${shadowColor}, 0 1px 3px rgba(0,0,0,0.05)`,
-                  borderColor: borderColor
-                }}>
-                  {/* Header row with columns: Icon+Name | Tag | CTA Button */}
-                  <div className="flex items-start justify-between mb-3 gap-2">
-                    {/* Column 1: Icon + Concept Name */}
-                    <div className="flex items-start gap-2 sm:gap-3 flex-grow min-w-0">
-                      {/* Icon */}
-                      <div className="flex-shrink-0 mt-1">
-                        <span className="flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-full shadow-sm" style={{
-                          background: `linear-gradient(135deg, rgba(6, 196, 213, 0.15), ${shadowColor} 120%)`,
-                          boxShadow: `0 2px 8px ${shadowColor}`
-                        }}>
-                          {getIconComponent(term.icon)}
-                        </span>
-                      </div>
-                      
-                      {/* Term title and description */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-base sm:text-lg lg:text-xl font-bold text-[#06C4D5] font-happy-monkey lowercase leading-tight mb-1">
-                          {term.term.toLowerCase()}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-black font-happy-monkey leading-snug opacity-90 line-clamp-2">
-                          {getSummary(term.term, term.category)}
-                        </p>
+                {/* Concept Card Content */}
+                <div className={`flex flex-col items-start p-0 gap-2 sm:gap-[8px] w-full ${expandedCards[term.term] ? '' : 'sm:h-[72.7px]'}`}>
+                  
+                  {/* Concept Card Header */}
+                  <div className="flex flex-row items-center flex-wrap sm:flex-nowrap p-0 gap-2 sm:gap-[10px] w-full min-h-[32.7px]" id={`concept-header-${term.term.toLowerCase().replace(/\s+/g, '-')}`}>
+                    {/* Concept Icon Container */}
+                    <div 
+                      className={`flex flex-col justify-center items-center p-[4px] gap-[4px] min-w-[36.63px] h-[32.7px] 
+                        ${expandedCards[term.term] ? 'bg-[rgba(83,252,255,0.1)]' : 'bg-white'} rounded-[8px]`} 
+                      id={`concept-icon-container-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
+                      aria-hidden="true"
+                    >
+                      <div className="w-[28.63px] h-[24.7px] flex items-center justify-center" id={`concept-icon-${term.term.toLowerCase().replace(/\s+/g, '-')}`}>
+                        {getIconComponent(term.icon)}
                       </div>
                     </div>
                     
-                    {/* Column 2: Category Tag + CTA Button */}
-                    <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 flex-shrink-0">
-                      {/* Category Tag - hidden on mobile, shown on desktop */}
-                      <span className="hidden sm:inline-block px-2 py-1 text-xs font-happy-monkey lowercase rounded-full bg-[rgba(6,196,213,0.1)] text-[#06C4D5] whitespace-nowrap">
-                        {term.category.toLowerCase()}
-                      </span>
-                      
-                      {/* Source label for special categories - hidden on mobile */}
-                      {(term.icon === "naval" || term.icon === "neuroscience") && (
-                        <span 
-                          className="hidden sm:inline-block text-xs px-2 py-1 rounded-md font-happy-monkey lowercase" 
-                          style={{ backgroundColor: labelBg, color: labelColor }}
-                        >
-                          {labelText}
-                        </span>
-                      )}
-                      
-                      {/* CTA Button - mobile responsive */}
-                      <button
-                        onClick={() => setSelected(selected === idx ? null : idx)}
-                        className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-happy-monkey lowercase font-medium bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] text-white shadow-sm hover:shadow-md transition-all hover:scale-105 whitespace-nowrap min-h-[44px] sm:min-h-[36px]"
-                        style={{
-                          background: selected === idx 
-                            ? 'linear-gradient(135deg, #06C4D5, #06C4D5)' 
-                            : 'linear-gradient(135deg, #06C4D5, #06C4D5)'
-                        }}
+                    {/* Concept Title Container */}
+                    <div className="flex flex-row items-center p-0 gap-[10px] min-h-[18px] flex-grow overflow-hidden" id={`concept-title-container-${term.term.toLowerCase().replace(/\s+/g, '-')}`}>
+                      <h3 
+                        className={`font-righteous font-normal text-[14px] sm:text-[16px] leading-tight sm:leading-[18px] flex items-center uppercase truncate
+                          ${expandedCards[term.term] ? 'text-[#FFD400]' : 'text-[#148BAF]'} flex-grow`}
+                        id={`concept-title-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
                       >
-                        {selected === idx ? 'hide example' : 'see example'}
-                      </button>
+                        {term.term}
+                      </h3>
                     </div>
-                  </div>
-                  
-                  {/* Mobile category tag - shown below title on mobile */}
-                  <div className="sm:hidden mb-2">
-                    <span className="inline-block px-2 py-0.5 text-xs font-happy-monkey lowercase rounded-full bg-[rgba(6,196,213,0.1)] text-[#06C4D5]">
-                      {term.category.toLowerCase()}
-                    </span>
-                    {/* Source label for special categories on mobile */}
-                    {(term.icon === "naval" || term.icon === "neuroscience") && (
-                      <span 
-                        className="inline-block text-xs px-2 py-0.5 rounded-md font-happy-monkey lowercase ml-2" 
-                        style={{ backgroundColor: labelBg, color: labelColor }}
-                      >
-                        {labelText}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* Content section */}
-                  <div className="ml-0 sm:ml-[50px]"> {/* Remove left margin on mobile */}
-                    {/* Full description - only shown when expanded */}
-                    {selected === idx && (
-                      <p className="text-black text-sm font-happy-monkey">
-                        {term.explanation}
-                      </p>
-                    )}
-                  </div>
-                  
-                  {/* Expanded content */}
-                  <div 
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                      selected === idx ? 'max-h-[500px] opacity-100 mt-3' : 'max-h-0 opacity-0'
-                    }`}
-                  >
+                    
+                    {/* Concept Category Badge */}
                     <div 
-                      ref={el => storyRefs.current[idx] = el}
-                      className={`ml-0 sm:ml-[50px] ${selected === idx ? 'animate-slide-down' : ''}`}
+                      className="flex flex-col justify-center items-center p-1 sm:p-[4px_8px] gap-[4px] min-w-[70px] sm:w-[98px] h-[24px] bg-[rgba(83,252,255,0.1)] rounded-[8px]" 
+                      id={`concept-category-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
+                      aria-label={`Category: ${term.category}`}
                     >
-                      <div className="rounded-lg p-3 text-sm text-black leading-relaxed border transition-all" 
-                           style={{ 
-                             boxShadow: `inset 0 1px 5px ${shadowColor}`,
-                             backgroundColor: `${labelBg || 'rgba(6,196,213,0.05)'}`,
-                             borderColor: `${borderColor || 'rgba(6,196,213,0.15)'}`,
-                             opacity: 0.9
-                           }}>
-                        <p className="mb-2 font-medium text-[#06C4D5] font-happy-monkey lowercase">example:</p>
-                        <p className="font-happy-monkey leading-tight text-xs sm:text-sm">{term.story}</p>
-                      </div>
-                      
-                      <div className="mt-3 flex justify-center sm:justify-end">
-                        <button 
-                          onClick={goToPractices}
-                          className="text-white text-xs font-happy-monkey lowercase font-medium flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#06C4D5] to-[#06C4D5] rounded-full hover:shadow-md transition-all hover:translate-y-[-2px]"
-                        >
-                          find related practices
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </button>
-                      </div>
+                      <span className="w-full sm:w-[82px] h-[16px] font-happy-monkey font-normal text-[10px] sm:text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#148BAF]">
+                        {term.category}
+                      </span>
                     </div>
                   </div>
+                  
+                  {/* Concept Description Row */}
+                  <div className="flex flex-row justify-between items-center p-0 gap-2 sm:gap-[10px] w-full min-h-[32px]" id={`concept-description-row-${term.term.toLowerCase().replace(/\s+/g, '-')}`}>
+                    {/* Concept Summary Text */}
+                    <p 
+                      className="flex-1 max-w-[calc(100%-50px)] font-happy-monkey font-normal text-[11px] sm:text-[12px] leading-tight sm:leading-[16px] flex items-center lowercase text-black line-clamp-2"
+                      id={`concept-summary-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      {getSummary(term.term, term.category)}
+                    </p>
+                    
+                    {/* Expand/Collapse Button */}
+                    <div 
+                      className={`flex flex-col justify-center items-center p-1 sm:p-[4px_8px] gap-[4px] min-w-[40px] h-[24px] 
+                        ${expandedCards[term.term] ? 'bg-white' : 'bg-[#F5F5F5]'} shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[8px]`}
+                      onClick={(e) => toggleCardExpansion(term.term, e)}
+                      id={`expand-button-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
+                      role="button"
+                      aria-label={`${expandedCards[term.term] ? 'Show less' : 'Show more'} about ${term.term}`}
+                      aria-controls={`expanded-content-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
+                      aria-expanded={expandedCards[term.term]}
+                    >
+                      <span className="w-full sm:w-[24px] h-[16px] font-happy-monkey font-normal text-[10px] sm:text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#148BAF]">
+                        {expandedCards[term.term] ? 'less' : 'more'}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Expanded Content - Yellow Box (Only shown when expanded) */}
+                  {expandedCards[term.term] && (
+                    <div 
+                      className="flex flex-row justify-center items-center p-2 sm:p-[4px] gap-[10px] w-full sm:w-[340px] h-auto min-h-[88px] bg-[#FCDF4D] rounded-[10px] mt-2 sm:mt-[8px]"
+                      id={`expanded-content-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
+                      aria-label={`Additional information about ${term.term}`}
+                    >
+                      <p 
+                        className="w-full sm:w-[332px] font-happy-monkey font-normal text-[11px] sm:text-[12px] leading-tight sm:leading-[16px] flex items-center lowercase text-black"
+                        id={`concept-story-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
+                        {term.story || "Start your day right with our energetic morning running group. All paces welcome! Every Sunday morning the run starts. Need more explanation..."}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
-            );
-          })
-        ) : (
-          <div className="text-center py-10 bg-white rounded-xl border border-[rgba(6,196,213,0.2)] shadow-md mx-3">
-            <div className="mx-auto w-16 h-16 mb-4 rounded-full flex items-center justify-center bg-[rgba(6,196,213,0.1)]">
-              <Search className="text-[#06C4D5]" size={24} />
-            </div>
-            <p className="text-[#06C4D5] text-lg font-happy-monkey lowercase">no matching concepts found</p>
-            <p className="text-black text-sm mt-2 font-happy-monkey lowercase">try a different search term or category</p>
+            ))}
           </div>
         )}
       </div>
+
+      {/* Page Footer Section */}
+      <div className="mt-10 text-center" id="learn-page-footer">
+        <p className="text-sm text-gray-500" id="learn-page-footer-text">
+          Explore more about each concept by clicking on them. Dive deep into the world of psychology!
+        </p>
       </div>
     </div>
   );

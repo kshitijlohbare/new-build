@@ -13,7 +13,7 @@ type ActiveTabType = 'all' | 'meditation' | 'physical' | 'journal' | 'huberman' 
 const Practices = () => {
   const { practices, isLoading, addPractice } = usePractices(); // Removed userProgress
   const { toast } = useToast();
-  const [activeTab] = useState<ActiveTabType>('all');
+  const [activeTab, setActiveTab] = useState<ActiveTabType>('all');
   const [isAddPracticeDialogOpen, setIsAddPracticeDialogOpen] = useState(false);
   const [selectedPracticeId, setSelectedPracticeId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -184,25 +184,45 @@ const Practices = () => {
         {/* Filter Chips - Horizontal scrolling categories */}
         <div className="flex flex-row items-start p-0 gap-[4px] w-full h-[36px] overflow-x-auto scrollbar-hide" 
              data-testid="filter-chips-container">
-          {/* Filter chip - Habits (with background) */}
-          <button className="box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] bg-[rgba(83,252,255,0.1)] border border-[#04C4D5] rounded-[20px] whitespace-nowrap" 
-                  data-testid="filter-chip-habits">
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">habits</span>
+          {/* Filter chip - All */}
+          <button 
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'all' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
+            data-testid="filter-chip-all"
+            onClick={() => setActiveTab('all')}>
+            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">all</span>
           </button>
           
-          {/* Filter chip - Naval (no background) */}
-          <button className="box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] border border-[#04C4D5] rounded-[20px] whitespace-nowrap" 
-                  data-testid="filter-chip-naval">
+          {/* Filter chip - Habits */}
+          <button 
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'meditation' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
+            data-testid="filter-chip-habits"
+            onClick={() => setActiveTab('meditation')}>
+            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">meditation</span>
+          </button>
+          
+          {/* Filter chip - Naval */}
+          <button 
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'naval' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
+            data-testid="filter-chip-naval"
+            onClick={() => setActiveTab('naval')}>
             <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">naval ravikant</span>
           </button>
           
-          {/* Filter chip - Huberman (no background) */}
-          <button className="box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] border border-[#04C4D5] rounded-[20px] whitespace-nowrap" 
-                  data-testid="filter-chip-huberman">
+          {/* Filter chip - Huberman */}
+          <button 
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'huberman' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
+            data-testid="filter-chip-huberman"
+            onClick={() => setActiveTab('huberman')}>
             <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">andrew huberman</span>
           </button>
           
-          {/* Additional filter chips would go here */}
+          {/* Filter chip - Neuroscience */}
+          <button 
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'neuroscience' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
+            data-testid="filter-chip-neuroscience"
+            onClick={() => setActiveTab('neuroscience')}>
+            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">neuroscience</span>
+          </button>
         </div>
       </div>
 

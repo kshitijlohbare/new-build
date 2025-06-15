@@ -1,6 +1,6 @@
 // filepath: /Users/kshitijlohbare/Downloads/new build/src/pages/Community.tsx
 import { useState } from 'react';
-import CommunityTopNavBar from "../components/community/EnhancedNavBar";
+import CommunityTopNavBar from "../components/community/CommunityTopNavBar";
 import GroupMessages from "./GroupMessages";
 
 // Premium CSS animation keyframes with glassmorphism effects

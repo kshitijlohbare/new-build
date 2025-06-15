@@ -199,14 +199,14 @@ const FocusTimer = () => {
   return (
     <div data-testid="focus-timer-page" className="min-h-screen pb-28">
       {/* Main Container */}
-      <div data-testid="focus-timer-container" className="container mx-auto px-4 py-2">
+      <div data-testid="focus-timer-container" className="container mx-auto">
         {/* Header Bar */}
-        <header data-testid="focus-timer-header-bar" className="flex flex-col items-center justify-center py-4">
-          <p className="text-lg font-['Happy_Monkey'] text-[#148BAF] mt-2">get things done!</p>
+        <header data-testid="focus-timer-header-bar" className="flex flex-col items-center justify-center">
+          <p className="font-size-[#16px] font-['Happy_Monkey'] text-[#04C4D5] mt-2">get things done!</p>
         </header>
 
         {/* Timer Section */}
-        <section data-testid="circular-timer-section" className="timer-container relative mb-2 w-full">
+        <section data-testid="circular-timer-section" className="timer-container relative w-full">
           {/* Timer Circle */}
           <div data-testid="timer-circle" className="timer-display timer-display-responsive mx-auto">
             {/* Progress Bar */}
@@ -292,7 +292,8 @@ const FocusTimer = () => {
               </div>
               
               {/* Timer Display */}
-              <div data-testid="timer-time" className="w-[157px] h-[77px] font-['Happy_Monkey'] font-normal text-[64px] leading-[77px] lowercase text-[#148BAF]">
+              <div data-testid="timer-time" className="w-[157px] h-[77px] font-['Happy_Monkey'] font-normal text-[64px] leading-[77px] lowercase text-[#000000
+              ]">
                 {Math.floor(timer / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}
               </div>
               
@@ -550,25 +551,23 @@ const FocusTimer = () => {
           {/* Player Controls Center Panel - Fixed 20px from bottom and centered */}
           <div 
             data-testid="player-controls-center-panel" 
-            className="absolute left-1/2 bottom-[20px] transform -translate-x-1/2 flex justify-center items-center gap-[20px] py-1.5 px-5 bg-[#E0FBFF] rounded-full border-2 border-white shadow-2xl pointer-events-auto"
+            className="absolute left-1/2 bottom-[20px] transform -translate-x-1/2 flex justify-center items-center gap-[20px] py-1.5 px-5 bg-[#FCDF4D] rounded-full border-2 border-white shadow-2xl pointer-events-auto"
           >
             {/* Play/Pause Button */}
             <button 
               data-testid="play-pause-button"
-              className="bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors active:scale-90" 
               onClick={() => setIsRunning(!isRunning)}
               aria-label={isRunning ? "Pause timer" : "Start timer"}
             >
               {isRunning ? (
-                <img src={PauseIconPath} alt="Pause" className="w-10 h-10" />
+                <img src={PauseIconPath} alt="Pause" className="w-11 h-11" />
               ) : (
-                <img src={PlayIconPath} alt="Play" className="w-10 h-10" />
+                <img src={PlayIconPath} alt="Play" className="w-11 h-11" />
               )}
             </button>
             {/* Stop Button */}
             <button 
-              data-testid="stop-button"
-              className="bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors active:scale-90" 
+              data-testid="stop-button" 
               onClick={() => {
                 setIsRunning(false);
                 setCurrentCycle(1);
@@ -582,7 +581,7 @@ const FocusTimer = () => {
               }}
               aria-label="Reset timer"
             >
-              <img src={StopIconPath} alt="Stop" className="w-10 h-10" />
+              <img src={StopIconPath} alt="Stop" className="w-11 h-11" />
             </button>
           </div>
           
@@ -590,7 +589,7 @@ const FocusTimer = () => {
           <div className="absolute right-[20px] bottom-[20px] w-16 h-16 pointer-events-auto">
             <button 
                 data-testid="music-button"
-                className={`w-16 h-16 bg-[#E0FBFF] rounded-full flex items-center justify-center shadow-2xl hover:bg-[#cbeef2] transition-colors active:scale-90 ${selectedMusic ? 'bg-[#148BAF] text-white' : ''}`}
+                className={`w-16 h-16 bg-[#FCDF4D] rounded-full flex items-center justify-center border-2 border-white shadow-2xl pointer-events-auto hover:bg-[#cbeef2] transition-colors active:scale-90 ${selectedMusic ? 'bg-[#148BAF] text-white' : ''}`}
                 onClick={() => toggleMusicDrawer()}
                 aria-label="Open music options"
               >

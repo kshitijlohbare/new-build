@@ -741,9 +741,9 @@ h1, h2, h3, h4, h5, h6 {
 .timer-display-responsive {
   width: 100% !important; /* Full width of parent container */
   height: 100% !important; /* Full height of parent container */
+  aspect-ratio: 1/1; /* Ensure circle is perfectly round */
   margin: 0 auto; /* Center horizontally */
-  max-width: 100vw; /* Prevent overflow */
-  max-height: 100vw; /* Keep it proportional */
+  max-width: 100%; /* Prevent overflow */
 }
 
 /* Adjust timer contents for larger size */
@@ -1018,27 +1018,23 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(100vw - 2rem) !important; /* Full viewport width minus some padding */
-  height: calc(100vw - 2rem) !important; /* Equal to width */
+  width: min(calc(100vw - 2rem), 600px) !important; /* Use min to respect max-width */
+  height: auto !important; /* Let aspect-ratio control height */
   max-width: 600px; /* Maximum size limit */
-  max-height: 600px; /* Maximum size limit */
   margin: 0 auto; /* Center horizontally */
 }
 
 /* Adjust for various screen sizes */
 @media (max-width: 480px) {
   [data-testid="circular-timer-section"] {
-    width: calc(100vw - 1rem) !important; /* Slightly more width on mobile */
-    height: calc(100vw - 1rem) !important;
+    width: min(calc(100vw - 1rem), 450px) !important; /* Slightly more width on mobile */
     max-width: 450px;
-    max-height: 450px;
   }
 }
 
 @media (min-width: 768px) {
   [data-testid="circular-timer-section"] {
     width: min(75vw, 600px) !important; /* Slightly less width on larger screens */
-    height: min(75vw, 600px) !important;
   }
 }
 
@@ -1056,11 +1052,18 @@ h1, h2, h3, h4, h5, h6 {
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center; /* Center children horizontally */
+  justify-content: center; /* Help with vertical centering */
 }
 
 [data-testid="circular-timer-section"] {
   flex: 1;
-  margin-bottom: 1.5rem !important;
+  /* Removed margin-bottom */
+  /* Ensure consistent circular shape */
+  aspect-ratio: 1/1 !important;
+  /* Improved centering */
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 /* Ensure proper spacing in flex layout */
