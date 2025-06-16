@@ -475,6 +475,19 @@ export function Home() {
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
   // Add a state to track which filter is active
   const [activeFilter, setActiveFilter] = useState<string>('all');
+  
+  // Define all possible filter categories
+  const filterCategories = [
+    { id: 'all', label: 'all' },
+    { id: 'habits', label: 'habits' },
+    { id: 'naval', label: 'naval ravikant' },
+    { id: 'huberman', label: 'andrew huberman' },
+    { id: 'neuroscience', label: 'neuroscience' },
+    { id: 'wisdom', label: 'wisdom' },
+    { id: 'psychology', label: 'psychology' },
+    { id: 'emotional', label: 'emotional' },
+    { id: 'cognitive', label: 'cognitive' }
+  ];
 
   // Categories for filtering defined in component usage
 
@@ -530,6 +543,8 @@ export function Home() {
       if (activeFilter === 'psychology' && term.category.toLowerCase().includes('psycholog')) return true;
       if (activeFilter === 'wellbeing' && (term.category.toLowerCase().includes('wellbeing') || 
                                         term.category.toLowerCase().includes('well-being'))) return true;
+      if (activeFilter === 'emotional' && term.icon === 'emotional') return true;
+      if (activeFilter === 'cognitive' && term.icon === 'cognitive') return true;
       
       return false;
     });
@@ -555,31 +570,14 @@ export function Home() {
         </div>
         {/* Filter Chips - Horizontal scrolling categories */}
         <div className="flex flex-row items-start p-0 gap-[4px] w-full h-[36px] overflow-x-auto scrollbar-hide" id="learn-filter-chips-container">
-          <button 
-            onClick={() => setActiveFilter('all')} 
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === 'all' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">all</span>
-          </button>
-          <button 
-            onClick={() => setActiveFilter('habits')}
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === 'habits' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">habits</span>
-          </button>
-          <button 
-            onClick={() => setActiveFilter('naval')}
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === 'naval' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">naval ravikant</span>
-          </button>
-          <button 
-            onClick={() => setActiveFilter('huberman')}
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === 'huberman' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">andrew huberman</span>
-          </button>
-          <button 
-            onClick={() => setActiveFilter('neuroscience')}
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === 'neuroscience' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">neuroscience</span>
-          </button>
+          {filterCategories.map(category => (
+            <button 
+              key={category.id}
+              onClick={() => setActiveFilter(category.id)}
+              className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === category.id ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
+              <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">{category.label}</span>
+            </button>
+          ))}
         </div>
       </div>
       {/* Search Bar (fixed to bottom, like Practices) */}

@@ -19,7 +19,7 @@ const HeaderBar: React.FC = () => {
   }
 
   return (
-   <div className="flex flex-row items-center p-[10px] gap-[10px] w-full h-[52px] bg-gradient-to-b from-[#06C4D5] to-[#04C4D5]">
+   <div className="flex flex-row items-center p-[10px] gap-[10px] w-full h-[52px] bg-gradient-to-b from-[#06C4D5] to-[#208EB1]">
       {/* Menu Button */}
       <div 
         className="flex items-center justify-center w-[24px] h-[24px] rounded-[8px] cursor-pointer"

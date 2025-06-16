@@ -8,7 +8,7 @@ import PracticeDetailPopup from '@/components/wellbeing/PracticeDetailPopup';
 import QuotesIcon from "../assets/icons/quotes.svg";
 
 // Define a type for the active tab state for better type safety
-type ActiveTabType = 'all' | 'meditation' | 'physical' | 'journal' | 'huberman' | 'naval' | 'neuroscience';
+type ActiveTabType = 'all' | 'meditation' | 'physical' | 'journal' | 'huberman' | 'naval' | 'neuroscience' | 'popular' | 'daily' | 'quick';
 
 const Practices = () => {
   const { practices, isLoading, addPractice } = usePractices(); // Removed userProgress
@@ -91,6 +91,15 @@ const Practices = () => {
                  )) || 
                  practice.name.toLowerCase().includes('breathing') || 
                  practice.name.toLowerCase().includes('mindfulness');
+        case 'popular':
+          // Practices with higher points (indicating popularity)
+          return Boolean(practice.points && practice.points >= 5);
+        case 'daily':
+          // Only show daily practices
+          return practice.isDaily === true;
+        case 'quick':
+          // Practices that take less time
+          return practice.duration && practice.duration <= 5;
         case 'all':
         default:
           return true;
@@ -223,6 +232,30 @@ const Practices = () => {
             onClick={() => setActiveTab('neuroscience')}>
             <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">neuroscience</span>
           </button>
+          
+          {/* Filter chip - Popular */}
+          <button 
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'popular' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
+            data-testid="filter-chip-popular"
+            onClick={() => setActiveTab('popular')}>
+            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">popular</span>
+          </button>
+          
+          {/* Filter chip - Daily */}
+          <button 
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'daily' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
+            data-testid="filter-chip-daily"
+            onClick={() => setActiveTab('daily')}>
+            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">daily</span>
+          </button>
+          
+          {/* Filter chip - Quick */}
+          <button 
+            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'quick' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
+            data-testid="filter-chip-quick"
+            onClick={() => setActiveTab('quick')}>
+            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">quick</span>
+          </button>
         </div>
       </div>
 
@@ -230,7 +263,7 @@ const Practices = () => {
       <div className="grid grid-cols-2 gap-2" data-testid="practices-grid-container">
         {filteredPractices.map((practice) => (
           <div key={practice.id} 
-               className="flex flex-col justify-center items-center p-[10px] gap-[10px] w-full h-[200px] bg-[#F5F5F5] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[8px]"
+               className={`flex flex-col justify-center items-center p-[10px] gap-[10px] w-full h-[200px] ${practice.isDaily ? 'bg-[#F5F5F5]':'bg-[#EDFEFF]'} shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[8px]`}
                data-testid={`practice-card-${practice.id}`}
                onClick={() => handlePracticeNameClick(practice.id)}
                style={{ 
