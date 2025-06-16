@@ -22,7 +22,7 @@ const MobileDailyPractices = () => {
             <div className="w-full h-6 relative">
               {/* Rotated progress bar */}
               <div className="absolute top-0 left-0 w-full h-6 origin-left">
-                <div className="relative w-full h-24 origin-top-left -rotate-90 transform-gpu">
+                <div className="relative w-full h-24 origin-top-left transform-gpu">
                   <div className="absolute top-0 left-0 h-6 w-full bg-gradient-to-r from-[#49DAEA] to-[rgba(196,254,255,0.2)] rounded">
                     <div className="font-happy-monkey font-normal text-sm leading-4 lowercase text-white absolute left-2 top-1">10%</div>
                     {/* Star with points */}
@@ -68,7 +68,7 @@ const MobileDailyPractices = () => {
             <div className="w-full h-6 relative">
               {/* Rotated progress bar */}
               <div className="absolute top-0 left-0 w-full h-6 origin-left">
-                <div className="relative w-full h-24 origin-top-left -rotate-90 transform-gpu">
+                <div className="relative w-full h-24 origin-top-left transform-gpu">
                   <div className="absolute top-0 left-0 h-6 w-full bg-gradient-to-r from-[#49DAEA] to-[rgba(196,254,255,0.2)] rounded">
                     <div className="font-happy-monkey font-normal text-sm leading-4 lowercase text-white absolute left-2 top-1">0%</div>
                     {/* Star with points */}

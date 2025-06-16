@@ -10,26 +10,50 @@ import logoIcon from '@/assets/icons/CAKTUS COCO.svg';
 
 const HomeHeader: React.FC = () => {
   const { userProgress } = usePractices();
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, sidebarVisible } = useSidebar();
+  
+  // Debug log to track sidebar state
+  console.log("HomeHeader rendering, sidebarVisible:", sidebarVisible);
   
   return (
-    <div className="flex flex-row items-center p-[10px] gap-[10px] w-full h-[52px] bg-[#FCDF4D]">
+    <header 
+      id="home-header" 
+      data-testid="home-header"
+      className="flex flex-row items-center p-[10px] gap-[10px] w-full h-[52px] bg-[#FCDF4D] sticky top-0 z-10 pointer-events-auto flex-shrink-0"
+      aria-label="Application header with navigation and user stats"
+    >
       {/* Menu Button */}
-      <div 
-        className="flex items-center justify-center w-[24px] h-[24px] rounded-[8px] cursor-pointer"
-        onClick={toggleSidebar}
+      <button 
+        type="button"
+        id="header-menu-btn"
+        data-testid="header-menu-button"
+        className="flex items-center justify-center w-[40px] h-[40px] rounded-[8px] cursor-pointer p-1 hover:bg-black/5 active:bg-black/10 pointer-events-auto relative z-10 focus:outline-none"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Menu button clicked');
+          toggleSidebar();
+        }}
+        aria-label="Toggle sidebar menu"
+        style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
       >
         <img 
           src={hamburgerIcon} 
           alt="Menu"
-          className="w-[24px] h-[24px]"
+          className="w-[24px] h-[24px] pointer-events-none"
         />
-      </div>
+      </button>
       
       {/* Logo */}
-      <div className="flex flex-row items-center flex-grow">
-        <Link to="/">
+      <div 
+        id="header-logo-container"
+        data-testid="header-logo-container" 
+        className="flex flex-row items-center flex-grow"
+      >
+        <Link to="/" aria-label="Go to homepage">
           <img 
+            id="header-logo"
+            data-testid="header-logo"
             src={logoIcon} 
             alt="CAKTUS COCO"
             className="h-[20px]"
@@ -38,12 +62,22 @@ const HomeHeader: React.FC = () => {
       </div>
       
       {/* Stats Icons */}
-      <div className="flex flex-row items-center gap-[12px]">
+      <div 
+        id="user-stats-container"
+        data-testid="user-stats-container" 
+        className="flex flex-row items-center gap-[12px]"
+        aria-label="User statistics"
+      >
         {/* Level Badge */}
-        <div className="relative flex items-center justify-center">
+        <div 
+          id="user-level-badge"
+          data-testid="user-level-badge"
+          className="relative flex items-center justify-center"
+          aria-label={`User level: ${userProgress?.level || 3}`}
+        >
           <img 
             src={streakIcon} 
-            alt="Level" 
+            alt="Level icon" 
             className="w-[24px] h-[24px]"
           />
           <span className="absolute font-['Happy_Monkey'] font-normal text-[16px] flex items-center justify-center text-white">
@@ -52,10 +86,15 @@ const HomeHeader: React.FC = () => {
         </div>
         
         {/* Streak Badge */}
-        <div className="relative flex items-center justify-center">
+        <div 
+          id="user-streak-badge"
+          data-testid="user-streak-badge"
+          className="relative flex items-center justify-center"
+          aria-label={`Current streak: ${userProgress?.streakDays || 2} days`}
+        >
           <img 
             src={badgeIcon} 
-            alt="Streak" 
+            alt="Streak icon" 
             className="w-[24px] h-[24px]"
           />
           <span className="absolute font-['Happy_Monkey'] font-normal text-[16px] flex items-center justify-center text-white">
@@ -64,10 +103,15 @@ const HomeHeader: React.FC = () => {
         </div>
         
         {/* Star Badge */}
-        <div className="relative flex items-center justify-center">
+        <div 
+          id="user-points-badge"
+          data-testid="user-points-badge"
+          className="relative flex items-center justify-center"
+          aria-label={`Total points: ${userProgress?.totalPoints || 88}`}
+        >
           <img 
             src={starIcon} 
-            alt="Points" 
+            alt="Points icon" 
             className="w-[24px] h-[24px]"
           />
           <span className="absolute font-['Happy_Monkey'] font-normal text-[16px] flex items-center justify-center text-white">
@@ -75,7 +119,7 @@ const HomeHeader: React.FC = () => {
           </span>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 

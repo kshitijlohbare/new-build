@@ -21,7 +21,10 @@ const Sidebar = ({ onNavigate }: SidebarProps) => {
   };
 
   return (
-    <nav className="h-full py-3 sm:py-4 md:py-6 px-2 sm:px-3 flex flex-col items-center bg-[#F7FFFF] gap-1 sm:gap-2 md:gap-3 overflow-y-auto">
+    <nav 
+      className="h-full py-3 sm:py-4 md:py-6 px-2 sm:px-3 flex flex-col items-center bg-[#F7FFFF] gap-1 sm:gap-2 md:gap-3 overflow-y-auto relative"
+      style={{ zIndex: 99999 }}
+    >
       {navItems.map((item) => (
         <NavLink
           key={item.path}

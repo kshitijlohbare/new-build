@@ -18,6 +18,165 @@ const Practices = () => {
   const [selectedPracticeId, setSelectedPracticeId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Add state for dynamic filter categories
+  const [filterCategories, setFilterCategories] = useState<Array<{id: string, label: string, count: number}>>([]);
+  
+  // Generate dynamic filter categories based on practice data
+  useEffect(() => {
+    if (practices.length > 0) {
+      // Start with the "all" filter
+      const categories: Array<{id: string, label: string, count: number}> = [
+        { id: 'all', label: 'all', count: practices.length }
+      ];
+      
+      // Create maps to count different types of practices
+      const sourcesMap = new Map<string, number>();
+      const iconsMap = new Map<string, number>();
+      const tagsMap = new Map<string, number>();
+      const durationMap = new Map<string, number>();
+      const pointsMap = new Map<string, number>();
+      
+      // Process each practice to extract filter data
+      practices.forEach(practice => {
+        // Extract sources
+        if (practice.source) {
+          // Source-based categories (huberman, naval)
+          if (practice.source.toLowerCase().includes('huberman')) {
+            const count = sourcesMap.get('huberman') || 0;
+            sourcesMap.set('huberman', count + 1);
+          } else if (practice.source.toLowerCase().includes('naval')) {
+            const count = sourcesMap.get('naval') || 0;
+            sourcesMap.set('naval', count + 1);
+          }
+          
+          // Add other common sources if they appear multiple times
+          const sourceLower = practice.source.toLowerCase();
+          const count = sourcesMap.get(sourceLower) || 0;
+          sourcesMap.set(sourceLower, count + 1);
+        }
+        
+        // Extract practice types from icons
+        if (practice.icon) {
+          const count = iconsMap.get(practice.icon) || 0;
+          iconsMap.set(practice.icon, count + 1);
+          
+          // Specific mappings for common practice types
+          if (['meditation', 'sparkles', 'breathing'].includes(practice.icon)) {
+            const count = sourcesMap.get('meditation') || 0;
+            sourcesMap.set('meditation', count + 1);
+          }
+          
+          if (['shower', 'yoga'].includes(practice.icon)) {
+            const count = sourcesMap.get('physical') || 0;
+            sourcesMap.set('physical', count + 1);
+          }
+          
+          if (['journal', 'moleskine'].includes(practice.icon)) {
+            const count = sourcesMap.get('journal') || 0;
+            sourcesMap.set('journal', count + 1);
+          }
+        }
+        
+        // Extract from practice name
+        const nameLower = practice.name.toLowerCase();
+        if (nameLower.includes('meditation') || nameLower.includes('breathing')) {
+          const count = sourcesMap.get('meditation') || 0;
+          sourcesMap.set('meditation', count + 1);
+        }
+        
+        if (nameLower.includes('exercise') || nameLower.includes('yoga') || 
+            nameLower.includes('physical')) {
+          const count = sourcesMap.get('physical') || 0;
+          sourcesMap.set('physical', count + 1);
+        }
+        
+        if (nameLower.includes('journal') || nameLower.includes('gratitude')) {
+          const count = sourcesMap.get('journal') || 0;
+          sourcesMap.set('journal', count + 1);
+        }
+        
+        // Extract from tags
+        if (practice.tags) {
+          practice.tags.forEach(tag => {
+            const tagLower = tag.toLowerCase();
+            const count = tagsMap.get(tagLower) || 0;
+            tagsMap.set(tagLower, count + 1);
+            
+            if (tagLower === 'neuroscience' || tagLower === 'brain') {
+              const count = sourcesMap.get('neuroscience') || 0;
+              sourcesMap.set('neuroscience', count + 1);
+            }
+          });
+        }
+        
+        // Track daily practices
+        if (practice.isDaily) {
+          const count = sourcesMap.get('daily') || 0;
+          sourcesMap.set('daily', count + 1);
+        }
+        
+        // Track duration categories
+        if (practice.duration) {
+          if (practice.duration <= 5) {
+            const count = durationMap.get('quick') || 0;
+            durationMap.set('quick', count + 1);
+            
+            // Also add to sources map for quick practices
+            const count2 = sourcesMap.get('quick') || 0;
+            sourcesMap.set('quick', count2 + 1);
+          } else if (practice.duration <= 15) {
+            const count = durationMap.get('medium') || 0;
+            durationMap.set('medium', count + 1);
+          } else {
+            const count = durationMap.get('long') || 0;
+            durationMap.set('long', count + 1);
+          }
+        }
+        
+        // Track high point practices (popular)
+        if (practice.points) {
+          if (practice.points >= 5) {
+            const count = pointsMap.get('high') || 0;
+            pointsMap.set('high', count + 1);
+            
+            // Also add to sources map for popular practices
+            const count2 = sourcesMap.get('popular') || 0;
+            sourcesMap.set('popular', count2 + 1);
+          }
+        }
+      });
+      
+      // Add sources with at least one practice
+      sourcesMap.forEach((count, source) => {
+        if (count > 0) {
+          let label = source;
+          if (source === 'huberman') label = 'andrew huberman';
+          if (source === 'naval') label = 'naval ravikant';
+          
+          // Only add if not already in categories
+          if (!categories.some(cat => cat.id === source)) {
+            categories.push({
+              id: source,
+              label,
+              count
+            });
+          }
+        }
+      });
+      
+      // Sort categories by count (except 'all' stays first)
+      const sortedCategories = [
+        categories[0],
+        ...categories.slice(1).sort((a, b) => b.count - a.count)
+      ];
+      
+      // Limit to a reasonable number of categories
+      const finalCategories = sortedCategories.slice(0, 12);
+      
+      setFilterCategories(finalCategories);
+    }
+  }, [practices]);
+  
   // Add debug output to help diagnose issues
   console.log(`Found ${practices.length} total practices:`);
   
@@ -180,95 +339,63 @@ const Practices = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-[20px]" data-testid="practices-page-container">
+    <div className="min-h-screen flex flex-col p-[20px] bg-transparent relative pointer-events-none" id="practices-page" data-testid="practices-page-container">
+      {/* Background embed frame */}
+      <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0" id="practices-background-container">
+        <iframe 
+          src='https://my.spline.design/glassmorphlandingpage-dTRlb7D9jEqp40V25exFI0oj/' 
+          frameBorder='0' 
+          width='100%' 
+          height='100vh' 
+          className="fixed"
+          title="Background 3D animation" 
+          style={{ minHeight: '100vh' }}
+        ></iframe>
+      </div>
+      
       {/* Title and Filters Container */}
-      <div className="flex flex-col justify-center items-center p-0 gap-[20px] w-full h-[74px] bg-white mb-4" 
-           data-testid="title-filters-container">
+      <div className="flex flex-col justify-center items-center p-0 gap-[20px] w-full h-[74px] bg-transparent mb-4 relative z-20 pointer-events-auto" 
+           id="practices-title-filters-container" data-testid="title-filters-container">
         {/* Page Title - "your practices" */}
-        <div className="w-full h-[18px] text-center" data-testid="practices-page-title">
+        <div className="w-full h-[18px] text-center relative z-20" id="practices-page-title" data-testid="practices-page-title">
           <span className="font-['Happy_Monkey'] font-normal text-[16px] leading-[18px] text-center lowercase text-[#04C4D5]" 
-                data-testid="practices-title-text">your practices</span>
+                id="practices-title-text" data-testid="practices-title-text">your practices</span>
         </div>
 
         {/* Filter Chips - Horizontal scrolling categories */}
-        <div className="flex flex-row items-start p-0 gap-[4px] w-full h-[36px] overflow-x-auto scrollbar-hide" 
-             data-testid="filter-chips-container">
-          {/* Filter chip - All */}
-          <button 
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'all' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
-            data-testid="filter-chip-all"
-            onClick={() => setActiveTab('all')}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">all</span>
-          </button>
-          
-          {/* Filter chip - Habits */}
-          <button 
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'meditation' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
-            data-testid="filter-chip-habits"
-            onClick={() => setActiveTab('meditation')}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">meditation</span>
-          </button>
-          
-          {/* Filter chip - Naval */}
-          <button 
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'naval' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
-            data-testid="filter-chip-naval"
-            onClick={() => setActiveTab('naval')}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">naval ravikant</span>
-          </button>
-          
-          {/* Filter chip - Huberman */}
-          <button 
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'huberman' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
-            data-testid="filter-chip-huberman"
-            onClick={() => setActiveTab('huberman')}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">andrew huberman</span>
-          </button>
-          
-          {/* Filter chip - Neuroscience */}
-          <button 
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'neuroscience' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
-            data-testid="filter-chip-neuroscience"
-            onClick={() => setActiveTab('neuroscience')}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">neuroscience</span>
-          </button>
-          
-          {/* Filter chip - Popular */}
-          <button 
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'popular' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
-            data-testid="filter-chip-popular"
-            onClick={() => setActiveTab('popular')}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">popular</span>
-          </button>
-          
-          {/* Filter chip - Daily */}
-          <button 
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'daily' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
-            data-testid="filter-chip-daily"
-            onClick={() => setActiveTab('daily')}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">daily</span>
-          </button>
-          
-          {/* Filter chip - Quick */}
-          <button 
-            className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeTab === 'quick' ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`} 
-            data-testid="filter-chip-quick"
-            onClick={() => setActiveTab('quick')}>
-            <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">quick</span>
-          </button>
+        <div className="flex flex-row items-start p-0 pl-[4px] pr-[4px] w-screen -mx-[20px] h-[36px] overflow-x-auto scrollbar-hide z-20 gap-2" 
+             id="practices-filter-chips-container" data-testid="filter-chips-container">
+          {filterCategories.map((category) => (
+            <button 
+              key={category.id}
+              className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] w-auto min-w-max ${
+                activeTab === category.id as ActiveTabType 
+                  ? 'bg-[#FCDF4D] border border-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)]' 
+                  : `border ${category.id === 'all' ? 'border-white' : 'border-[#04C4D5]'}`
+              } rounded-[20px] whitespace-nowrap px-4`} 
+              data-testid={`filter-chip-${category.id}`}
+              onClick={() => setActiveTab(category.id as ActiveTabType)}>
+              <span className={`font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase ${
+                activeTab === category.id as ActiveTabType ? 'text-black' : 'text-[#148BAF]'
+              }`}>
+                {category.label} {category.count > 0 && category.id !== 'all' ? `(${category.count})` : ''}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Practices Grid - Main content showing practice cards */}
-      <div className="grid grid-cols-2 gap-2" data-testid="practices-grid-container">
+      <div className="grid grid-cols-2 gap-2 justify-items-center justify-center relative z-10 pointer-events-auto" id="practices-grid" data-testid="practices-grid-container">
         {filteredPractices.map((practice) => (
           <div key={practice.id} 
-               className={`flex flex-col justify-center items-center p-[10px] gap-[10px] w-full h-[200px] ${practice.isDaily ? 'bg-[#F5F5F5]':'bg-[#EDFEFF]'} shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[8px]`}
+               className={`flex flex-col justify-center items-center p-[10px] gap-[10px] w-full h-[200px] ${practice.isDaily ? 'bg-[#F5F5F5]/80':'bg-[#EDFEFF]/80'} backdrop-blur-xl shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[8px]`}
                data-testid={`practice-card-${practice.id}`}
                onClick={() => handlePracticeNameClick(practice.id)}
                style={{ 
                  boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)",
-                 position: "relative"
+                 position: "relative",
+                 width: "100%"
                }}> 
             {/* Practice Card Title */}
             <div className={`w-full h-[36px] font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase ${practice.isDaily ? 'text-[#FFD400]' : 'text-[#148BAF]'} flex-none order-0 self-stretch`}
@@ -310,10 +437,10 @@ const Practices = () => {
       </div>
 
       {/* Search Bar - Fixed at bottom */}
-      <div className="fixed bottom-[20px] left-0 w-full flex justify-center z-[2]" data-testid="search-bar-container">
+      <div className="fixed bottom-[20px] left-0 w-full flex justify-center z-[20] pointer-events-auto" id="practices-search-bar-container" data-testid="search-bar-container">
         <div 
           className="box-border flex flex-row justify-center items-center px-[20px] py-[10px] gap-[10px] w-[380px] h-[52px] bg-[#148BAF] border border-white rounded-[100px]" 
-          data-testid="search-bar"
+          id="practices-search-bar" data-testid="search-bar"
           style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
         >
           {/* Search Input Field */}
@@ -323,12 +450,12 @@ const Practices = () => {
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="flex-grow bg-transparent outline-none font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] lowercase text-[#F7FFFF] placeholder-[#F7FFFF]"
-            data-testid="search-input"
+            id="practices-search-input" data-testid="search-input"
           />
           {/* Search Button */}
-          <div className="flex flex-row justify-center items-center w-[31px] h-[32px] flex-none" data-testid="search-button">
+          <div className="flex flex-row justify-center items-center w-[31px] h-[32px] flex-none" id="practices-search-button" data-testid="search-button">
             {/* Search Icon */}
-            <svg className="w-[19.28px] h-[20px] text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" data-testid="search-icon">
+            <svg className="w-[19.28px] h-[20px] text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" id="practices-search-icon" data-testid="search-icon">
               <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>

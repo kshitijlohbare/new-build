@@ -7,6 +7,7 @@ import MobileDailyPractices from "../components/wellbeing/MobileDailyPractices";
 import MobileBookSessionSection from "../components/wellbeing/MobileBookSessionSection";
 import HomeHeader from "@/components/layout/HomeHeader";
 import emojiButtonIcon from "../assets/emoji button.svg";
+import GlobalSidebar from "@/components/layout/GlobalSidebar";
 
 const MobileHome = () => {
   const [newDelight, setNewDelight] = useState("");
@@ -329,33 +330,80 @@ const MobileHome = () => {
   };
 
   return (
-    <div className="mobile-home-container" id="mobile-home-root">
+    <div className="relative h-screen w-full bg-white">
       <MobileViewport />
       
-      {/* Custom HomeHeader for header bar - only on homepage */}
-      <HomeHeader />
+      {/* Global sidebar handles the sidebar display */}
+      <GlobalSidebar />
       
-      {/* Combined welcome header and delights section - flush with top nav */}
-      <div className="hero-section" id="mobile-hero-section">
+      {/* Main container with header and content stacked */}
+      <div 
+        className="flex flex-col h-full overflow-hidden mobile-home-container" 
+        id="mobile-home-root" 
+        data-testid="mobile-home-container"
+        aria-label="Mobile home page"
+      >
+        {/* HomeHeader - sticky at top */}
+        <HomeHeader />
+        
+        {/* Main content that scrolls under the header */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Combined welcome header and delights section */}
+      <section 
+        className="hero-section" 
+        id="mobile-hero-section" 
+        data-testid="mobile-hero-section"
+        aria-labelledby="welcome-title-text"
+      >
         {/* Welcome title */}
-        <div className="welcome-header" id="mobile-welcome-header">
-          <h1 className="welcome-title" id="welcome-title-text">welcome to your wellness home</h1>
+        <div 
+          className="welcome-header" 
+          id="mobile-welcome-header"
+          data-testid="mobile-welcome-header"
+        >
+          <h1 
+            className="welcome-title" 
+            id="welcome-title-text"
+            data-testid="welcome-title"
+          >
+            welcome to your wellness home
+          </h1>
         </div>
         
         {/* Today's delights section - properly positioned above the bubbles */}
-        <div className="delights-wrapper" id="mobile-delights-wrapper">
-          <h2 className="delights-title" id="delights-section-title">your today's delights</h2>
-          <div className="delights-container" id="delights-scrollable-container" ref={delightsContainerRef}>
+        <div 
+          className="delights-wrapper" 
+          id="mobile-delights-wrapper"
+          data-testid="mobile-delights-wrapper"
+          aria-labelledby="delights-section-title"
+        >
+          <h2 
+            className="delights-title" 
+            id="delights-section-title"
+            data-testid="delights-section-title"
+          >
+            your today's delights
+          </h2>
+          <div 
+            className="delights-container" 
+            id="delights-scrollable-container" 
+            data-testid="delights-scrollable-container"
+            aria-label="Scrollable list of delights"
+            ref={delightsContainerRef}
+          >
             {/* Simple vertical layout without column grouping */}
             {userDelights.map((delight, index) => (
               <div 
                 key={index} 
                 className="column-wrapper"
+                data-testid={`delight-column-${index}`}
               >
                 <div 
                   ref={el => delightRefs.current[index] = el}
                   className="delight-bubble" 
                   id={`delight-item-${index}`}
+                  data-testid={`delight-item-${index}`}
+                  aria-label={`Delight entry: ${delight}`}
                   onTouchStart={(e) => handleTouchStart(index, e)}
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
@@ -367,6 +415,8 @@ const MobileHome = () => {
                   <div 
                     className="delight-delete"
                     id={`delight-delete-btn-${index}`}
+                    data-testid={`delight-delete-btn-${index}`}
+                    aria-label="Delete this delight"
                     onClick={(e) => handleDelete(index, e)}
                   >
                     ×
@@ -376,10 +426,18 @@ const MobileHome = () => {
             ))}
             
             {/* Add new delight button in its own column */}
-            <div className="column-wrapper" id="add-delight-column">
+            <div 
+              className="column-wrapper" 
+              id="add-delight-column"
+              data-testid="add-delight-column"
+            >
               <div 
                 className="delight-bubble add-delight"
                 id="add-delight-bubble"
+                data-testid="add-delight-bubble"
+                aria-label="Add a new delight"
+                role="button"
+                tabIndex={0}
                 onClick={() => {
                   const input = document.querySelector('input[placeholder*="delighted"]') as HTMLInputElement;
                   if (input) input.focus();
@@ -392,44 +450,94 @@ const MobileHome = () => {
           
           {/* Navigation buttons and scroll indicators removed */}
         </div>
-      </div>
+      </section>
       
       {/* Daily Practices Section */}
-      <div id="daily-practices-container" className="wellbeing-section">
-        <h2 className="text-[#06C4D5] text-xl font-happy-monkey lowercase text-center mb-2">daily practices</h2>
+      <section 
+        id="daily-practices-section" 
+        data-testid="daily-practices-section"
+        className="wellbeing-section"
+        aria-labelledby="daily-practices-heading"
+      >
+        <h2 
+          id="daily-practices-heading"
+          data-testid="daily-practices-heading"
+          className="text-[#06C4D5] text-xl font-happy-monkey lowercase text-center mb-2"
+        >
+          daily practices
+        </h2>
         <MobileDailyPractices />
-      </div>
+      </section>
       
-      {/* Wellbeing Tips Section */}
-      <div id="wellbeing-tips-container" className="wellbeing-section">
-        <h2 className="text-[#06C4D5] text-xl font-happy-monkey lowercase text-center mb-2">wellbeing tips</h2>
+      {/* Wellbeing Tips Section - Exactly as per design */}
+      <section 
+        id="wellbeing-tips-section" 
+        data-testid="wellbeing-tips-section"
+        className="wellbeing-section"
+        aria-labelledby="wellbeing-tips-heading"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: '10px 0',
+          width: '100%',
+          maxWidth: '360px',
+          margin: '0 auto',
+          backgroundColor: 'transparent'
+        }}
+      >
         <MobileWellbeingTipsSection />
-      </div>
+      </section>
       
       {/* Book Session Section */}
-      <div id="book-session-container" className="wellbeing-section">
-        <h2 id="book-session-title" className="text-[#06C4D5] text-xl font-happy-monkey lowercase text-center mb-2">book a session</h2>
+      <section 
+        id="book-session-section" 
+        data-testid="book-session-section"
+        className="wellbeing-section"
+        aria-labelledby="book-session-heading"
+      >
+        <h2 
+          id="book-session-heading"
+          data-testid="book-session-heading"
+          className="text-[#06C4D5] text-xl font-happy-monkey lowercase text-center mb-2"
+        >
+          book a session
+        </h2>
         <MobileBookSessionSection />
-      </div>
+      </section>
       
       {/* Floating bottom input for delights */}
       {showInputBar && (
         <div 
           className="input-bar" 
           id="delights-input-container"
+          data-testid="delights-input-container"
+          aria-label="Enter a new delight"
           onTouchStart={handleInputBarTouchStart}
           onTouchMove={handleInputBarTouchMove}
           onTouchEnd={handleInputBarTouchEnd}
         >
           {showEmojiPicker && (
-            <div className="absolute bottom-full left-0 right-0 bg-white rounded-3xl p-2 mb-2 shadow-xl border" id="emoji-picker-dropdown">
-              <div className="grid grid-cols-6 gap-1" id="emoji-grid">
+            <div 
+              className="absolute bottom-full left-0 right-0 bg-white rounded-3xl p-2 mb-2 shadow-xl border" 
+              id="emoji-picker-dropdown"
+              data-testid="emoji-picker-dropdown"
+              aria-label="Emoji picker"
+            >
+              <div 
+                className="grid grid-cols-6 gap-1" 
+                id="emoji-grid"
+                data-testid="emoji-grid"
+              >
                 {emojis.map((emoji, index) => (
                   <button
                     key={index}
                     type="button"
+                    id={`emoji-btn-${index}`}
+                    data-testid={`emoji-btn-${index}`}
                     onClick={() => handleEmojiSelect(emoji)}
                     className="text-xl p-1.5 hover:bg-gray-100 rounded-lg transition-colors emoji-select-btn"
+                    aria-label={`Insert emoji ${emoji}`}
                   >
                     {emoji}
                   </button>
@@ -438,12 +546,30 @@ const MobileHome = () => {
             </div>
           )}
           {/* Swipe indicator with a subtle hint */}
-          <div className="swipe-indicator" aria-hidden="true"></div>
-          <p className="text-[8px] text-white text-opacity-70 text-center -mt-1 mb-1" aria-hidden="true">swipe down to dismiss</p>
-          <form onSubmit={handleSubmitDelight} className="flex items-center gap-2 w-full" id="delight-submit-form">
+          <div 
+            className="swipe-indicator" 
+            id="swipe-indicator"
+            data-testid="swipe-indicator"
+            aria-hidden="true"
+          ></div>
+          <p 
+            className="text-[8px] text-white text-opacity-70 text-center -mt-1 mb-1" 
+            id="swipe-hint-text"
+            data-testid="swipe-hint-text"
+            aria-hidden="true"
+          >
+            swipe down to dismiss
+          </p>
+          <form 
+            onSubmit={handleSubmitDelight} 
+            className="flex items-center gap-2 w-full" 
+            id="delight-submit-form"
+            data-testid="delight-submit-form"
+          >
             <KeyboardAwareInput
               type="text"
               id="delight-input-field"
+              data-testid="delight-input-field"
               value={newDelight}
               onChange={(e) => setNewDelight(e.target.value)}
               placeholder="what delighted you today?"
@@ -453,17 +579,27 @@ const MobileHome = () => {
             <button 
               type="button" 
               id="emoji-toggle-button"
+              data-testid="emoji-toggle-button"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)} 
               className="emoji-button flex-shrink-0"
               aria-label="Open emoji picker"
             >
-              <img src={emojiButtonIcon} alt="Emoji" width="32" height="32" />
+              <img 
+                src={emojiButtonIcon} 
+                alt="Emoji" 
+                width="32" 
+                height="32" 
+                id="emoji-button-icon"
+                data-testid="emoji-button-icon"
+              />
             </button>
             <button 
               type="submit" 
               id="delight-post-button"
+              data-testid="delight-post-button"
               disabled={!newDelight.trim()}
               className={`post-button flex-shrink-0 ${!newDelight.trim() ? 'opacity-100' : ''}`}
+              aria-label="Post your delight"
             >
               post
             </button>
@@ -474,13 +610,21 @@ const MobileHome = () => {
       {/* Floating add button that appears when the input bar is hidden */}
       {!showInputBar && (
         <button
+          id="add-delight-floating-button"
+          data-testid="add-delight-floating-button"
           onClick={showInputBarAgain}
           className="add-delight-floating-button"
           aria-label="Add new delight"
         >
-          <span className="plus-icon">+</span>
+          <span 
+            className="plus-icon"
+            id="plus-icon"
+            data-testid="plus-icon"
+          >+</span>
         </button>
       )}
+        </div>
+      </div>
     </div>
   );
 };

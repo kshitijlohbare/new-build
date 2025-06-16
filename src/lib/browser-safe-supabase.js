@@ -24,7 +24,13 @@ const createBrowserSafeClient = () => {
       storageKey: 'caktus_coco.auth.token',
       autoRefreshToken: true,
       persistSession: true,
-      detectSessionInUrl: true
+      detectSessionInUrl: true,
+      cookieOptions: {
+        domain: typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'localhost' : 'caktuscoco.com',
+        path: '/',
+        sameSite: 'lax',
+        secure: true
+      }
     },
     global: {
       headers: {

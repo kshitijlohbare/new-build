@@ -61,7 +61,6 @@ nav.app-navbar * {
   flex-direction: column;
   align-items: flex-start;
   width: 100vw;
-  margin-left: calc(-50vw + 50%);
   margin-top: 0; /* Remove gap between nav and hero */
   background: linear-gradient(180.0deg, #FCDF4D 0.05%, #FFD400 99.95%);
   border-radius: 0px 0px 20px 20px;
@@ -111,7 +110,7 @@ nav.app-navbar * {
   font-size: 24px;
   line-height: 29px;
   text-align: center; /* Center align the title */
-  text-transform: lowercase;
+  text-transform: uppercase;
   color: #000000;
   order: 0; /* Position it at the top */
   align-self: center; /* Center align horizontally */

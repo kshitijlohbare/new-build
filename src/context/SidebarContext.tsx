@@ -23,6 +23,7 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const toggleSidebar = () => {
+    console.log('Toggling sidebar, current state:', sidebarVisible);
     setSidebarVisible(prev => !prev);
   };
 

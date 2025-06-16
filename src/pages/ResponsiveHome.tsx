@@ -11,7 +11,14 @@ const ResponsiveHome = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
+    // Initial check
+    handleResize();
+    
     window.addEventListener("resize", handleResize);
+    
+    // Log for debugging
+    console.log("ResponsiveHome rendering, isMobile:", isMobile);
+    
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 

@@ -469,36 +469,155 @@ const terms: PsychTerm[] = [
 export function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   // Initialize with all terms by combining them here
-  const [filteredTerms, setFilteredTerms] = useState<PsychTerm[]>([...terms, ...moreConcepts, ...moreConcepts2, ...moreConcepts3, ...neuroscienceConcepts, ...navalConcepts]);
-  // const containerRef = useRef<HTMLDivElement | null>(null);
+  const allTerms = [...terms, ...moreConcepts, ...moreConcepts2, ...moreConcepts3, ...neuroscienceConcepts, ...navalConcepts];
+  const [filteredTerms, setFilteredTerms] = useState<PsychTerm[]>(allTerms);
   // Add a state to track which cards are expanded
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
   // Add a state to track which filter is active
   const [activeFilter, setActiveFilter] = useState<string>('all');
+  // Add state for dynamic filter categories
+  const [filterCategories, setFilterCategories] = useState<Array<{id: string, label: string, count: number}>>([]);
+
+  console.log("Learn component state - activeFilter:", activeFilter, "filteredTerms count:", filteredTerms.length);
   
-  // Define all possible filter categories
-  const filterCategories = [
-    { id: 'all', label: 'all' },
-    { id: 'habits', label: 'habits' },
-    { id: 'naval', label: 'naval ravikant' },
-    { id: 'huberman', label: 'andrew huberman' },
-    { id: 'neuroscience', label: 'neuroscience' },
-    { id: 'wisdom', label: 'wisdom' },
-    { id: 'psychology', label: 'psychology' },
-    { id: 'emotional', label: 'emotional' },
-    { id: 'cognitive', label: 'cognitive' }
-  ];
+  // Generate dynamic filter categories based on terms data
+  useEffect(() => {
+    console.log("Generating filter categories from", allTerms.length, "total terms");
+    if (allTerms.length > 0) {
+      // Start with the "all" filter
+      const categories: Array<{id: string, label: string, count: number}> = [
+        { id: 'all', label: 'all', count: allTerms.length }
+      ];
+      
+      // Create maps to count occurrences
+      const iconCounts = new Map<string, number>();
+      const categoryCounts = new Map<string, number>();
+      
+      // Process each term to count categories
+      allTerms.forEach(term => {
+        // Count by icon type
+        if (term.icon) {
+          iconCounts.set(term.icon, (iconCounts.get(term.icon) || 0) + 1);
+        }
+        
+        // Count by category (simplified)
+        if (term.category) {
+          const category = term.category.toLowerCase();
+          if (category.includes('naval')) {
+            categoryCounts.set('naval', (categoryCounts.get('naval') || 0) + 1);
+          } else if (category.includes('neuroscience')) {
+            categoryCounts.set('neuroscience', (categoryCounts.get('neuroscience') || 0) + 1);
+          } else if (category.includes('habit')) {
+            categoryCounts.set('habits', (categoryCounts.get('habits') || 0) + 1);
+          } else if (category.includes('psychology') || category === 'core concepts') {
+            categoryCounts.set('psychology', (categoryCounts.get('psychology') || 0) + 1);
+          } else if (category.includes('wellbeing') || category.includes('well-being')) {
+            categoryCounts.set('wellbeing', (categoryCounts.get('wellbeing') || 0) + 1);
+          }
+        }
+        
+        // Check for Huberman content in keywords
+        if (term.keywords?.some(k => k.toLowerCase().includes('huberman'))) {
+          categoryCounts.set('huberman', (categoryCounts.get('huberman') || 0) + 1);
+        }
+        
+        // Check for wisdom content
+        if (term.category?.toLowerCase().includes('wisdom') || 
+            term.keywords?.some(k => k.toLowerCase().includes('wisdom'))) {
+          categoryCounts.set('wisdom', (categoryCounts.get('wisdom') || 0) + 1);
+        }
+      });
+      
+      // Add icon-based categories
+      iconCounts.forEach((count, icon) => {
+        if (count > 0) {
+          categories.push({ id: icon, label: icon, count });
+        }
+      });
+      
+      // Add content-based categories
+      categoryCounts.forEach((count, category) => {
+        if (count > 0) {
+          categories.push({ id: category, label: category, count });
+        }
+      });
+      
+      console.log("Generated filter categories:", categories);
+      setFilterCategories(categories);
+    }
+  }, [allTerms]);
 
-  // Categories for filtering defined in component usage
+  // Filter terms based on search query and active filter
+  useEffect(() => {
+    const filtered = allTerms.filter(term => {
+      // Apply search query filter
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = query === '' || 
+        term.term.toLowerCase().includes(query) ||
+        term.explanation.toLowerCase().includes(query) ||
+        term.story.toLowerCase().includes(query) ||
+        term.category.toLowerCase().includes(query) ||
+        (term.keywords?.some(keyword => keyword.toLowerCase().includes(query)) ?? false);
+      
+      // If search doesn't match, return false immediately
+      if (!matchesSearch) return false;
+      
+      // If filter is 'all', include all search matches
+      if (activeFilter === 'all') return true;
+      
+      // Handle specific filters
+      switch(activeFilter) {
+        case 'naval':
+          return term.icon === 'naval' || 
+                 (term.keywords?.some(k => k.toLowerCase().includes('naval')) ?? false);
+        
+        case 'neuroscience':
+          return term.icon === 'neuroscience' || 
+                 term.category.toLowerCase().includes('neuroscience');
+        
+        case 'habits':
+          return term.category.toLowerCase().includes('habit') || 
+                 (term.keywords?.some(k => k.toLowerCase().includes('habit')) ?? false);
+        
+        case 'huberman':
+          return (term.keywords?.some(k => k.toLowerCase().includes('huberman')) ?? false);
+        
+        case 'wisdom':
+          return term.category.toLowerCase().includes('wisdom') || 
+                 (term.keywords?.some(k => k.toLowerCase().includes('wisdom')) ?? false);
+        
+        case 'psychology':
+          return term.category.toLowerCase().includes('psycholog') || 
+                 term.category.toLowerCase() === 'core concepts';
+        
+        case 'wellbeing':
+          return term.category.toLowerCase().includes('wellbeing') || 
+                 term.category.toLowerCase().includes('well-being');
+        
+        case 'emotional':
+          return term.icon === 'emotional';
+        
+        case 'cognitive':
+          return term.icon === 'cognitive';
+        
+        case 'behavioral':
+          return term.icon === 'behavioral';
+        
+        case 'mindfulness':
+          return term.icon === 'mindfulness';
+        
+        case 'social':
+          return term.icon === 'social';
+        
+        default:
+          console.log("Unknown filter:", activeFilter);
+          return false;
+      }
+    });
 
-  // Function to toggle card expansion
-  const toggleCardExpansion = (term: string, event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent card click from navigating
-    setExpandedCards(prev => ({
-      ...prev,
-      [term]: !prev[term]
-    }));
-  };
+    console.log(`Filtering with "${activeFilter}" and query "${searchQuery}" produced ${filtered.length} results from ${allTerms.length} total terms`);
+    setFilteredTerms(filtered);
+  }, [searchQuery, activeFilter, allTerms]);
 
   useEffect(() => {
     // Apply CSS animation styles to the document
@@ -518,8 +637,9 @@ export function Home() {
 
   useEffect(() => {
     // Filter terms based on search query and active filter
-    const allTermsForFiltering = [...terms, ...moreConcepts, ...moreConcepts2, ...moreConcepts3, ...neuroscienceConcepts, ...navalConcepts]; 
-    const filtered = allTermsForFiltering.filter(term => {
+    console.log("Filtering with activeFilter:", activeFilter, "searchQuery:", searchQuery);
+    
+    const filtered = allTerms.filter(term => {
       // Apply search query filter
       const query = searchQuery.toLowerCase();
       const matchesSearch = query === '' || 
@@ -529,28 +649,65 @@ export function Home() {
         term.category.toLowerCase().includes(query) ||
         (term.keywords?.some(keyword => keyword.toLowerCase().includes(query)) ?? false);
       
-      // Also apply category filter if not 'all'
+      // If search doesn't match, return false immediately
       if (!matchesSearch) return false;
       
+      // If filter is 'all', include all search matches
       if (activeFilter === 'all') return true;
-      if (activeFilter === 'naval' && term.icon === 'naval') return true;
-      if (activeFilter === 'neuroscience' && term.icon === 'neuroscience') return true;
-      if (activeFilter === 'habits' && (term.category.toLowerCase().includes('habit') || 
-                                       (term.keywords?.some(k => k.toLowerCase().includes('habit')) ?? false))) return true;
-      if (activeFilter === 'huberman' && (term.keywords?.some(k => k.toLowerCase().includes('huberman')) ?? false)) return true;
-      if (activeFilter === 'wisdom' && (term.category.toLowerCase().includes('wisdom') || 
-                                      (term.keywords?.some(k => k.toLowerCase().includes('wisdom')) ?? false))) return true;
-      if (activeFilter === 'psychology' && term.category.toLowerCase().includes('psycholog')) return true;
-      if (activeFilter === 'wellbeing' && (term.category.toLowerCase().includes('wellbeing') || 
-                                        term.category.toLowerCase().includes('well-being'))) return true;
-      if (activeFilter === 'emotional' && term.icon === 'emotional') return true;
-      if (activeFilter === 'cognitive' && term.icon === 'cognitive') return true;
       
-      return false;
+      // Handle specific filters
+      switch(activeFilter) {
+        case 'naval':
+          return term.icon === 'naval' || 
+                 (term.keywords?.some(k => k.toLowerCase().includes('naval')) ?? false);
+        
+        case 'neuroscience':
+          return term.icon === 'neuroscience' || 
+                 term.category.toLowerCase().includes('neuroscience');
+        
+        case 'habits':
+          return term.category.toLowerCase().includes('habit') || 
+                 (term.keywords?.some(k => k.toLowerCase().includes('habit')) ?? false);
+        
+        case 'huberman':
+          return (term.keywords?.some(k => k.toLowerCase().includes('huberman')) ?? false);
+        
+        case 'wisdom':
+          return term.category.toLowerCase().includes('wisdom') || 
+                 (term.keywords?.some(k => k.toLowerCase().includes('wisdom')) ?? false);
+        
+        case 'psychology':
+          return term.category.toLowerCase().includes('psycholog') || 
+                 term.category.toLowerCase() === 'core concepts';
+        
+        case 'wellbeing':
+          return term.category.toLowerCase().includes('wellbeing') || 
+                 term.category.toLowerCase().includes('well-being');
+        
+        case 'emotional':
+          return term.icon === 'emotional';
+        
+        case 'cognitive':
+          return term.icon === 'cognitive';
+        
+        case 'behavioral':
+          return term.icon === 'behavioral';
+        
+        case 'mindfulness':
+          return term.icon === 'mindfulness';
+        
+        case 'social':
+          return term.icon === 'social';
+        
+        default:
+          console.log("Unknown filter:", activeFilter);
+          return false;
+      }
     });
 
+    console.log(`Filtering with "${activeFilter}" and query "${searchQuery}" produced ${filtered.length} results from ${allTerms.length} total terms`);
     setFilteredTerms(filtered);
-  }, [searchQuery, activeFilter]);
+  }, [searchQuery, activeFilter, allTerms]);
 
   // Modified to handle card expansion/collapse instead of navigation
   const handleTermSelect = (term: PsychTerm, event: React.MouseEvent) => {
@@ -558,10 +715,32 @@ export function Home() {
     toggleCardExpansion(term.term, event);
   };
 
+  // Function to toggle card expansion
+  const toggleCardExpansion = (term: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent card click from navigating
+    setExpandedCards(prev => ({
+      ...prev,
+      [term]: !prev[term]
+    }));
+  };
+
   return (
-    <div className="min-h-screen flex flex-col p-[20px] bg-white" id="learn-page" aria-label="Psychology Concepts Learning Page">
+    <div className="min-h-screen flex flex-col p-[20px] bg-transparent relative pointer-events-none" id="learn-page" aria-label="Psychology Concepts Learning Page">
+      {/* Background embed frame */}
+      <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0">
+        <iframe 
+          src='https://my.spline.design/particleaibrain-az4SiexShAY1WrpvxP1RuP9A/' 
+          frameBorder='0' 
+          width='100%' 
+          height='100vh' 
+          className="fixed"
+          title="Background 3D animation"
+          style={{ minHeight: '100vh' }}
+        ></iframe>
+      </div>
+      
       {/* Title and Filters Container (copied from Practices) */}
-      <div className="flex flex-col justify-center items-center p-0 gap-[20px] w-full h-[74px] bg-white mb-4" id="learn-title-filters-container">
+      <div className="flex flex-col justify-center items-center p-0 gap-[20px] w-full h-[74px] bg-transparent mb-4 relative z-20 pointer-events-auto" id="learn-title-filters-container">
         {/* Page Title */}
         <div className="w-full h-[18px] text-center" id="learn-page-title">
           <span className="font-['Happy_Monkey'] font-normal text-[16px] leading-[18px] text-center lowercase text-[#04C4D5]">
@@ -569,19 +748,34 @@ export function Home() {
           </span>
         </div>
         {/* Filter Chips - Horizontal scrolling categories */}
-        <div className="flex flex-row items-start p-0 gap-[4px] w-full h-[36px] overflow-x-auto scrollbar-hide" id="learn-filter-chips-container">
+        <div className="flex flex-row items-start p-0 pl-[4px] pr-[4px] w-screen -mx-[20px] h-[36px] overflow-x-auto scrollbar-hide z-20 gap-2 pointer-events-auto" id="learn-filter-chips-container">
           {filterCategories.map(category => (
             <button 
               key={category.id}
-              onClick={() => setActiveFilter(category.id)}
-              className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] ${activeFilter === category.id ? 'bg-[rgba(83,252,255,0.1)]' : ''} border border-[#04C4D5] rounded-[20px] whitespace-nowrap`}>
-              <span className="font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF]">{category.label}</span>
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("Filter clicked:", category.id, "current activeFilter:", activeFilter);
+                setActiveFilter(category.id);
+              }}
+              className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] w-auto min-w-max cursor-pointer pointer-events-auto ${
+                activeFilter === category.id 
+                  ? 'bg-[#FCDF4D] border border-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)]' 
+                  : `border ${category.id === 'all' ? 'border-white' : 'border-[#04C4D5]'}`
+              } rounded-[20px] whitespace-nowrap px-4`}
+              style={{ touchAction: 'manipulation' }}
+            >
+              <span className={`font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase ${
+                activeFilter === category.id ? 'text-black' : 'text-[#148BAF]'
+              }`}>
+                {category.label} {category.count > 0 && category.id !== 'all' ? `(${category.count})` : ''}
+              </span>
             </button>
           ))}
         </div>
       </div>
       {/* Search Bar (fixed to bottom, like Practices) */}
-      <div className="fixed bottom-[20px] left-0 w-full flex justify-center z-[2]" id="learn-search-bar-container">
+      <div className="fixed bottom-[20px] left-0 w-full flex justify-center z-[20] pointer-events-auto" id="learn-search-bar-container">
         <div 
           className="box-border flex flex-row justify-center items-center px-[20px] py-[10px] gap-[10px] w-full max-w-[380px] h-[52px] bg-[#148BAF] border border-white rounded-[100px]" 
           id="learn-search-bar"
@@ -605,19 +799,20 @@ export function Home() {
       </div>
 
       {/* Concepts Grid Container */}
-      <div className="max-w-3xl mx-auto" id="concepts-container">
+      <div className="max-w-3xl mx-auto relative z-10 pointer-events-auto" id="concepts-container">
         {filteredTerms.length === 0 ? (
-          <p className="text-center text-gray-500 py-4" id="no-results-message">No concepts found. Try a different search term.</p>
+          <p className="text-center text-gray-500 py-4" id="no-results-message">No concepts found. Try a different search term or filter.</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-2 sm:px-0" id="concepts-grid" role="list" aria-label="Psychology concepts">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 px-2 sm:px-0 mx-auto" style={{ justifyItems: 'center' }} id="concepts-grid" role="list" aria-label="Psychology concepts">
             {filteredTerms.map((term, index) => (
               <div
                 key={term.term}
                 id={`concept-card-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
-                className={`box-border flex flex-col justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[8px] w-full
+                style={{ width: '100%', maxWidth: '360px' }}
+                className={`box-border flex flex-col justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[8px]
                   ${expandedCards[term.term] 
-                    ? 'h-auto sm:h-[188.7px] bg-white' 
-                    : 'h-auto sm:h-[92.7px] bg-[#F5F5F5]'} 
+                    ? 'h-auto sm:h-[188.7px] bg-white/80 backdrop-blur-xl' 
+                    : 'h-auto sm:h-[92.7px] bg-[#F5F5F5]/80 backdrop-blur-xl'} 
                   border border-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[10px] card-hover cursor-pointer 
                   ${index === 0 ? 'animate-slide-down' : ''} transition-all duration-300`}
                 onClick={(event) => handleTermSelect(term, event)}
@@ -723,3 +918,5 @@ export function Home() {
     </div>
   );
 }
+
+export default Home;

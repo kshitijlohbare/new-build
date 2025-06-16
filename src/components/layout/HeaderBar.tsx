@@ -19,18 +19,21 @@ const HeaderBar: React.FC = () => {
   }
 
   return (
-   <div className="flex flex-row items-center p-[10px] gap-[10px] w-full h-[52px] bg-gradient-to-b from-[#06C4D5] to-[#208EB1]">
+   <div id="main-header-bar" className="flex flex-row items-center p-[10px] gap-[10px] w-full h-[52px] bg-gradient-to-b from-[#06C4D5] to-[#208EB1] sticky top-0 z-10 pointer-events-auto flex-shrink-0">
       {/* Menu Button */}
-      <div 
-        className="flex items-center justify-center w-[24px] h-[24px] rounded-[8px] cursor-pointer"
+      <button 
+        type="button"
+        className="flex items-center justify-center w-[32px] h-[32px] rounded-[8px] cursor-pointer relative z-10 pointer-events-auto active:bg-white/30 p-1"
         onClick={toggleSidebar}
+        style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
+        aria-label="Toggle navigation menu"
       >
         <img 
           src={hamburgerIcon} 
           alt="Menu"
           className="w-[24px] h-[24px]"
         />
-      </div>
+      </button>
       
       {/* Logo */}
       <div className="flex flex-row items-center flex-grow">

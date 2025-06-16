@@ -3,7 +3,7 @@ import { usePractices } from '../../context/PracticeContext';
 import { X, Clock, BookOpen, Award, CheckCircle, ArrowLeft, ArrowRight, User, ExternalLink } from 'lucide-react';
 
 interface PracticeDetailPopupProps {
-  practiceId: number;
+  practiceId: number | null;
   onClose: () => void;
 }
 

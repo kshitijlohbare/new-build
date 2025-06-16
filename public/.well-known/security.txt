@@ -1,0 +1,6 @@
+https://caktuscoco.com/.well-known/security.txt
+Contact: mailto:security@caktuscoco.com
+Expires: 2026-06-16T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://caktuscoco.com/.well-known/security.txt
+Policy: https://caktuscoco.com/security-policy
