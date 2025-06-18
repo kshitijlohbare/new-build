@@ -1,0 +1,42 @@
+./src/pages/GroupMessages.tsx:// Mock data for demonstration
+./src/pages/GroupMessages.tsx:const mockMessages: Message[] = [
+./src/pages/GroupMessages.tsx:  const [messages, setMessages] = useState<Message[]>(mockMessages);
+./src/pages/MoreConcepts3.tsx:    story: "Despite having no specific expectations, Aisha felt pleasantly excited about her blind date, demonstrating the mild optimism we often feel toward neutral situations.",
+./src/pages/MoreConcepts3.tsx:    explanation: "The spacing effect demonstrates that learning is more effective when study sessions are spaced out over time, rather than crammed into a single session. Distributed practice leads to stronger memory formation.",
+./src/pages/MoreConcepts3.tsx:    story: "Though exhausted after work, Keisha stuck to her plan of going to the gym instead of collapsing on the couch, demonstrating her ability to override immediate desires for long-term goals.",
+./src/pages/TherapistListing_New.tsx:      // Set fallback data with more varied examples
+./src/pages/TherapistListing_New.tsx:          id: "fallback-1",
+./src/pages/TherapistListing_New.tsx:          id: "fallback-2",
+./src/pages/TherapistListing_New.tsx:          id: "fallback-3",
+./src/pages/TherapistListing_New.tsx:          id: "fallback-4",
+./src/pages/Learn.tsx:    story: "In a clinical trial, some patients given a sugar pill (placebo) reported significant improvement in their symptoms, simply because they believed they were receiving real treatment. This demonstrates the power of belief on health outcomes.",
+./src/pages/Profile.tsx:                          fallbackText={follower.display_name.charAt(0)}
+./src/pages/Profile.tsx:                          fallbackText={following.display_name.charAt(0)}
+./src/pages/FlashScreen.tsx:      {/* Add a visible fallback element */}
+./src/components/appointment/VideoCallSetup.tsx:        // If API fails, fall back to demo mode
+./src/components/appointment/VideoCallSetup.tsx:        console.warn('Zoom API call failed, falling back to demo mode');
+./src/components/appointment/VideoCallSetup.tsx:      // Fallback for demo or if API fails
+./src/components/appointment/VideoCallSetup.tsx:        // If API fails, fall back to demo mode
+./src/components/appointment/VideoCallSetup.tsx:        console.warn('Google Meet API call failed, falling back to demo mode');
+./src/components/appointment/VideoCallSetup.tsx:      // Fallback for demo or if API fails
+./src/components/appointment/VideoCallSetup.tsx:        // If API fails, fall back to demo mode
+./src/components/appointment/VideoCallSetup.tsx:        console.warn('Teams API call failed, falling back to demo mode');
+./src/components/appointment/VideoCallSetup.tsx:      // Fallback for demo or if API fails
+./src/components/appointment/VideoCallSetup.tsx:      // Send email notifications (mock)
+./src/components/appointment/VideoCallSetup.tsx:            <strong>Note:</strong> This is a demo implementation. In production, this would:
+./src/components/appointment/CalendarIntegration.tsx:        // If the API fails, fall back to demo mode
+./src/components/appointment/CalendarIntegration.tsx:        console.warn('Availability API call failed, falling back to demo mode');
+./src/components/appointment/CalendarIntegration.tsx:      // Fall back to demo availability
+./src/components/appointment/CalendarIntegration.tsx:  // Generate fallback time slots for demo or when API fails
+./src/components/appointment/CalendarIntegration.tsx:    // Generate mock time slots (9 AM to 5 PM, 1-hour intervals)
+./src/components/appointment/CalendarIntegration.tsx:      // Make some slots unavailable as demo
+./src/components/appointment/CalendarIntegration.tsx:      // For demo purposes, we'll set it as connected anyway
+./src/components/appointment/CalendarIntegration.tsx:      // Still fetch time slots for the demo
+./src/components/appointment/CalendarIntegration.tsx:            <strong>Note:</strong> This is a demo. In production, this would:
+./src/services/AppointmentBookingService.ts:  // Create a fallback meeting when API calls fail
+./src/services/AppointmentBookingService.ts:    console.warn(`⚠️ Using fallback meeting creation for ${platform} appointment ${appointmentId}`);
+./src/services/EmailNotificationService.ts:  private emailProvider = 'mock'; // 'sendgrid' | 'mailgun' | 'aws-ses' | 'mock'
+./src/services/EmailNotificationService.ts:    // Mock success/failure (90% success rate for demo)
+./src/services/EmailNotificationService.ts:      case 'mock':
+./src/services/EmailNotificationService.ts:    // For demo purposes, we'll just log that it would be scheduled
+./src/services/EmailNotificationService.ts:        // For demo purposes, using placeholder email

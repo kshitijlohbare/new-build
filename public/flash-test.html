@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Screen Test</title>
+    <style>
+        .flash-screen__container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #3b5998;
+            z-index: 9999;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .flash-screen__moving-rect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 100vh;
+            background: #ffe066;
+            -webkit-mask-image: url('./src/assets/Frame143.svg');
+            mask-image: url('./src/assets/Frame143.svg');
+            -webkit-mask-size: cover;
+            mask-size: cover;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            transition: left 0.1s linear;
+        }
+
+        .loading-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            fontSize: 24px;
+            font-weight: bold;
+            z-index: 10000;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="flash-screen__container">
+        <div class="loading-text">Loading...</div>
+        <div class="flash-screen__moving-rect" id="movingRect"></div>
+    </div>
+
+    <script>
+        const rect = document.getElementById('movingRect');
+        let animationFrame;
+        let start = null;
+        const duration = 2000; // ms
+        const screenWidth = window.innerWidth;
+        const rectWidth = 100;
+
+        function animate(timestamp) {
+            if (!start) start = timestamp;
+            const elapsed = (timestamp - start) % duration;
+            const progress = elapsed / duration;
+            const left = progress * (screenWidth + rectWidth) - rectWidth;
+            rect.style.left = `${left}px`;
+            animationFrame = requestAnimationFrame(animate);
+        }
+        
+        animationFrame = requestAnimationFrame(animate);
+        
+        // Hide after 3 seconds for testing
+        setTimeout(() => {
+            document.body.innerHTML = '<h1 style="text-align: center; margin-top: 50px;">Flash screen test completed!</h1>';
+        }, 3000);
+    </script>
+</body>
+</html>

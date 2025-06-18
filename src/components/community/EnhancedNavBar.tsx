@@ -54,112 +54,109 @@ const EnhancedNavBar: React.FC<CommunityTopNavBarProps> = ({ activeView, onViewC
   }, [activeView]);
 
   return (
-    <div className="community-top-nav-wrapper w-full px-3 py-2">
-      {/* Main container */}
-      <div className="community-top-nav-bar w-full h-[52px] bg-[#F5F5F5] border border-white rounded-[100px] flex items-center justify-between px-1 relative overflow-hidden">
-        {/* Background highlight pill that moves based on active state */}
-        <motion.div
-          animate={{ left: pillStyle.left, width: pillStyle.width }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="absolute top-1 h-[44px] bg-[#FCDF4D] rounded-full shadow-[1px_2px_4px_rgba(73,218,234,0.5)] z-0"
-        />
-        
-        {/* News Feed - Left section */}
-        <motion.div
-          ref={newsfeedRef}
-          className="flex justify-center items-center h-full relative z-10 cursor-pointer"
-          style={{ flexBasis: activeView === 'newsfeed' ? '100%' : '60%', flexGrow: 0, flexShrink: 1 }}
-          animate={{ flexBasis: activeView === 'newsfeed' ? '100%' : '60%' }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          onClick={() => onViewChange('newsfeed')}
-          whileHover={{ scale: activeView !== 'newsfeed' ? 1.05 : 1 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <div className="flex items-center justify-center w-full">
-            <img
-              src={activeView === 'newsfeed' ? NewsFeedIconActive : NewsFeedIcon}
-              alt="News Feed"
-              className="mr-2"
-              width={24}
-              height={24}
-            />
-            {activeView === 'newsfeed' && (
-              <motion.span
-                initial="hidden"
-                animate="visible"
-                variants={textVariants}
-                className="font-['Happy_Monkey'] text-base text-black whitespace-nowrap"
-              >
-                share your feels
-              </motion.span>
-            )}
-          </div>
-        </motion.div>
-        
-        {/* Community - Center section */}
-        <motion.div
-          ref={communityRef}
-          className="flex justify-center items-center h-full relative z-10 cursor-pointer"
-          style={{ flexBasis: activeView === 'community' ? '100%' : '60%', flexGrow: 0, flexShrink: 1 }}
-          animate={{ flexBasis: activeView === 'community' ? '100%' : '60%' }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          onClick={() => onViewChange('community')}
-          whileHover={{ scale: activeView !== 'community' ? 1.05 : 1 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <div className="flex items-center justify-center w-full">
-            <img
-              src={activeView === 'community' ? CommunityIconActive : CommunityIcon}
-              alt="Community"
-              className="mr-2"
-              width={24}
-              height={24}
-            />
-            {activeView === 'community' && (
-              <motion.span
-                initial="hidden"
-                animate="visible"
-                variants={textVariants}
-                className="font-['Happy_Monkey'] text-base text-black whitespace-nowrap"
-              >
-                find your tribe
-              </motion.span>
-            )}
-          </div>
-        </motion.div>
-        
-        {/* Profile - Right section */}
-        <motion.div
-          ref={profileRef}
-          className="flex justify-center items-center h-full relative z-10 cursor-pointer"
-          style={{ flexBasis: activeView === 'profile' ? '100%' : '60%', flexGrow: 0, flexShrink: 1 }}
-          animate={{ flexBasis: activeView === 'profile' ? '100%' : '60%' }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          onClick={() => onViewChange('profile')}
-          whileHover={{ scale: activeView !== 'profile' ? 1.05 : 1 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <div className="flex items-center justify-center w-full">
-            <img
-              src={activeView === 'profile' ? ProfileIconActive : ProfileIcon}
-              alt="Profile"
-              className="mr-2"
-              width={24}
-              height={24}
-            />
-            {activeView === 'profile' && (
-              <motion.span
-                initial="hidden"
-                animate="visible"
-                variants={textVariants}
-                className="font-['Happy_Monkey'] text-base text-black whitespace-nowrap"
-              >
-                profile
-              </motion.span>
-            )}
-          </div>
-        </motion.div>
-      </div>
+    <div className="w-full h-[52px] bg-[#F5F5F5] border border-white rounded-[100px] flex items-center justify-between px-1 relative overflow-hidden">
+      {/* Background highlight pill that moves based on active state */}
+      <motion.div
+        animate={{ left: pillStyle.left, width: pillStyle.width }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="absolute top-1 h-[44px] bg-[#FCDF4D] rounded-full shadow-[1px_2px_4px_rgba(73,218,234,0.5)] z-0"
+      />
+      
+      {/* News Feed - Left section */}
+      <motion.div
+        ref={newsfeedRef}
+        className="flex justify-center items-center h-full relative z-10 cursor-pointer"
+        style={{ flexBasis: activeView === 'newsfeed' ? '100%' : '60%', flexGrow: 0, flexShrink: 1 }}
+        animate={{ flexBasis: activeView === 'newsfeed' ? '100%' : '60%' }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        onClick={() => onViewChange('newsfeed')}
+        whileHover={{ scale: activeView !== 'newsfeed' ? 1.05 : 1 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <div className="flex items-center justify-center w-full">
+          <img
+            src={activeView === 'newsfeed' ? NewsFeedIconActive : NewsFeedIcon}
+            alt="News Feed"
+            className="mr-2"
+            width={24}
+            height={24}
+          />
+          {activeView === 'newsfeed' && (
+            <motion.span
+              initial="hidden"
+              animate="visible"
+              variants={textVariants}
+              className="font-['Happy_Monkey'] text-base text-black whitespace-nowrap"
+            >
+              share your feels
+            </motion.span>
+          )}
+        </div>
+      </motion.div>
+      
+      {/* Community - Center section */}
+      <motion.div
+        ref={communityRef}
+        className="flex justify-center items-center h-full relative z-10 cursor-pointer"
+        style={{ flexBasis: activeView === 'community' ? '100%' : '60%', flexGrow: 0, flexShrink: 1 }}
+        animate={{ flexBasis: activeView === 'community' ? '100%' : '60%' }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        onClick={() => onViewChange('community')}
+        whileHover={{ scale: activeView !== 'community' ? 1.05 : 1 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <div className="flex items-center justify-center w-full">
+          <img
+            src={activeView === 'community' ? CommunityIconActive : CommunityIcon}
+            alt="Community"
+            className="mr-2"
+            width={24}
+            height={24}
+          />
+          {activeView === 'community' && (
+            <motion.span
+              initial="hidden"
+              animate="visible"
+              variants={textVariants}
+              className="font-['Happy_Monkey'] text-base text-black whitespace-nowrap"
+            >
+              find your tribe
+            </motion.span>
+          )}
+        </div>
+      </motion.div>
+      
+      {/* Profile - Right section */}
+      <motion.div
+        ref={profileRef}
+        className="flex justify-center items-center h-full relative z-10 cursor-pointer"
+        style={{ flexBasis: activeView === 'profile' ? '100%' : '60%', flexGrow: 0, flexShrink: 1 }}
+        animate={{ flexBasis: activeView === 'profile' ? '100%' : '60%' }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        onClick={() => onViewChange('profile')}
+        whileHover={{ scale: activeView !== 'profile' ? 1.05 : 1 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <div className="flex items-center justify-center w-full">
+          <img
+            src={activeView === 'profile' ? ProfileIconActive : ProfileIcon}
+            alt="Profile"
+            className="mr-2"
+            width={24}
+            height={24}
+          />
+          {activeView === 'profile' && (
+            <motion.span
+              initial="hidden"
+              animate="visible"
+              variants={textVariants}
+              className="font-['Happy_Monkey'] text-base text-black whitespace-nowrap"
+            >
+              profile
+            </motion.span>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 };

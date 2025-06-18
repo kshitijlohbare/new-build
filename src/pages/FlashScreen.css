@@ -4,9 +4,12 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #fff;
+  background: #3b5998; /* Changed to blue background to make it more visible */
   z-index: 9999;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .flash-screen__moving-rect {
@@ -17,8 +20,8 @@
   height: 100vh;
   background: #ffe066;
   /* Masking with SVG */
-  -webkit-mask-image: url('../assets/Frame 143.svg');
-  mask-image: url('../assets/Frame 143.svg');
+  -webkit-mask-image: url('../assets/Frame143.svg');
+  mask-image: url('../assets/Frame143.svg');
   -webkit-mask-size: cover;
   mask-size: cover;
   -webkit-mask-repeat: no-repeat;

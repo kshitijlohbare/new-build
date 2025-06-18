@@ -1,22 +1,26 @@
 // browser-safe-supabase.js - A Supabase client optimized for browser use 
 import { createClient } from '@supabase/supabase-js';
+import { getSupabaseConfig, isDevelopment, logEnvironmentInfo } from './env-config';
 
 /**
  * Creates a Supabase client optimized for browser environments
  * This client handles CORS issues by using appropriate configuration
  */
 const createBrowserSafeClient = () => {
-  // Get Supabase configuration - use window globals if available
-  const supabaseUrl = typeof window !== 'undefined' && window.SUPABASE_URL 
-    ? window.SUPABASE_URL 
-    : 'https://svnczxevigicuskppyfz.supabase.co';
+  // Log environment information in development
+  logEnvironmentInfo();
   
-  const supabaseKey = typeof window !== 'undefined' && window.SUPABASE_ANON_KEY
-    ? window.SUPABASE_ANON_KEY
-    : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bmN6eGV2aWdpY3Vza3BweWZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwNDk1NDAsImV4cCI6MjA1OTYyNTU0MH0.00MNZRYjGKHTEFvF0enW-VCZ4qgDnXC4LeV8XsjGaEU';
-
-  // Detect if we're running in development mode (localhost)
-  const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+  // Get Supabase configuration from centralized config
+  const { supabaseUrl, supabaseKey } = getSupabaseConfig();
+  
+  // Validate configuration
+  if (!supabaseUrl) {
+    throw new Error('Supabase URL is not configured. Please check your environment variables.');
+  }
+  
+  if (!supabaseKey) {
+    throw new Error('Supabase key is not configured. Please check your environment variables.');
+  }
   
   // Create client options
   const options = {
@@ -42,22 +46,22 @@ const createBrowserSafeClient = () => {
   // When in development, use local proxy paths
   if (isDevelopment) {
     console.log('Creating Supabase client in development mode with proxy support');
-
-    // For localhost development - use empty URL to leverage proxy
-    return createClient('', supabaseKey, {
+    
+    // For localhost development - must provide a valid URL even when using proxy
+    return createClient(supabaseUrl, supabaseKey, {
       ...options,
       rest: {
-        baseUrl: '/rest/v1'
+        baseUrl: `${supabaseUrl}/rest/v1`
       },
       realtime: {
-        baseUrl: '/realtime/v1'
+        baseUrl: `${supabaseUrl}/realtime/v1`
       },
       auth: {
         ...options.auth,
-        baseUrl: '/auth/v1',
+        baseUrl: `${supabaseUrl}/auth/v1`,
       },
       storage: {
-        baseUrl: '/storage/v1'
+        baseUrl: `${supabaseUrl}/storage/v1`
       },
     });
   } else {
@@ -66,8 +70,28 @@ const createBrowserSafeClient = () => {
   }
 };
 
-// Create and export a singleton instance
-export const supabase = createBrowserSafeClient();
+// Create and export a singleton instance with error handling
+let supabaseClient;
+try {
+  supabaseClient = createBrowserSafeClient();
+  console.log('Supabase client successfully initialized');
+} catch (error) {
+  console.error('Failed to initialize Supabase client:', error);
+  // Fallback to a dummy client to prevent application crashes
+  supabaseClient = {
+    from: () => ({
+      select: () => ({ data: [], error: new Error('Supabase client failed to initialize') }),
+      insert: () => ({ data: null, error: new Error('Supabase client failed to initialize') }),
+      update: () => ({ data: null, error: new Error('Supabase client failed to initialize') }),
+      delete: () => ({ data: null, error: new Error('Supabase client failed to initialize') }),
+    }),
+    auth: {
+      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+      onAuthStateChange: () => ({ data: null, error: null, unsubscribe: () => {} }),
+    },
+  };
+}
+export const supabase = supabaseClient;
 
 // Helper function for getting session data
 export const getSessionFromLocalStorage = () => {

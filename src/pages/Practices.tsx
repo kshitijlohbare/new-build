@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { usePractices, Practice } from "@/context/PracticeContext";
 import { useToast } from '@/hooks/useToast';
 import AddPracticeDialog from "@/components/wellbeing/AddPracticeDialog";
-import PracticeDetailPopup from '@/components/wellbeing/PracticeDetailPopup';
+import SimplePracticePopup from '@/components/wellbeing/SimplePracticePopup';
+import ClickablePortal from '@/components/common/ClickablePortal';
+import '@/components/wellbeing/popupFix.css';
 
 // Import icons
 import QuotesIcon from "../assets/icons/quotes.svg";
@@ -20,6 +22,18 @@ const Practices = () => {
   
   // Add state for dynamic filter categories
   const [filterCategories, setFilterCategories] = useState<Array<{id: string, label: string, count: number}>>([]);
+  
+  // Helper function to get emoji based on practice icon
+  const getIconEmoji = (icon?: string) => {
+    const iconMap: Record<string, string> = {
+      'shower': '🚿', 'sun': '☀️', 'moleskine': '📓', 'book': '📚',
+      'relax': '😌', 'tree': '🌳', 'calendar': '📅', 'review': '📋',
+      'disconnect': '🔌', 'screen': '📱', 'caffeine': '☕', 'smelling': '👃',
+      'sparkles': '✨', 'anchor': '⚓', 'brain': '🧠'
+    };
+    
+    return iconMap[icon || ''] || '📝';
+  };
   
   // Generate dynamic filter categories based on practice data
   useEffect(() => {
@@ -389,7 +403,7 @@ const Practices = () => {
       <div className="grid grid-cols-2 gap-2 justify-items-center justify-center relative z-10 pointer-events-auto" id="practices-grid" data-testid="practices-grid-container">
         {filteredPractices.map((practice) => (
           <div key={practice.id} 
-               className={`flex flex-col justify-center items-center p-[10px] gap-[10px] w-full h-[200px] ${practice.isDaily ? 'bg-[#F5F5F5]/80':'bg-[#EDFEFF]/80'} backdrop-blur-xl shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[8px]`}
+               className={`flex flex-col justify-start items-stretch p-[10px] gap-[10px] w-full h-[220px] ${practice.isDaily ? 'bg-[#F5F5F5]/80':'bg-[#EDFEFF]/80'} backdrop-blur-xl shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[8px]`}
                data-testid={`practice-card-${practice.id}`}
                onClick={() => handlePracticeNameClick(practice.id)}
                style={{ 
@@ -397,25 +411,38 @@ const Practices = () => {
                  position: "relative",
                  width: "100%"
                }}> 
-            {/* Practice Card Title */}
-            <div className={`w-full h-[36px] font-['Righteous'] font-normal text-[16px] leading-[18px] flex items-center justify-center text-center uppercase ${practice.isDaily ? 'text-[#FFD400]' : 'text-[#148BAF]'} flex-none order-0 self-stretch`}
+            {/* Practice Card Title with Icon Circle */}
+            <div className={`w-full min-h-[48px] font-['Righteous'] font-normal text-[16px] leading-[18px] flex flex-wrap items-center justify-start text-left uppercase ${practice.isDaily ? 'text-[#FFD400]' : 'text-[#148BAF]'} flex-none order-0 self-stretch relative`}
                  data-testid={`practice-card-title-${practice.id}`}>
-              <span>{practice.name}</span>
+              <div 
+                className="w-[24px] h-[24px] rounded-full flex items-center justify-center bg-white ml-1 mr-2"
+                style={{ 
+                  boxShadow: "0px 1px 2px rgba(0,0,0,0.1)",
+                  border: `1px solid ${practice.isDaily ? 'rgba(255,212,0,0.3)' : 'rgba(4,196,213,0.2)'}`,
+                  flexShrink: 0,
+                  marginTop: "2px"
+                }}
+              >
+                <span className="text-[13px]" style={{ lineHeight: 1 }}>
+                  {getIconEmoji(practice.icon)}
+                </span>
+              </div>
+              <div className="line-clamp-2 text-left flex-1">{practice.name}</div>
             </div>
             {/* Practice Card Description */}
-            <div className="w-full h-[64px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-black flex-none order-1 self-stretch overflow-hidden"
+            <div className="w-full h-[72px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center px-2 text-left lowercase text-black flex-none order-1 self-stretch overflow-hidden"
                  data-testid={`practice-card-description-${practice.id}`}>
-              <div className="line-clamp-3 overflow-ellipsis">
+              <div className="line-clamp-4 overflow-ellipsis w-full">
                 {practice.description}
               </div>
             </div>
             {/* Practice Card Source Tag */}
-            <div className="flex flex-row justify-center items-center py-[4px] px-[8px] gap-[4px] w-full h-[24px] bg-white rounded-[8px] flex-none order-2 self-stretch"
+            <div className="flex flex-row justify-start items-center py-[4px] px-[8px] gap-[4px] w-full h-[24px] bg-white rounded-[8px] flex-none order-2 self-stretch"
                  data-testid={`practice-card-source-${practice.id}`}>
               {/* Left quote icon */}
               <img src={QuotesIcon} alt="quotes" className="w-auto h-[8px] flex-none order-0 flex-grow-0" />
               {/* Source Text */}
-              <div className="mx-2 font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase text-[#148BAF] flex-none order-1 flex-grow-1 truncate overflow-hidden max-w-[75%]">
+              <div className="mx-2 font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-left lowercase text-[#148BAF] flex-none order-1 flex-grow-1 truncate overflow-hidden max-w-[75%]">
                 {practice.source || 'source'}
               </div>
               {/* Right quote icon */}
@@ -424,7 +451,7 @@ const Practices = () => {
             {/* Practice Card Action Button */}
             <button
               onClick={e => { e.stopPropagation(); handleToggleDailyPractice(practice); }}
-              className={`box-border flex flex-col justify-center items-center py-[4px] px-[8px] gap-[4px] w-full h-[26px] rounded-[8px] flex-none order-3 self-stretch ${practice.isDaily ? 'bg-[#FFE066] border border-[#FFE066]' : 'bg-white border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.5)]'}`}
+              className={`box-border flex flex-col justify-center items-center py-[4px] px-[8px] gap-[4px] w-full h-[26px] rounded-[8px] flex-none order-3 self-stretch ${practice.isDaily ? 'bg-[#FFE066] border border-[#FFE066]' : 'bg-white border border-[#04C4D5] shadow-[1px 2px 4px rgba(73,218,234,0.5)]'}`}
               data-testid={`practice-card-action-button-${practice.id}`}
               style={practice.isDaily ? {} : { boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
             >
@@ -465,13 +492,14 @@ const Practices = () => {
 
       {/* Modal Components */}
       {/* Practice Detail Popup - Shows when a practice is clicked */}
-      {selectedPracticeId !== null && (
-        <PracticeDetailPopup
-          practiceId={selectedPracticeId}
-          onClose={handleClosePopup}
-          data-testid="practice-detail-popup"
-        />
-      )}
+      <ClickablePortal isOpen={selectedPracticeId !== null} onClose={handleClosePopup}>
+        {selectedPracticeId !== null && (
+          <SimplePracticePopup
+            practiceId={selectedPracticeId}
+            onClose={handleClosePopup}
+          />
+        )}
+      </ClickablePortal>
       {/* Add Practice Dialog - For adding new practices */}
       <AddPracticeDialog 
         isOpen={isAddPracticeDialogOpen}

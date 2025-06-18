@@ -12,12 +12,11 @@ const CommunityTopNavBar: React.FC<CommunityTopNavBarProps> = ({ activeView, onV
   // - profile: "profile" in yellow pill on right
   
   return (
-    <div className="community-top-nav-wrapper w-full px-3 py-2 flex flex-row justify-center items-center">
-      <div className="community-top-nav-bar w-full h-[52px] bg-[#F5F5F5] border border-white rounded-[100px] flex flex-row items-center justify-between px-2 relative">
+    <div className="w-full h-[52px] bg-[#F5F5F5] border border-white rounded-[100px] flex flex-row items-center justify-between px-2 relative">
         
         {/* News Feed Icon - Pen/Notes (Left side) */}
         <div 
-          className={`community-nav-icon flex items-center justify-center cursor-pointer ${activeView === 'newsfeed' ? 'z-10' : ''}`}
+          className={`flex items-center justify-center cursor-pointer ${activeView === 'newsfeed' ? 'z-10' : ''}`}
           onClick={() => onViewChange('newsfeed')}
         >
           <svg width="32" height="32" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -38,7 +37,7 @@ const CommunityTopNavBar: React.FC<CommunityTopNavBarProps> = ({ activeView, onV
         
         {/* Community Icon - Group */}
         <div 
-          className={`community-nav-icon w-12 h-12 flex items-center justify-center cursor-pointer ${activeView === 'community' ? 'bg-[#FCDF4D] rounded-full shadow-[1px_2px_4px_rgba(73,218,234,0.5)]' : ''}`}
+          className={`w-12 h-12 flex items-center justify-center cursor-pointer ${activeView === 'community' ? 'bg-[#FCDF4D] rounded-full shadow-[1px_2px_4px_rgba(73,218,234,0.5)]' : ''}`}
           onClick={() => onViewChange('community')}
         >
           <svg width="32" height="32" viewBox="0 0 28 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -57,7 +56,7 @@ const CommunityTopNavBar: React.FC<CommunityTopNavBarProps> = ({ activeView, onV
         
         {/* Profile Icon - User */}
         <div 
-          className={`community-nav-icon w-12 h-12 flex items-center justify-center cursor-pointer ${activeView === 'profile' ? 'bg-[#FCDF4D] rounded-full shadow-[1px_2px_4px_rgba(73,218,234,0.5)]' : ''}`}
+          className={`w-12 h-12 flex items-center justify-center cursor-pointer ${activeView === 'profile' ? 'bg-[#FCDF4D] rounded-full shadow-[1px_2px_4px_rgba(73,218,234,0.5)]' : ''}`}
           onClick={() => onViewChange('profile')}
         >
           <svg width="32" height="32" viewBox="0 0 25 28" fill="none" xmlns="http://www.w3.org/2000/svg">

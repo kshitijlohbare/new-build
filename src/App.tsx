@@ -6,7 +6,7 @@ import { PracticeProvider } from "./context/PracticeContext"; // Import the new 
 import { AchievementProvider } from "./context/AchievementContext"; // Import the achievement provider
 import { ProfileProvider } from "./context/ProfileContext"; // Import the profile provider
 import { SidebarProvider } from "./context/SidebarContext"; // Import the sidebar provider
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { checkUserProfileTables } from "./scripts/profileUtils";
 import { ensureDatabaseTables } from "./scripts/ensureDatabaseTables";
 import { createSQLFunctions } from "./scripts/createSQLFunctions";
@@ -29,8 +29,13 @@ import PractitionerListing from "./pages/PractitionerListing"; // Import our new
 import TherapyBooking from "./pages/TherapyBooking";
 import Booking from "./pages/Booking"; // Import the Booking page
 import Community from "./pages/Community"; // Import the Community page for fitness groups
+import FitnessGroups from "./pages/FitnessGroups"; // Import the FitnessGroups page
+import SocialFeed from "./pages/SocialFeed"; // Import the new SocialFeed UI
 import PractitionerDetail from "./pages/PractitionerDetail"; // Import the new PractitionerDetail page
 import TherapistRegistration from "./pages/TherapistRegistration";
+// Import lazy loaded versions of Fitness Groups
+const FitnessGroupsNew = lazy(() => import("./pages/FitnessGroups.new"));
+const FitnessGroupsUpdated = lazy(() => import("./pages/FitnessGroups.updated"));
 // Ensure we load the correct FocusTimer with explicit path
 import FocusTimer from "./pages/FocusTimer";
 import PractitionerOnboarding from "./pages/PractitionerOnboarding"; // Import PractitionerOnboarding
@@ -38,7 +43,7 @@ import PractitionerEditProfile from "./pages/PractitionerEditProfile"; // Import
 import { Home as Learn } from "./pages/Learn"; // Import Learn using named import
 import TestPage from "./pages/TestPage"; // Import TestPage for debugging
 import LandingPage from "./pages/LandingPage"; // Import the new LandingPage
-import FlashScreen from './pages/FlashScreen';
+import FlashScreen from "./pages/FlashScreen";
 import './App.css';
 import React from "react"; // Make sure React is imported
 
@@ -126,19 +131,23 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
 }
 
 const App = () => {
-  // Flash screen state
-  const [showFlash, setShowFlash] = useState(true);
+  // Flash screen state - disabled by default (for testing only)
+  const [showFlash] = useState(false); // Flash screen disabled
   const [initError, setInitError] = useState<string | null>(null);
 
-  // Always call all hooks at the top level, before any conditional return
+  // Flash screen disabled - no need for the timer effect
+  /* 
   useEffect(() => {
+    console.log('App mounted - showing flash screen');
     // Show flash screen then main content
     const flashTimer = setTimeout(() => {
+      console.log('Flash screen timer expired - hiding flash screen');
       setShowFlash(false);
     }, 2000); // Flash screen duration
     
     return () => clearTimeout(flashTimer);
   }, []);
+  */
 
   // Initialize necessary tables when app loads
   useEffect(() => {
@@ -199,11 +208,14 @@ const App = () => {
     );
   }
   
-  // Show flash screen
+  // Flash screen disabled, but code kept for reference 
   if (showFlash) {
+    console.log('Rendering FlashScreen component');
     return <FlashScreen />;
   }
 
+  // Always render main app content
+  console.log('Rendering main app content');
   return (
     <ErrorBoundary>
       <Favicon />
@@ -253,8 +265,30 @@ const App = () => {
                           <Route path="practitioner-edit-profile" element={<PractitionerEditProfile />} />
                           <Route path="learn" element={<Learn />} /> {/* Add the learn page route */}
                           <Route path="fitness-groups" element={<Community />} /> {/* Add the fitness groups route */}
+                          <Route path="fitness" element={<FitnessGroups />} /> {/* Direct access to Fitness Groups page */}
+                          <Route path="social" element={<SocialFeed />} /> {/* New social feed UI based on the image */}
+                          <Route path="fitness-new" element={
+                            <ProtectedRoute>
+                              {/* Special route to see the updated fitness groups implementation */}
+                              <div style={{height: '100%', width: '100%'}}>
+                                <Suspense fallback={<div>Loading...</div>}>
+                                  <FitnessGroupsNew />
+                                </Suspense>
+                              </div>
+                            </ProtectedRoute>
+                          } /> {/* Access to new version of Fitness Groups */}
+                          <Route path="fitness-updated" element={
+                            <ProtectedRoute>
+                              {/* Special route to see the updated fitness groups implementation */}
+                              <div style={{height: '100%', width: '100%'}}>
+                                <Suspense fallback={<div>Loading...</div>}>
+                                  <FitnessGroupsUpdated />
+                                </Suspense>
+                              </div>
+                            </ProtectedRoute>
+                          } /> {/* Access to updated version of Fitness Groups */}
                           <Route path="test" element={<TestPage />} /> {/* Add the test page route for debugging */}
-                          <Route path="flash" element={<FlashScreen />} /> {/* Temporary route to view the FlashScreen component */}
+                          <Route path="flash" element={<FlashScreen />} /> {/* Route kept for testing purposes only */}
                         </Route>
                         
                         {/* Redirect root for non-authenticated users to landing page */}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { BookOpen, Lightbulb, Heart, Brain, Zap, Anchor } from "lucide-react";
 import { moreConcepts } from "./MoreConcepts";
 import { moreConcepts2 } from "./MoreConcepts2";
@@ -15,7 +15,19 @@ const animationStyles = `
 
 @keyframes pulse {
   0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  5        case 'mindfulness':
+          return term.icon === 'mindfulness';
+        
+        case 'social':
+          return term.icon === 'social';
+        
+        default:
+          return false;
+      }
+    });
+
+    setFilteredTerms(filtered);
+  }, [searchQuery, activeFilter, allTerms]); scale(1.05); }
   100% { transform: scale(1); }
 }
 
@@ -468,8 +480,32 @@ const terms: PsychTerm[] = [
 
 export function Home() {
   const [searchQuery, setSearchQuery] = useState("");
-  // Initialize with all terms by combining them here
-  const allTerms = [...terms, ...moreConcepts, ...moreConcepts2, ...moreConcepts3, ...neuroscienceConcepts, ...navalConcepts];
+  
+  // Function to remove duplicate terms by keeping the first occurrence
+  const removeDuplicateTerms = (termsArray: PsychTerm[]): PsychTerm[] => {
+    const uniqueTerms: PsychTerm[] = [];
+    const seenTerms = new Set<string>();
+    
+    termsArray.forEach(term => {
+      if (!seenTerms.has(term.term)) {
+        seenTerms.add(term.term);
+        uniqueTerms.push(term);
+      }
+    });
+    
+    return uniqueTerms;
+  };
+  
+  // Memoize allTerms to prevent infinite update loop
+  const allTerms = useMemo(() => removeDuplicateTerms([
+    ...terms,
+    ...moreConcepts,
+    ...moreConcepts2,
+    ...moreConcepts3,
+    ...neuroscienceConcepts,
+    ...navalConcepts
+  ]), [terms, moreConcepts, moreConcepts2, moreConcepts3, neuroscienceConcepts, navalConcepts]);
+
   const [filteredTerms, setFilteredTerms] = useState<PsychTerm[]>(allTerms);
   // Add a state to track which cards are expanded
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
@@ -478,71 +514,59 @@ export function Home() {
   // Add state for dynamic filter categories
   const [filterCategories, setFilterCategories] = useState<Array<{id: string, label: string, count: number}>>([]);
 
-  console.log("Learn component state - activeFilter:", activeFilter, "filteredTerms count:", filteredTerms.length);
-  
   // Generate dynamic filter categories based on terms data
   useEffect(() => {
-    console.log("Generating filter categories from", allTerms.length, "total terms");
     if (allTerms.length > 0) {
       // Start with the "all" filter
       const categories: Array<{id: string, label: string, count: number}> = [
         { id: 'all', label: 'all', count: allTerms.length }
       ];
       
-      // Create maps to count occurrences
-      const iconCounts = new Map<string, number>();
-      const categoryCounts = new Map<string, number>();
+      // Create a single map to track all categories and avoid duplicates
+      const categoryCountsMap = new Map<string, number>();
       
       // Process each term to count categories
       allTerms.forEach(term => {
         // Count by icon type
         if (term.icon) {
-          iconCounts.set(term.icon, (iconCounts.get(term.icon) || 0) + 1);
+          categoryCountsMap.set(term.icon, (categoryCountsMap.get(term.icon) || 0) + 1);
         }
         
-        // Count by category (simplified)
+        // Count by category content (only if not already counted by icon)
         if (term.category) {
           const category = term.category.toLowerCase();
-          if (category.includes('naval')) {
-            categoryCounts.set('naval', (categoryCounts.get('naval') || 0) + 1);
-          } else if (category.includes('neuroscience')) {
-            categoryCounts.set('neuroscience', (categoryCounts.get('neuroscience') || 0) + 1);
+          if (category.includes('naval') && !categoryCountsMap.has('naval')) {
+            categoryCountsMap.set('naval', (categoryCountsMap.get('naval') || 0) + 1);
+          } else if (category.includes('neuroscience') && !categoryCountsMap.has('neuroscience')) {
+            categoryCountsMap.set('neuroscience', (categoryCountsMap.get('neuroscience') || 0) + 1);
           } else if (category.includes('habit')) {
-            categoryCounts.set('habits', (categoryCounts.get('habits') || 0) + 1);
+            categoryCountsMap.set('habits', (categoryCountsMap.get('habits') || 0) + 1);
           } else if (category.includes('psychology') || category === 'core concepts') {
-            categoryCounts.set('psychology', (categoryCounts.get('psychology') || 0) + 1);
+            categoryCountsMap.set('psychology', (categoryCountsMap.get('psychology') || 0) + 1);
           } else if (category.includes('wellbeing') || category.includes('well-being')) {
-            categoryCounts.set('wellbeing', (categoryCounts.get('wellbeing') || 0) + 1);
+            categoryCountsMap.set('wellbeing', (categoryCountsMap.get('wellbeing') || 0) + 1);
           }
         }
         
         // Check for Huberman content in keywords
         if (term.keywords?.some(k => k.toLowerCase().includes('huberman'))) {
-          categoryCounts.set('huberman', (categoryCounts.get('huberman') || 0) + 1);
+          categoryCountsMap.set('huberman', (categoryCountsMap.get('huberman') || 0) + 1);
         }
         
         // Check for wisdom content
         if (term.category?.toLowerCase().includes('wisdom') || 
             term.keywords?.some(k => k.toLowerCase().includes('wisdom'))) {
-          categoryCounts.set('wisdom', (categoryCounts.get('wisdom') || 0) + 1);
+          categoryCountsMap.set('wisdom', (categoryCountsMap.get('wisdom') || 0) + 1);
         }
       });
       
-      // Add icon-based categories
-      iconCounts.forEach((count, icon) => {
+      // Add all unique categories from the single map
+      categoryCountsMap.forEach((count, categoryId) => {
         if (count > 0) {
-          categories.push({ id: icon, label: icon, count });
+          categories.push({ id: categoryId, label: categoryId, count });
         }
       });
       
-      // Add content-based categories
-      categoryCounts.forEach((count, category) => {
-        if (count > 0) {
-          categories.push({ id: category, label: category, count });
-        }
-      });
-      
-      console.log("Generated filter categories:", categories);
       setFilterCategories(categories);
     }
   }, [allTerms]);
@@ -610,12 +634,10 @@ export function Home() {
           return term.icon === 'social';
         
         default:
-          console.log("Unknown filter:", activeFilter);
           return false;
       }
     });
 
-    console.log(`Filtering with "${activeFilter}" and query "${searchQuery}" produced ${filtered.length} results from ${allTerms.length} total terms`);
     setFilteredTerms(filtered);
   }, [searchQuery, activeFilter, allTerms]);
 
@@ -634,80 +656,6 @@ export function Home() {
 
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    // Filter terms based on search query and active filter
-    console.log("Filtering with activeFilter:", activeFilter, "searchQuery:", searchQuery);
-    
-    const filtered = allTerms.filter(term => {
-      // Apply search query filter
-      const query = searchQuery.toLowerCase();
-      const matchesSearch = query === '' || 
-        term.term.toLowerCase().includes(query) ||
-        term.explanation.toLowerCase().includes(query) ||
-        term.story.toLowerCase().includes(query) ||
-        term.category.toLowerCase().includes(query) ||
-        (term.keywords?.some(keyword => keyword.toLowerCase().includes(query)) ?? false);
-      
-      // If search doesn't match, return false immediately
-      if (!matchesSearch) return false;
-      
-      // If filter is 'all', include all search matches
-      if (activeFilter === 'all') return true;
-      
-      // Handle specific filters
-      switch(activeFilter) {
-        case 'naval':
-          return term.icon === 'naval' || 
-                 (term.keywords?.some(k => k.toLowerCase().includes('naval')) ?? false);
-        
-        case 'neuroscience':
-          return term.icon === 'neuroscience' || 
-                 term.category.toLowerCase().includes('neuroscience');
-        
-        case 'habits':
-          return term.category.toLowerCase().includes('habit') || 
-                 (term.keywords?.some(k => k.toLowerCase().includes('habit')) ?? false);
-        
-        case 'huberman':
-          return (term.keywords?.some(k => k.toLowerCase().includes('huberman')) ?? false);
-        
-        case 'wisdom':
-          return term.category.toLowerCase().includes('wisdom') || 
-                 (term.keywords?.some(k => k.toLowerCase().includes('wisdom')) ?? false);
-        
-        case 'psychology':
-          return term.category.toLowerCase().includes('psycholog') || 
-                 term.category.toLowerCase() === 'core concepts';
-        
-        case 'wellbeing':
-          return term.category.toLowerCase().includes('wellbeing') || 
-                 term.category.toLowerCase().includes('well-being');
-        
-        case 'emotional':
-          return term.icon === 'emotional';
-        
-        case 'cognitive':
-          return term.icon === 'cognitive';
-        
-        case 'behavioral':
-          return term.icon === 'behavioral';
-        
-        case 'mindfulness':
-          return term.icon === 'mindfulness';
-        
-        case 'social':
-          return term.icon === 'social';
-        
-        default:
-          console.log("Unknown filter:", activeFilter);
-          return false;
-      }
-    });
-
-    console.log(`Filtering with "${activeFilter}" and query "${searchQuery}" produced ${filtered.length} results from ${allTerms.length} total terms`);
-    setFilteredTerms(filtered);
-  }, [searchQuery, activeFilter, allTerms]);
 
   // Modified to handle card expansion/collapse instead of navigation
   const handleTermSelect = (term: PsychTerm, event: React.MouseEvent) => {
@@ -755,7 +703,6 @@ export function Home() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log("Filter clicked:", category.id, "current activeFilter:", activeFilter);
                 setActiveFilter(category.id);
               }}
               className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] w-auto min-w-max cursor-pointer pointer-events-auto ${
@@ -806,8 +753,8 @@ export function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 px-2 sm:px-0 mx-auto" style={{ justifyItems: 'center' }} id="concepts-grid" role="list" aria-label="Psychology concepts">
             {filteredTerms.map((term, index) => (
               <div
-                key={term.term}
-                id={`concept-card-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
+                key={`${term.term}-${term.category}-${index}`}
+                id={`concept-card-${term.term.toLowerCase().replace(/\s+/g, '-')}-${index}`}
                 style={{ width: '100%', maxWidth: '360px' }}
                 className={`box-border flex flex-col justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[8px]
                   ${expandedCards[term.term] 

@@ -18,6 +18,15 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
     // Trigger entrance animation
     setAnimateIn(true);
   }, []);
+  
+  // Debug state changes
+  useEffect(() => {
+    console.log('PracticeDetailPopup state changed:', { 
+      practiceId, 
+      currentStep,
+      hasSteps: practice?.steps && practice.steps.length > 0
+    });
+  }, [practiceId, currentStep, practice]);
 
   // Handle closing with animation
   const handleClose = () => {
@@ -63,38 +72,83 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
   };
 
   const showStepDetail = (index: number) => {
+    console.log('Showing step detail for index:', index);
     setCurrentStep(index);
   };
 
   const closeStepDetail = () => {
+    console.log('Closing step detail view');
     setCurrentStep(null);
   };
 
   // Navigation between steps
   const goToNextStep = () => {
     if (currentStep !== null && practice.steps && currentStep < practice.steps.length - 1) {
+      console.log('Going to next step:', currentStep + 1);
       setCurrentStep(currentStep + 1);
+    } else {
+      console.log('Cannot go to next step, already at last step or step is null');
     }
   };
 
   const goToPrevStep = () => {
     if (currentStep !== null && currentStep > 0) {
+      console.log('Going to previous step:', currentStep - 1);
       setCurrentStep(currentStep - 1);
+    } else {
+      console.log('Cannot go to previous step, already at first step or step is null');
     }
   };
 
+  // Add body scroll lock effect
+  useEffect(() => {
+    // Prevent body scrolling when popup is open
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      // Re-enable scrolling when popup closes
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/60 p-2 md:p-4">
+    <div 
+      className="fixed inset-0 flex items-center justify-center z-50 bg-black/60 p-2 md:p-4"
+      onClick={(e) => {
+        // Only close if clicking the background overlay directly
+        if (e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
+    >
       <div 
         className={`bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-hidden shadow-xl transform transition-all duration-300 ease-out ${
           animateIn && !animateOut ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         } ${animateOut ? 'scale-95 opacity-0' : ''}`}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white p-4 md:p-6 relative">
           <button
-            onClick={handleClose}
-            className="absolute right-3 top-3 p-1.5 rounded-full bg-white/40 hover:bg-white/60 transition-colors text-white active:scale-95 shadow-sm border border-white/30"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClose();
+            }}
+            className="absolute right-3 top-3 p-2 rounded-full bg-white/40 hover:bg-white/60 transition-colors text-white active:scale-95 shadow-sm border border-white/30 z-10"
             aria-label="Close"
           >
             <X size={20} />
@@ -111,7 +165,7 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-140px)] p-4 md:p-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div className="overflow-y-auto max-h-[calc(90vh-140px)] p-4 md:p-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 relative z-1">
           {/* Info cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
             {practice.duration && (
@@ -199,8 +253,20 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
                 {practice.steps.map((step, index) => (
                   <div 
                     key={index}
-                    onClick={() => showStepDetail(index)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      showStepDetail(index);
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        showStepDetail(index);
+                      }
+                    }}
                     className="relative bg-white border border-gray-200 hover:border-[rgba(4,196,213,0.3)] rounded-xl p-4 cursor-pointer transition-all duration-200 group hover:shadow-md hover:scale-[1.01] active:scale-[0.99] transform"
+                    aria-label={`View step ${index + 1}: ${step.title}`}
                   >
                     {/* Step number badge */}
                     <div className="absolute -left-2 -top-2 w-6 h-6 rounded-full bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white flex items-center justify-center text-xs font-bold shadow-sm">
@@ -218,19 +284,23 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
                           
                           {/* Preview image thumbnail if available */}
                           {step.imageUrl && (
-                            <div className="mt-2 overflow-hidden rounded-lg h-20 w-20 bg-gray-100">
+                            <div className="mt-2 overflow-hidden rounded-lg h-20 w-20 bg-gray-100 flex-shrink-0">
                               <img 
                                 src={step.imageUrl} 
                                 alt={`Step ${index + 1} thumbnail`}
-                                className="h-full w-full object-cover hover:scale-110 transition-transform duration-300" 
+                                className="h-full w-full object-cover hover:scale-110 transition-transform duration-300"
+                                onError={(e) => {
+                                  console.log('Thumbnail failed to load');
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
                               />
                             </div>
                           )}
                         </div>
                         
                         {/* View details arrow */}
-                        <div className="text-gray-400 group-hover:text-[#148BAF] transition-colors">
-                          <ArrowRight size={18} />
+                        <div className="text-gray-400 group-hover:text-[#148BAF] transition-colors flex-shrink-0">
+                          <ArrowRight size={22} />
                         </div>
                       </div>
                     </div>
@@ -238,17 +308,23 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
                 ))}
               </div>
             </div>
-          )}              {/* Step Detail View */}
+          )}
+          
+          {/* Step Detail View */}
           {currentStep !== null && practice.steps && practice.steps[currentStep] && (
             <div className="animate-fade-in transform transition-transform duration-300">
               {/* Navigation header */}
               <div className="flex justify-between items-center mb-4">
                 <button 
-                  onClick={closeStepDetail}
-                  className="flex items-center text-[#148BAF] hover:text-[#04C4D5] transition-all transform active:scale-[0.98] hover:bg-[rgba(4,196,213,0.05)] px-2 py-1 rounded-md"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeStepDetail();
+                  }}
+                  className="flex items-center text-[#148BAF] hover:text-[#04C4D5] transition-all transform active:scale-[0.98] hover:bg-[rgba(4,196,213,0.05)] px-3 py-2 rounded-md"
+                  aria-label="Back to all steps"
                 >
-                  <ArrowLeft size={16} className="mr-1" />
-                  <span className="text-sm">Back to all steps</span>
+                  <ArrowLeft size={18} className="mr-2" />
+                  <span className="text-sm font-medium">Back to all steps</span>
                 </button>
                 <div className="text-sm text-gray-500">
                   Step {currentStep + 1} of {practice.steps.length}
@@ -256,40 +332,56 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
               </div>
               
               {/* Step navigation */}
-              <div className="flex justify-between mb-4">
+              <div className="flex justify-between mb-4 step-navigation">
                 <button 
-                  onClick={goToPrevStep}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToPrevStep();
+                  }}
                   disabled={currentStep === 0}
-                  className={`p-2 rounded-full transition-all transform ${
+                  className={`p-3 rounded-full transition-all transform ${
                     currentStep === 0 
                       ? 'text-gray-300 cursor-not-allowed' 
                       : 'text-[#148BAF] hover:bg-[rgba(4,196,213,0.1)] active:scale-[0.95]'
                   }`}
+                  aria-label="Previous step"
                 >
-                  <ArrowLeft size={20} />
+                  <ArrowLeft size={24} />
                 </button>
                 
                 <button 
-                  onClick={goToNextStep}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToNextStep();
+                  }}
                   disabled={currentStep === practice.steps.length - 1}
-                  className={`p-2 rounded-full transition-all transform ${
+                  className={`p-3 rounded-full transition-all transform ${
                     currentStep === practice.steps.length - 1 
                       ? 'text-gray-300 cursor-not-allowed' 
                       : 'text-[#148BAF] hover:bg-[rgba(4,196,213,0.1)] active:scale-[0.95]'
                   }`}
+                  aria-label="Next step"
                 >
-                  <ArrowRight size={20} />
+                  <ArrowRight size={24} />
                 </button>
               </div>
               
               {/* Step content */}
-              <div className="bg-white rounded-xl border border-[rgba(4,196,213,0.2)] overflow-hidden">
-                {practice.steps[currentStep].imageUrl && (
+              <div 
+                className="bg-white rounded-xl border border-[rgba(4,196,213,0.2)] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {practice.steps && practice.steps[currentStep]?.imageUrl && (
                   <div className="w-full h-52 bg-gray-200 relative">
                     <img 
                       src={practice.steps[currentStep].imageUrl} 
-                      alt={practice.steps[currentStep].title}
+                      alt={practice.steps[currentStep].title || `Step ${currentStep + 1}`}
                       className="w-full h-full object-cover" 
+                      onError={(e) => {
+                        console.log('Image failed to load:', practice.steps && practice.steps[currentStep]?.imageUrl);
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                      loading="eager"
                     />
                   </div>
                 )}
@@ -332,19 +424,27 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
         {/* Footer with add to daily and close button */}
         <div className="border-t border-[rgba(4,196,213,0.2)] p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
           <button
-            onClick={handleToggleDaily}
-            className={`px-6 py-2 rounded-lg font-happy-monkey transition-all shadow-[0_2px_8px_rgba(4,196,213,0.3)] active:scale-[0.98] transform text-base lowercase ${
+            onClick={(e) => {
+              e.stopPropagation();
+              handleToggleDaily();
+            }}
+            className={`px-6 py-3 rounded-lg font-happy-monkey transition-all shadow-[0_2px_8px_rgba(4,196,213,0.3)] active:scale-[0.98] transform text-base lowercase ${
               practice.isDaily
-                ? 'bg-white text-[#148BAF] border border-[#04C4D5] hover:bg-gray-100'
+                ? 'bg-white text-[#148BAF] border-2 border-[#04C4D5] hover:bg-gray-100'
                 : 'bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white hover:from-[#03b1c1] hover:to-[#0f7a99]'
             }`}
+            aria-label={practice.isDaily ? "Remove from daily practices" : "Add to daily practices"}
           >
             {practice.isDaily ? 'remove from daily practices' : 'add to daily practices'}
           </button>
           <div className="flex gap-2">
             <button
-              onClick={handleClose}
-              className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-[#148BAF] rounded-lg font-happy-monkey transition-all shadow-[0_2px_8px_rgba(4,196,213,0.1)] active:scale-[0.98] transform text-base lowercase"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClose();
+              }}
+              className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-[#148BAF] rounded-lg font-happy-monkey transition-all shadow-[0_2px_8px_rgba(4,196,213,0.1)] active:scale-[0.98] transform text-base lowercase"
+              aria-label="Close popup"
             >
               close
             </button>

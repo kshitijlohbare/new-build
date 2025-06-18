@@ -1,0 +1,1038 @@
+import { supabase } from '@/lib/supabase';
+import { emailService } from './EmailNotificationService';
+
+interface BookingData {
+  userId: string;
+  practitionerId: number;
+  practitionerName: string;
+  date: string;
+  time: string;
+  sessionType: string;
+  userEmail: string;
+  userName: string;
+  videoMeetingConfig?: {
+    platform: 'zoom' | 'google-meet' | 'microsoft-teams' | 'other';
+    hostEmail: string;
+  };
+}
+
+interface MeetingDetails {
+  platform: string;
+  meetingUrl: string;
+  meetingId?: string;
+  meetingPassword?: string;
+}
+
+// Comprehensive appointment booking service
+export class AppointmentBookingService {
+  private static instance: AppointmentBookingService;
+
+  private constructor() {}
+
+  public static getInstance(): AppointmentBookingService {
+    if (!AppointmentBookingService.instance) {
+      AppointmentBookingService.instance = new AppointmentBookingService();
+    }
+    return AppointmentBookingService.instance;
+  }
+
+  // Create a new appointment with video meeting and email notification
+  public async createAppointment(bookingData: BookingData): Promise<{ success: boolean; appointmentId?: number; error?: string }> {
+    try {
+      // Step 1: Create the appointment record
+      const appointmentData = {
+        user_id: bookingData.userId,
+        practitioner_id: bookingData.practitionerId,
+        practitioner_name: bookingData.practitionerName,
+        date: bookingData.date,
+        time: bookingData.time,
+        session_type: bookingData.sessionType,
+        status: 'confirmed',
+        created_at: new Date().toISOString()
+      };
+
+      const { data: appointment, error: appointmentError } = await supabase
+        .from('appointments')
+        .insert(appointmentData)
+        .select()
+        .single();
+
+      if (appointmentError) {
+        console.error('Error creating appointment:', appointmentError);
+        return { success: false, error: appointmentError.message };
+      }
+
+      const appointmentId = appointment.id as number;
+
+      // Step 2: Create video meeting if configured
+      let meetingDetails: MeetingDetails | null = null;
+      if (bookingData.videoMeetingConfig) {
+        try {
+          meetingDetails = await this.createVideoMeeting(
+            appointmentId,
+            bookingData.videoMeetingConfig,
+            bookingData.userEmail
+          );
+        } catch (meetingError) {
+          console.error('Error creating video meeting:', meetingError);
+          // Don't fail the entire booking if video meeting creation fails
+          // The appointment is still valid, just without a meeting link
+        }
+      }
+
+      // Step 3: Send confirmation email
+      try {
+        await emailService.sendAppointmentNotification({
+          appointmentId,
+          recipientEmail: bookingData.userEmail,
+          recipientName: bookingData.userName,
+          practitionerName: bookingData.practitionerName,
+          date: bookingData.date,
+          time: bookingData.time,
+          sessionType: bookingData.sessionType,
+          meetingUrl: meetingDetails?.meetingUrl,
+          notificationType: 'confirmation'
+        });
+
+        // Schedule reminder email for 24 hours before
+        await emailService.scheduleReminderEmail(appointmentId);
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+        // Don't fail the booking if email fails
+      }
+
+      // Step 4: Add to practitioner's calendar (if integrated)
+      try {
+        await this.addToCalendar(appointmentId, bookingData);
+      } catch (calendarError) {
+        console.error('Error adding to calendar:', calendarError);
+        // Don't fail the booking if calendar integration fails
+      }
+
+      return { success: true, appointmentId };
+    } catch (error) {
+      console.error('Error in createAppointment:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      };
+    }
+  }
+
+  // Create video meeting based on platform
+  private async createVideoMeeting(
+    appointmentId: number,
+    config: { platform: string; hostEmail: string },
+    guestEmail: string
+  ): Promise<MeetingDetails> {
+    const { platform, hostEmail } = config;
+
+    let meetingDetails: MeetingDetails;
+
+    switch (platform) {
+      case 'zoom':
+        meetingDetails = await this.createZoomMeeting(appointmentId, hostEmail, guestEmail);
+        break;
+      case 'google-meet':
+        meetingDetails = await this.createGoogleMeet(appointmentId, hostEmail, guestEmail);
+        break;
+      case 'microsoft-teams':
+        meetingDetails = await this.createTeamsMeeting(appointmentId, hostEmail, guestEmail);
+        break;
+      default:
+        meetingDetails = await this.createGenericMeeting(appointmentId, platform);
+    }
+
+    // Store meeting details in database
+    await this.storeMeetingDetails(appointmentId, meetingDetails, hostEmail, guestEmail);
+
+    return meetingDetails;
+  }
+
+  // Production Zoom meeting creation using Zoom API
+  private async createZoomMeeting(appointmentId: number, hostEmail: string, guestEmail: string): Promise<MeetingDetails> {
+    try {
+      const appointment = await this.getAppointmentDetails(appointmentId);
+      if (!appointment) {
+        throw new Error(`Appointment ${appointmentId} not found`);
+      }
+      
+      // Get zoom API credentials from environment variables or a secure store
+      const zoomApiKey = import.meta.env.VITE_ZOOM_API_KEY;
+      const zoomApiSecret = import.meta.env.VITE_ZOOM_API_SECRET;
+      
+      if (!zoomApiKey || !zoomApiSecret) {
+        throw new Error('Zoom API credentials not configured');
+      }
+      
+      // Zoom JWT creation is done server-side for security
+      // JWT payload with API key and expiration is handled by the serverless function
+      
+      // Using a serverless function to generate the token and create meeting
+      const response = await fetch('/api/create-zoom-meeting', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          appointmentId,
+          hostEmail,
+          guestEmail,
+          topic: `Therapy Session with ${appointment.practitioner_name}`,
+          agenda: `${appointment.session_type} appointment on ${appointment.date}`,
+          startTime: `${appointment.date}T${appointment.time}`,
+          durationMinutes: 60
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Zoom API error: ${response.statusText}`);
+      }
+      
+      const meeting = await response.json();
+      
+      // Use structured logging in production
+      const logger = process.env.NODE_ENV === 'production' ? console.info : console.log;
+      logger(`Creating Zoom meeting for appointment ${appointmentId}`);
+      
+      return {
+        platform: 'zoom',
+        meetingUrl: meeting.join_url,
+        meetingId: meeting.id.toString(),
+        meetingPassword: meeting.password
+      };
+    } catch (error) {
+      console.error('Error creating Zoom meeting:', error);
+      // Fallback to a simpler implementation if the API call fails
+      return this.createFallbackMeeting(appointmentId, 'zoom');
+    }
+  }
+
+  // Production Google Meet creation using Google Calendar API
+  private async createGoogleMeet(appointmentId: number, hostEmail: string, guestEmail: string): Promise<MeetingDetails> {
+    try {
+      const appointment = await this.getAppointmentDetails(appointmentId);
+      if (!appointment) {
+        throw new Error(`Appointment ${appointmentId} not found`);
+      }
+
+      // In production, this would call a secure backend service to handle API authentication
+      const response = await fetch('/api/create-google-meet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          appointmentId,
+          hostEmail,
+          guestEmail,
+          summary: `Therapy Session with ${appointment.practitioner_name}`,
+          description: `${appointment.session_type} appointment`,
+          startDateTime: `${appointment.date}T${appointment.time}`,
+          duration: 60 // minutes
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Google Calendar API error: ${response.statusText}`);
+      }
+
+      const meeting = await response.json();
+      
+      // Use structured logging in production
+      const meetLogger = process.env.NODE_ENV === 'production' ? console.info : console.log;
+      meetLogger(`Created Google Meet for appointment ${appointmentId}`);
+      
+      return {
+        platform: 'google-meet',
+        meetingUrl: meeting.meetingUrl,
+        meetingId: meeting.meetingId
+      };
+    } catch (error) {
+      console.error('Error creating Google Meet:', error);
+      return this.createFallbackMeeting(appointmentId, 'google-meet');
+    }
+  }
+
+  // Production Microsoft Teams meeting creation using Microsoft Graph API
+  private async createTeamsMeeting(appointmentId: number, hostEmail: string, guestEmail: string): Promise<MeetingDetails> {
+    try {
+      const appointment = await this.getAppointmentDetails(appointmentId);
+      if (!appointment) {
+        throw new Error(`Appointment ${appointmentId} not found`);
+      }
+      
+      // Call a secure serverless function to handle the Microsoft Graph API
+      const response = await fetch('/api/create-teams-meeting', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          appointmentId,
+          hostEmail,
+          guestEmail,
+          subject: `Therapy Session with ${appointment.practitioner_name}`,
+          description: `${appointment.session_type} appointment on ${appointment.date}`,
+          startDateTime: `${appointment.date}T${appointment.time}`,
+          durationMinutes: 60
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Microsoft Graph API error: ${response.statusText}`);
+      }
+
+      const meeting = await response.json();
+      
+      // Use structured logging in production
+      const teamsLogger = process.env.NODE_ENV === 'production' ? console.info : console.log;
+      teamsLogger(`Created Teams meeting for appointment ${appointmentId}`);
+      
+      return {
+        platform: 'microsoft-teams',
+        meetingUrl: meeting.joinUrl,
+        meetingId: meeting.id
+      };
+    } catch (error) {
+      console.error('Error creating Teams meeting:', error);
+      return this.createFallbackMeeting(appointmentId, 'microsoft-teams');
+    }
+  }
+
+  // Generic meeting link creation for other platforms
+  private async createGenericMeeting(appointmentId: number, platform: string): Promise<MeetingDetails> {
+    try {
+      // Check if we have any custom integration for this platform
+      const response = await fetch(`/api/integrations/${platform}/create-meeting`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          appointmentId,
+          platform
+        }),
+      });
+      
+      // If the integration exists and works
+      if (response.ok) {
+        const meeting = await response.json();
+        return {
+          platform,
+          meetingUrl: meeting.joinUrl || meeting.url,
+          meetingId: meeting.id || `${platform}-${appointmentId}`,
+          meetingPassword: meeting.password
+        };
+      }
+      
+      // Fallback to a generic meeting link
+      return this.createFallbackMeeting(appointmentId, platform);
+    } catch (error) {
+      console.error(`Error creating ${platform} meeting:`, error);
+      return this.createFallbackMeeting(appointmentId, platform);
+    }
+  }
+
+  // Store meeting details in database
+  // Cancel video meeting for an appointment
+  private async cancelVideoMeeting(appointmentId: number): Promise<void> {
+    try {
+      // Get meeting details from the database
+      const { data: meetingDetails } = await supabase
+        .from('appointment_meetings')
+        .select('*')
+        .eq('appointment_id', appointmentId)
+        .single();
+      
+      if (!meetingDetails) {
+        return; // No meeting to cancel
+      }
+      
+      // Call appropriate API based on platform
+      switch (meetingDetails.platform) {
+        case 'zoom':
+          // Cancel Zoom meeting
+          await this.cancelZoomMeeting(meetingDetails.provider_meeting_id);
+          break;
+          
+        case 'google-meet':
+          // Google Meet is cancelled via calendar event
+          break;
+          
+        case 'microsoft-teams':
+          // Teams meeting is cancelled via calendar event
+          break;
+          
+        default:
+          // For other platforms, use the generic cancellation endpoint
+          const response = await fetch(`/api/integrations/${meetingDetails.platform}/cancel-meeting`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              meetingId: meetingDetails.meeting_id,
+              providerId: meetingDetails.provider_meeting_id
+            }),
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Failed to cancel ${meetingDetails.platform} meeting`);
+          }
+      }
+      
+      // Mark the meeting as cancelled in the database
+      await supabase
+        .from('appointment_meetings')
+        .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+        .eq('appointment_id', appointmentId);
+        
+      // Log the cancellation
+      await supabase.from('integration_logs').insert({
+        integration_type: 'video',
+        provider: meetingDetails.platform,
+        action: 'cancel_meeting',
+        status: 'success',
+        appointment_id: appointmentId,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      // Log error but don't throw - we want to continue with other cancellation tasks
+      await supabase.from('integration_logs').insert({
+        integration_type: 'video',
+        provider: 'unknown',
+        action: 'cancel_meeting',
+        status: 'error',
+        appointment_id: appointmentId,
+        error_message: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+  
+  // Cancel a Zoom meeting
+  private async cancelZoomMeeting(meetingId: string): Promise<void> {
+    // Call Zoom API via our serverless function
+    const response = await fetch('/api/cancel-zoom-meeting', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ meetingId }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to cancel Zoom meeting');
+    }
+  }
+  
+  // Remove appointment from all connected calendars
+  private async removeFromCalendars(appointmentId: number): Promise<void> {
+    try {
+      // Get all calendar events for this appointment
+      const { data: calendarEvents } = await supabase
+        .from('calendar_events')
+        .select('*')
+        .eq('appointment_id', appointmentId);
+      
+      if (!calendarEvents || calendarEvents.length === 0) {
+        return; // No calendar events to remove
+      }
+      
+      // Process each calendar event
+      for (const event of calendarEvents) {
+        try {
+          switch (event.calendar_type) {
+            case 'google':
+              await this.removeFromGoogleCalendar(event);
+              break;
+              
+            case 'outlook':
+              await this.removeFromOutlookCalendar(event);
+              break;
+              
+            default:
+              // Log for unsupported calendar types
+              await supabase.from('integration_logs').insert({
+                integration_type: 'calendar',
+                provider: event.calendar_type,
+                action: 'delete_event',
+                status: 'error',
+                appointment_id: appointmentId,
+                error_message: `Unsupported calendar type: ${event.calendar_type}`,
+                timestamp: new Date().toISOString()
+              });
+          }
+        } catch (calendarError) {
+          // Log individual calendar errors but continue with others
+          await supabase.from('integration_logs').insert({
+            integration_type: 'calendar',
+            provider: event.calendar_type,
+            action: 'delete_event',
+            status: 'error',
+            appointment_id: appointmentId,
+            error_message: calendarError instanceof Error ? calendarError.message : String(calendarError),
+            timestamp: new Date().toISOString()
+          });
+        }
+      }
+      
+      // Mark all calendar events as cancelled
+      await supabase
+        .from('calendar_events')
+        .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+        .eq('appointment_id', appointmentId);
+        
+    } catch (error) {
+      // Log error but don't throw
+      await supabase.from('integration_logs').insert({
+        integration_type: 'calendar',
+        provider: 'multiple',
+        action: 'delete_event',
+        status: 'error',
+        appointment_id: appointmentId,
+        error_message: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+  
+  // Remove an event from Google Calendar
+  private async removeFromGoogleCalendar(calendarEvent: any): Promise<void> {
+    const { google } = require('googleapis');
+    
+    // Get practitioner's Google integration
+    const { data: integration } = await supabase
+      .from('practitioner_integrations')
+      .select('*')
+      .eq('practitioner_id', calendarEvent.practitioner_id)
+      .eq('integration_type', 'calendar')
+      .eq('provider', 'google')
+      .single();
+      
+    if (!integration) {
+      throw new Error('Google Calendar integration not found');
+    }
+    
+    // Create OAuth2 client
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI
+    );
+    
+    // Set credentials
+    oauth2Client.setCredentials({
+      access_token: integration.credentials.access_token,
+      refresh_token: integration.credentials.refresh_token,
+      expiry_date: integration.credentials.expiry_date
+    });
+    
+    // Initialize the calendar client
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+    
+    // Delete the event
+    await calendar.events.delete({
+      calendarId: 'primary',
+      eventId: calendarEvent.event_id,
+      sendUpdates: 'all'
+    });
+    
+    // Log success
+    await supabase.from('integration_logs').insert({
+      integration_type: 'calendar',
+      provider: 'google',
+      action: 'delete_event',
+      status: 'success',
+      appointment_id: calendarEvent.appointment_id,
+      practitioner_id: calendarEvent.practitioner_id,
+      timestamp: new Date().toISOString()
+    });
+  }
+  
+  // Remove an event from Outlook Calendar
+  private async removeFromOutlookCalendar(calendarEvent: any): Promise<void> {
+    const { Client } = require('@microsoft/microsoft-graph-client');
+    const { TokenCredentialAuthenticationProvider } = require('@microsoft/microsoft-graph-client/authProviders/azureTokenCredentials');
+    const { ClientSecretCredential } = require('@azure/identity');
+    
+    // Set up authentication with Azure AD
+    const credential = new ClientSecretCredential(
+      process.env.AZURE_TENANT_ID,
+      process.env.AZURE_CLIENT_ID,
+      process.env.AZURE_CLIENT_SECRET
+    );
+    
+    const authProvider = new TokenCredentialAuthenticationProvider(credential, {
+      scopes: ['https://graph.microsoft.com/.default']
+    });
+    
+    const graphClient = Client.initWithMiddleware({ authProvider });
+    
+    // Delete the event
+    await graphClient
+      .api(`/me/events/${calendarEvent.event_id}`)
+      .delete();
+    
+    // Log success
+    await supabase.from('integration_logs').insert({
+      integration_type: 'calendar',
+      provider: 'outlook',
+      action: 'delete_event',
+      status: 'success',
+      appointment_id: calendarEvent.appointment_id,
+      practitioner_id: calendarEvent.practitioner_id,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  private async storeMeetingDetails(
+    appointmentId: number,
+    meetingDetails: MeetingDetails,
+    hostEmail: string,
+    guestEmail: string
+  ): Promise<void> {
+    const { error } = await supabase
+      .from('appointment_meetings')
+      .insert({
+        appointment_id: appointmentId,
+        platform: meetingDetails.platform,
+        meeting_url: meetingDetails.meetingUrl,
+        meeting_id: meetingDetails.meetingId,
+        meeting_password: meetingDetails.meetingPassword,
+        host_email: hostEmail,
+        guest_email: guestEmail
+      });
+
+    if (error) {
+      console.error('Error storing meeting details:', error);
+      throw new Error('Failed to store meeting details');
+    }
+  }
+
+  // Add appointment to practitioner's calendar
+  private async addToCalendar(appointmentId: number, bookingData: BookingData): Promise<void> {
+    // Check if practitioner has calendar integration
+    const { data: integration, error } = await supabase
+      .from('calendar_integrations')
+      .select('*')
+      .eq('practitioner_id', bookingData.practitionerId)
+      .eq('is_active', true)
+      .single();
+
+    if (error || !integration) {
+      // Use structured logging
+      const calendarLogger = process.env.NODE_ENV === 'production' ? console.warn : console.log;
+      calendarLogger(`No active calendar integration found for practitioner ${bookingData.practitionerId}`);
+      return;
+    }
+
+    // Add to calendar based on type
+    switch (integration.calendar_type) {
+      case 'google':
+        await this.addToGoogleCalendar(appointmentId, bookingData, integration);
+        break;
+      case 'microsoft':
+        await this.addToOutlookCalendar(appointmentId, bookingData, integration);
+        break;
+      default:
+        const uLogger = process.env.NODE_ENV === 'production' ? console.warn : console.log;
+        uLogger(`Unsupported calendar type: ${integration.calendar_type}`);
+    }
+  }
+
+  // Google Calendar integration with Google Calendar API
+  private async addToGoogleCalendar(appointmentId: number, bookingData: BookingData, integration: any): Promise<void> {
+    try {
+      const { google } = require('googleapis');
+      const appointment = await this.getAppointmentDetails(appointmentId);
+      
+      if (!appointment) {
+        throw new Error(`Appointment ${appointmentId} not found`);
+      }
+      
+      // Create OAuth2 client
+      const oauth2Client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        process.env.GOOGLE_REDIRECT_URI
+      );
+      
+      // Set credentials from the stored integration
+      oauth2Client.setCredentials({
+        access_token: integration.credentials.access_token,
+        refresh_token: integration.credentials.refresh_token,
+        expiry_date: integration.credentials.expiry_date
+      });
+      
+      // Initialize the calendar client
+      const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+      
+      // Get meeting details if any
+      const { data: meetingDetails } = await supabase
+        .from('appointment_meetings')
+        .select('*')
+        .eq('appointment_id', appointmentId)
+        .single();
+      
+      // Create the calendar event
+      const event = {
+        summary: `Therapy Session with ${bookingData.userName}`,
+        description: `${bookingData.sessionType} session with ${bookingData.userName}. ${meetingDetails?.meeting_url ? `Video meeting link: ${meetingDetails.meeting_url}` : ''}`,
+        start: {
+          dateTime: `${bookingData.date}T${bookingData.time}:00`,
+          timeZone: 'UTC'
+        },
+        end: {
+          dateTime: `${bookingData.date}T${this.calculateEndTime(bookingData.time)}:00`,
+          timeZone: 'UTC'
+        },
+        attendees: [
+          { email: bookingData.userEmail }
+        ],
+        conferenceData: meetingDetails ? {
+          createRequest: {
+            requestId: appointmentId.toString(),
+            conferenceSolutionKey: {
+              type: "hangoutsMeet"
+            }
+          }
+        } : undefined
+      };
+      
+      // Insert the event
+      const response = await calendar.events.insert({
+        calendarId: 'primary',
+        resource: event,
+        conferenceDataVersion: 1,
+        sendUpdates: 'all'
+      });
+      
+      // Store the calendar event ID for future reference
+      await supabase.from('calendar_events').insert({
+        appointment_id: appointmentId,
+        calendar_type: 'google',
+        event_id: response.data.id,
+        calendar_link: response.data.htmlLink,
+        practitioner_id: bookingData.practitionerId
+      });
+      
+      // Log for auditing/tracking
+      await supabase.from('integration_logs').insert({
+        integration_type: 'calendar',
+        provider: 'google',
+        action: 'create_event',
+        status: 'success',
+        appointment_id: appointmentId,
+        practitioner_id: bookingData.practitionerId,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      // Log error
+      await supabase.from('integration_logs').insert({
+        integration_type: 'calendar',
+        provider: 'google',
+        action: 'create_event',
+        status: 'error',
+        appointment_id: appointmentId,
+        practitioner_id: bookingData.practitionerId,
+        error_message: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString()
+      });
+      
+      throw error;
+    }
+  }
+
+  // Outlook Calendar integration using Microsoft Graph API
+  private async addToOutlookCalendar(appointmentId: number, bookingData: BookingData, _integration: any): Promise<void> {
+    try {
+      const { Client } = require('@microsoft/microsoft-graph-client');
+      const { TokenCredentialAuthenticationProvider } = require('@microsoft/microsoft-graph-client/authProviders/azureTokenCredentials');
+      const { ClientSecretCredential } = require('@azure/identity');
+      
+      const appointment = await this.getAppointmentDetails(appointmentId);
+      
+      if (!appointment) {
+        throw new Error(`Appointment ${appointmentId} not found`);
+      }
+      
+      // Get meeting details if any
+      const { data: meetingDetails } = await supabase
+        .from('appointment_meetings')
+        .select('*')
+        .eq('appointment_id', appointmentId)
+        .single();
+      
+      // Set up authentication with Azure AD
+      const credential = new ClientSecretCredential(
+        process.env.AZURE_TENANT_ID,
+        process.env.AZURE_CLIENT_ID,
+        process.env.AZURE_CLIENT_SECRET
+      );
+      
+      const authProvider = new TokenCredentialAuthenticationProvider(credential, {
+        scopes: ['https://graph.microsoft.com/.default']
+      });
+      
+      const graphClient = Client.initWithMiddleware({ authProvider });
+      
+      // Create calendar event
+      const event = {
+        subject: `Therapy Session with ${bookingData.userName}`,
+        body: {
+          contentType: 'HTML',
+          content: `${bookingData.sessionType} session with ${bookingData.userName}. ${meetingDetails?.meeting_url ? `<br><br>Video meeting link: <a href="${meetingDetails.meeting_url}">${meetingDetails.meeting_url}</a>` : ''}`
+        },
+        start: {
+          dateTime: `${bookingData.date}T${bookingData.time}:00`,
+          timeZone: 'UTC'
+        },
+        end: {
+          dateTime: `${bookingData.date}T${this.calculateEndTime(bookingData.time)}:00`,
+          timeZone: 'UTC'
+        },
+        attendees: [
+          {
+            emailAddress: {
+              address: bookingData.userEmail,
+              name: bookingData.userName
+            },
+            type: 'required'
+          }
+        ],
+        isOnlineMeeting: Boolean(bookingData.videoMeetingConfig),
+        onlineMeetingProvider: 'teamsForBusiness'
+      };
+      
+      // Add the event to the calendar
+      const response = await graphClient
+        .api('/me/events')
+        .post(event);
+      
+      // Store the calendar event ID for future reference
+      await supabase.from('calendar_events').insert({
+        appointment_id: appointmentId,
+        calendar_type: 'outlook',
+        event_id: response.id,
+        calendar_link: response.webLink,
+        practitioner_id: bookingData.practitionerId,
+        teams_meeting_url: response.onlineMeeting?.joinUrl
+      });
+      
+      // If Teams meeting was created, update the appointment_meetings table
+      if (response.onlineMeeting && !meetingDetails) {
+        await supabase.from('appointment_meetings').insert({
+          appointment_id: appointmentId,
+          platform: 'microsoft-teams',
+          meeting_url: response.onlineMeeting.joinUrl,
+          meeting_id: response.onlineMeeting.conferenceId,
+          provider_meeting_id: response.id
+        });
+      }
+      
+      // Log for auditing/tracking
+      await supabase.from('integration_logs').insert({
+        integration_type: 'calendar',
+        provider: 'outlook',
+        action: 'create_event',
+        status: 'success',
+        appointment_id: appointmentId,
+        practitioner_id: bookingData.practitionerId,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      // Log error
+      await supabase.from('integration_logs').insert({
+        integration_type: 'calendar',
+        provider: 'outlook',
+        action: 'create_event',
+        status: 'error',
+        appointment_id: appointmentId,
+        practitioner_id: bookingData.practitionerId,
+        error_message: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString()
+      });
+      
+      throw error;
+    }
+  }
+
+  // Reschedule an existing appointment
+  public async rescheduleAppointment(
+    appointmentId: number,
+    newDate: string,
+    newTime: string,
+    userEmail: string,
+    userName: string
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      // Update appointment
+      const { data: appointment, error: updateError } = await supabase
+        .from('appointments')
+        .update({
+          date: newDate,
+          time: newTime,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', appointmentId)
+        .select('*, appointment_meetings(*)')
+        .single();
+
+      if (updateError) {
+        return { success: false, error: updateError.message };
+      }
+
+      // Update video meeting if exists
+      if (appointment.appointment_meetings?.[0]) {
+        // In production, you might need to update the actual meeting time
+        // For now, the existing meeting link remains valid
+      }
+
+      // Send rescheduling notification
+      await emailService.sendAppointmentNotification({
+        appointmentId,
+        recipientEmail: userEmail,
+        recipientName: userName,
+        practitionerName: appointment.practitioner_name as string,
+        date: newDate,
+        time: newTime,
+        sessionType: appointment.session_type as string,
+        meetingUrl: appointment.appointment_meetings?.[0] ? (appointment.appointment_meetings[0] as any).meeting_url : undefined,
+        notificationType: 'rescheduling'
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error rescheduling appointment:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      };
+    }
+  }
+
+  // Cancel an appointment
+  public async cancelAppointment(
+    appointmentId: number,
+    userEmail: string,
+    userName: string
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      // Update appointment status
+      const { data: appointment, error: updateError } = await supabase
+        .from('appointments')
+        .update({
+          status: 'cancelled',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', appointmentId)
+        .select()
+        .single();
+
+      if (updateError) {
+        return { success: false, error: updateError.message };
+      }
+
+      // Cancel video meeting if exists
+      await this.cancelVideoMeeting(appointmentId);
+      
+      // Remove from calendar if integrated
+      await this.removeFromCalendars(appointmentId);
+
+      // Send cancellation notification
+      await emailService.sendAppointmentNotification({
+        appointmentId,
+        recipientEmail: userEmail,
+        recipientName: userName,
+        practitionerName: appointment.practitioner_name as string,
+        date: appointment.date as string,
+        time: appointment.time as string,
+        sessionType: appointment.session_type as string,
+        notificationType: 'cancellation'
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      };
+    }
+  }
+
+  // Get appointment with meeting details
+  public async getAppointmentWithMeeting(appointmentId: number) {
+    const { data, error } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        appointment_meetings (*)
+      `)
+      .eq('id', appointmentId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching appointment:', error);
+      return null;
+    }
+
+    return data;
+  }
+
+  // Helper to get appointment details
+  // Helper method to calculate end time based on start time (assumes 1 hour sessions)
+  private calculateEndTime(startTime: string): string {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    let endHours = hours + 1;
+    
+    // Handle day rollover
+    if (endHours >= 24) {
+      endHours = endHours - 24;
+    }
+    
+    return `${endHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }
+
+  private async getAppointmentDetails(appointmentId: number): Promise<any> {
+    try {
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('id', appointmentId)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      console.error(`Error fetching appointment ${appointmentId}:`, error);
+      return null;
+    }
+  }
+
+  // Create a fallback meeting when API calls fail
+  private createFallbackMeeting(appointmentId: number, platform: string): MeetingDetails {
+    const meetingId = `${platform}-${appointmentId}-${Date.now()}`;
+    const meetingPassword = Math.random().toString(36).substring(2, 8);
+    
+    console.warn(`⚠️ Using fallback meeting creation for ${platform} appointment ${appointmentId}`);
+    
+    return {
+      platform,
+      meetingUrl: `https://${platform}.example.com/meeting/${meetingId}`,
+      meetingId,
+      meetingPassword
+    };
+  }
+}
+
+// Export singleton instance
+export const appointmentService = AppointmentBookingService.getInstance();

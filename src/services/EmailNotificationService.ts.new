@@ -1,0 +1,460 @@
+import { supabase } from '@/lib/supabase';
+import env from '@/lib/env-config';
+
+interface EmailNotificationData {
+  appointmentId: number;
+  recipientEmail: string;
+  recipientName: string;
+  practitionerName: string;
+  date: string;
+  time: string;
+  sessionType: string;
+  meetingUrl?: string;
+  notificationType: 'confirmation' | 'reminder' | 'cancellation' | 'rescheduling';
+}
+
+interface EmailTemplate {
+  subject: string;
+  body: string;
+}
+
+// Email service class for handling all appointment-related notifications
+export class EmailNotificationService {
+  private static instance: EmailNotificationService;
+  private emailProvider: 'sendgrid' | 'mailgun' | 'aws-ses' | 'mock';
+  
+  private constructor() {
+    // Determine which email provider to use based on environment
+    this.emailProvider = (env.EMAIL_PROVIDER as any) || 'mock';
+    
+    // In production, verify that we have valid credentials
+    if (env.NODE_ENV === 'production' && this.emailProvider === 'mock') {
+      console.warn('WARNING: Using mock email provider in production environment');
+    }
+  }
+
+  public static getInstance(): EmailNotificationService {
+    if (!EmailNotificationService.instance) {
+      EmailNotificationService.instance = new EmailNotificationService();
+    }
+    return EmailNotificationService.instance;
+  }
+  
+  // Production email service integrations
+  private async sendEmailViaServiceProvider(to: string, subject: string, htmlBody: string): Promise<boolean> {
+    try {
+      switch (this.emailProvider) {
+        case 'sendgrid':
+          // SendGrid integration
+          const sgMail = require('@sendgrid/mail');
+          sgMail.setApiKey(env.SENDGRID_API_KEY);
+          const msg = { 
+            to, 
+            from: env.EMAIL_FROM || 'noreply@mindfulcare.com', 
+            subject, 
+            html: htmlBody 
+          };
+          await sgMail.send(msg);
+          return true;
+          
+        case 'mailgun':
+          // Mailgun integration
+          const formData = require('form-data');
+          const Mailgun = require('mailgun.js');
+          const mailgun = new Mailgun(formData);
+          const mg = mailgun.client({
+            username: 'api',
+            key: env.MAILGUN_API_KEY
+          });
+          await mg.messages.create(env.MAILGUN_DOMAIN, {
+            from: env.EMAIL_FROM || 'noreply@mindfulcare.com',
+            to: [to],
+            subject,
+            html: htmlBody
+          });
+          return true;
+          
+        case 'aws-ses':
+          // AWS SES integration
+          const AWS = require('aws-sdk');
+          const ses = new AWS.SES({
+            region: env.AWS_REGION || 'us-east-1',
+            accessKeyId: env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: env.AWS_SECRET_ACCESS_KEY
+          });
+          
+          const params = {
+            Destination: {
+              ToAddresses: [to]
+            },
+            Message: {
+              Body: {
+                Html: { Data: htmlBody }
+              },
+              Subject: { Data: subject }
+            },
+            Source: env.EMAIL_FROM || 'noreply@mindfulcare.com'
+          };
+          
+          await ses.sendEmail(params).promise();
+          return true;
+          
+        case 'mock':
+        default:
+          // Mock email provider for development
+          if (env.NODE_ENV === 'production') {
+            console.error(`Failed to send email to ${to}: No valid email provider configured`);
+            return false;
+          } else {
+            console.log(`[MOCK EMAIL SENT TO: ${to}]`);
+            console.log(`Subject: ${subject}`);
+            console.log(`Body: ${htmlBody.substring(0, 200)}...`);
+            return true;
+          }
+      }
+    } catch (error) {
+      console.error(`Failed to send email to ${to}:`, error);
+      return false;
+    }
+  }
+  
+  private getTemplateForNotification(data: EmailNotificationData): EmailTemplate {
+    const { recipientName, practitionerName, date, time, sessionType, meetingUrl, notificationType } = data;
+    
+    // Log notification construction in development
+    if (env.NODE_ENV !== 'production') {
+      console.log(`Generating ${notificationType} email template for ${recipientName}`);
+    }
+    
+    // Common header and footer for all email templates
+    const emailHeader = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+          }
+          .header {
+            background-color: #4299e1;
+            padding: 20px;
+            color: white;
+            text-align: center;
+          }
+          .content {
+            padding: 20px;
+          }
+          .footer {
+            background-color: #f4f4f4;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+          }
+          .button-container {
+            text-align: center;
+            margin: 25px 0;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>MindfulCare Health</h1>
+        </div>
+        <div class="content">
+    `;
+    
+    const emailFooter = `
+        </div>
+        <div class="footer">
+          <p>This is an automated message from MindfulCare Health.</p>
+          <p>© ${new Date().getFullYear()} MindfulCare Health. All rights reserved.</p>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    // Different content based on notification type
+    switch (notificationType) {
+      case 'confirmation':
+        return {
+          subject: `Appointment Confirmation: Session with ${practitionerName}`,
+          body: `
+            ${emailHeader}
+            <h2>Your appointment has been confirmed!</h2>
+            <p>Hello ${recipientName},</p>
+            <p>Your appointment with ${practitionerName} has been confirmed for ${date} at ${time}.</p>
+            <p><strong>Session Type:</strong> ${sessionType}</p>
+            ${meetingUrl ? `<p><strong>Meeting URL:</strong> <a href="${meetingUrl}">${meetingUrl}</a></p>` : ''}
+            <p>Please make sure to join the session 5 minutes before the scheduled time.</p>
+            <div class="button-container">
+              <a href="${env.NEXT_PUBLIC_APP_URL}/appointments" style="background-color: #4299e1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Manage Appointment</a>
+            </div>
+            <p>If you need to cancel or reschedule, please do so at least 24 hours before your appointment.</p>
+            <p>Thank you for choosing MindfulCare Health.</p>
+            ${emailFooter}
+          `
+        };
+        
+      case 'reminder':
+        return {
+          subject: `Reminder: Your Upcoming Session with ${practitionerName}`,
+          body: `
+            ${emailHeader}
+            <h2>Your appointment is coming up!</h2>
+            <p>Hello ${recipientName},</p>
+            <p>This is a friendly reminder that your appointment with ${practitionerName} is scheduled for <strong>${date} at ${time}</strong>.</p>
+            <p><strong>Session Type:</strong> ${sessionType}</p>
+            <p>Please make sure to join the session 5 minutes before the scheduled time.</p>
+            <div class="button-container">
+              <a href="${meetingUrl || env.NEXT_PUBLIC_APP_URL + '/appointments'}" style="background-color: #4299e1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Join Session</a>
+            </div>
+            <p>If you need to cancel or reschedule, please do so as soon as possible.</p>
+            <p>We look forward to seeing you!</p>
+            ${emailFooter}
+          `
+        };
+        
+      case 'cancellation':
+        return {
+          subject: `Appointment Cancellation: Session with ${practitionerName}`,
+          body: `
+            ${emailHeader}
+            <h2>Your appointment has been cancelled</h2>
+            <p>Hello ${recipientName},</p>
+            <p>Your appointment with ${practitionerName} originally scheduled for ${date} at ${time} has been cancelled.</p>
+            <p>If you didn't request this cancellation, please contact our support team immediately.</p>
+            <div class="button-container">
+              <a href="${env.NEXT_PUBLIC_APP_URL}/appointments/new" style="background-color: #4299e1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Book a New Appointment</a>
+            </div>
+            <p>Thank you for choosing MindfulCare Health.</p>
+            ${emailFooter}
+          `
+        };
+        
+      case 'rescheduling':
+        return {
+          subject: `Appointment Rescheduled: Session with ${practitionerName}`,
+          body: `
+            ${emailHeader}
+            <h2>Your appointment has been rescheduled</h2>
+            <p>Hello ${recipientName},</p>
+            <p>Your appointment with ${practitionerName} has been rescheduled to <strong>${date} at ${time}</strong>.</p>
+            <p><strong>Session Type:</strong> ${sessionType}</p>
+            ${meetingUrl ? `<p><strong>Meeting URL:</strong> <a href="${meetingUrl}">${meetingUrl}</a></p>` : ''}
+            <div class="button-container">
+              <a href="${env.NEXT_PUBLIC_APP_URL}/appointments" style="background-color: #4299e1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">View Updated Appointment</a>
+            </div>
+            <p>If this new time doesn't work for you, please contact us as soon as possible to find an alternative.</p>
+            <p>Thank you for your understanding.</p>
+            ${emailFooter}
+          `
+        };
+        
+      default:
+        return {
+          subject: `MindfulCare Health: Important Information About Your Appointment`,
+          body: `
+            ${emailHeader}
+            <h2>Important Information</h2>
+            <p>Hello ${recipientName},</p>
+            <p>We're reaching out regarding your appointment with ${practitionerName} scheduled for ${date} at ${time}.</p>
+            <p>Please check your account for important information about this appointment.</p>
+            <div class="button-container">
+              <a href="${env.NEXT_PUBLIC_APP_URL}/appointments" style="background-color: #4299e1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">View Appointment Details</a>
+            </div>
+            <p>Thank you for choosing MindfulCare Health.</p>
+            ${emailFooter}
+          `
+        };
+    }
+  }
+  
+  /**
+   * Sends an appointment confirmation email
+   * @param data The notification data
+   * @returns true if email was sent successfully, false otherwise
+   */
+  public async sendAppointmentConfirmation(data: EmailNotificationData): Promise<boolean> {
+    const { recipientEmail, recipientName } = data;
+    
+    const template = this.getTemplateForNotification({
+      ...data,
+      notificationType: 'confirmation'
+    });
+    
+    return this.sendEmailViaServiceProvider(recipientEmail, template.subject, template.body);
+  }
+  
+  /**
+   * Sends an appointment reminder email
+   * @param data The notification data
+   * @returns true if email was sent successfully, false otherwise
+   */
+  public async sendAppointmentReminder(data: EmailNotificationData): Promise<boolean> {
+    const { recipientEmail, recipientName } = data;
+    
+    const template = this.getTemplateForNotification({
+      ...data,
+      notificationType: 'reminder'
+    });
+    
+    return this.sendEmailViaServiceProvider(recipientEmail, template.subject, template.body);
+  }
+  
+  /**
+   * Sends an appointment cancellation email
+   * @param data The notification data
+   * @returns true if email was sent successfully, false otherwise
+   */
+  public async sendAppointmentCancellation(data: EmailNotificationData): Promise<boolean> {
+    const { recipientEmail, recipientName } = data;
+    
+    const template = this.getTemplateForNotification({
+      ...data,
+      notificationType: 'cancellation'
+    });
+    
+    return this.sendEmailViaServiceProvider(recipientEmail, template.subject, template.body);
+  }
+  
+  /**
+   * Sends an appointment rescheduling email
+   * @param data The notification data
+   * @returns true if email was sent successfully, false otherwise
+   */
+  public async sendAppointmentRescheduling(data: EmailNotificationData): Promise<boolean> {
+    const { recipientEmail, recipientName } = data;
+    
+    const template = this.getTemplateForNotification({
+      ...data,
+      notificationType: 'rescheduling'
+    });
+    
+    return this.sendEmailViaServiceProvider(recipientEmail, template.subject, template.body);
+  }
+  
+  /**
+   * Schedule reminder emails for an appointment
+   * @param appointmentId The appointment ID
+   * @param notificationData The notification data
+   */
+  public async scheduleReminderEmails(appointmentId: number, notificationData: Omit<EmailNotificationData, 'notificationType'>): Promise<void> {
+    // In a production environment, we would queue reminder emails
+    // For example, using a job queue like Bull/Redis or a cloud service
+    if (env.NODE_ENV === 'production') {
+      try {
+        if (env.REDIS_URL) {
+          // Note: This is a simplified example. In a real implementation,
+          // you would properly set up your queue infrastructure.
+          const { Queue } = require('bull');
+          const reminderQueue = new Queue('email-reminders', env.REDIS_URL);
+          
+          // Schedule 24-hour reminder
+          await reminderQueue.add(
+            {
+              type: 'reminder',
+              appointmentId,
+              ...notificationData
+            },
+            { 
+              delay: 24 * 60 * 60 * 1000,  // 24 hours
+              attempts: 3
+            }
+          );
+          
+          // Schedule 1-hour reminder
+          await reminderQueue.add(
+            {
+              type: 'reminder',
+              appointmentId,
+              ...notificationData
+            },
+            { 
+              delay: 1 * 60 * 60 * 1000,  // 1 hour
+              attempts: 3
+            }
+          );
+          
+          console.log(`Scheduled reminder emails for appointment ${appointmentId}`);
+        } else {
+          console.warn(`Cannot schedule reminder emails: No Redis URL configured`);
+        }
+      } catch (error) {
+        console.error('Failed to schedule reminder emails:', error);
+      }
+    } else {
+      // In development, just log the scheduled reminders
+      console.log(`[DEV] Would schedule 24h and 1h reminder emails for appointment ${appointmentId}`);
+    }
+  }
+  
+  /**
+   * Cancel scheduled reminder emails for an appointment
+   * @param appointmentId The appointment ID to cancel reminders for
+   */
+  public async cancelScheduledReminders(appointmentId: number): Promise<void> {
+    // Similar to scheduling, this is a simplified example
+    if (env.NODE_ENV === 'production' && env.REDIS_URL) {
+      try {
+        const { Queue } = require('bull');
+        const reminderQueue = new Queue('email-reminders', env.REDIS_URL);
+        
+        // Find and remove jobs related to this appointment
+        const jobs = await reminderQueue.getJobs(['delayed', 'waiting']);
+        for (const job of jobs) {
+          if (job.data.appointmentId === appointmentId) {
+            await job.remove();
+            console.log(`Cancelled reminder email job ${job.id} for appointment ${appointmentId}`);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to cancel reminder emails:', error);
+      }
+    } else {
+      console.log(`[DEV] Would cancel scheduled reminders for appointment ${appointmentId}`);
+    }
+  }
+  
+  /**
+   * Logs email activity to our database for tracking
+   * @param success Whether the email was sent successfully
+   * @param emailType The type of email
+   * @param recipientEmail The recipient's email
+   * @param appointmentId The related appointment ID
+   */
+  private async logEmailActivity(
+    success: boolean, 
+    emailType: string, 
+    recipientEmail: string, 
+    appointmentId: number
+  ): Promise<void> {
+    try {
+      // Log to Supabase
+      const { data, error } = await supabase
+        .from('email_logs')
+        .insert([
+          { 
+            success, 
+            email_type: emailType,
+            recipient: recipientEmail,
+            appointment_id: appointmentId,
+            timestamp: new Date().toISOString()
+          }
+        ]);
+        
+      if (error) {
+        console.error('Failed to log email activity:', error);
+      }
+    } catch (error) {
+      console.error('Error logging email activity:', error);
+    }
+  }
+}
+
+// Export a singleton instance
+export const emailService = EmailNotificationService.getInstance();

@@ -28,7 +28,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  z-index: 999;
   background-color: rgba(0, 0, 0, 0.6);
   padding: 0.5rem 1rem;
 }
@@ -43,6 +43,7 @@
   transform: scale(1);
   opacity: 1;
   transition: all 0.3s ease-out;
+  z-index: 1000;
 }
 .practice-detail-popup-header {
   background: linear-gradient(to right, #04C4D5, #148BAF);
@@ -73,4 +74,79 @@
   padding: 1rem;
   display: flex;
   justify-content: space-between;
+}
+
+/* Improved focus styles for better accessibility */
+.practice-detail-popup button:focus-visible,
+.practice-detail-popup [role="button"]:focus-visible {
+  outline: 2px solid #04C4D5;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(4, 196, 213, 0.2);
+}
+
+/* Ensure buttons respond to clicks */
+.practice-detail-popup button,
+.practice-detail-popup [role="button"] {
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Improve touch target sizes for mobile */
+@media (max-width: 768px) {
+  .practice-detail-popup button,
+  .practice-detail-popup [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .practice-detail-popup .step-navigation button {
+    padding: 12px;
+  }
+}
+
+/* Prevent iOS Safari tap highlight */
+.practice-detail-popup * {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* High-priority styles to force interactivity */
+.fixed.inset-0.flex.items-center.justify-center {
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+.bg-white.rounded-2xl {
+  z-index: 10000 !important;
+  pointer-events: auto !important;
+}
+
+button {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure buttons have proper touch targets */
+@media (pointer: coarse) {
+  button {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
 }

@@ -1,15 +1,8 @@
 import { useState, useEffect } from "react";
-import { Users, Plus } from 'lucide-react';
+import { Smile } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useAuth } from "@/context/AuthContext";
-import { 
-  FitnessGroup, 
-  getFitnessGroups, 
-  getUserGroups, 
-  joinFitnessGroup, 
-  leaveFitnessGroup,
-  createFitnessGroup
-} from "@/helpers/fitnessGroupUtils";
+import "@/styles/SocialFeed.css";
 
 // Define available fitness group categories
 const groupCategories = {

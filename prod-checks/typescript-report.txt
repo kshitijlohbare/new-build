@@ -1,0 +1,131 @@
+src/services/AppointmentBookingService.ts(259,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(259,11): error TS1434: Unexpected keyword or identifier.
+src/services/AppointmentBookingService.ts(259,49): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(259,68): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(259,88): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(259,97): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(260,9): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(261,13): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(261,74): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(262,11): error TS1003: Identifier expected.
+src/services/AppointmentBookingService.ts(267,7): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(267,13): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(281,9): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(283,11): error TS1003: Identifier expected.
+src/services/AppointmentBookingService.ts(283,20): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(283,23): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(283,25): error TS1136: Property assignment expected.
+src/services/AppointmentBookingService.ts(296,5): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(296,7): error TS1005: 'try' expected.
+src/services/AppointmentBookingService.ts(300,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(301,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(304,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(304,11): error TS1434: Unexpected keyword or identifier.
+src/services/AppointmentBookingService.ts(304,51): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(304,69): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(304,78): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(305,9): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(307,13): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(316,9): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(319,19): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(319,22): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(319,24): error TS1136: Property assignment expected.
+src/services/AppointmentBookingService.ts(331,5): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(331,7): error TS1005: 'try' expected.
+src/services/AppointmentBookingService.ts(335,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(338,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(338,11): error TS1434: Unexpected keyword or identifier.
+src/services/AppointmentBookingService.ts(339,18): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(340,19): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(341,14): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(342,15): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(343,4): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(343,18): error TS1109: Expression expected.
+src/services/AppointmentBookingService.ts(344,11): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(354,9): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(363,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(363,11): error TS1434: Unexpected keyword or identifier.
+src/services/AppointmentBookingService.ts(363,44): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(363,65): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(363,79): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(363,93): error TS1109: Expression expected.
+src/services/AppointmentBookingService.ts(365,11): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(370,16): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(372,15): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(372,30): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(388,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(391,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(391,11): error TS1434: Unexpected keyword or identifier.
+src/services/AppointmentBookingService.ts(391,50): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(391,72): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(391,99): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(391,105): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(391,119): error TS1109: Expression expected.
+src/services/AppointmentBookingService.ts(393,12): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(393,84): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(403,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(403,11): error TS1434: Unexpected keyword or identifier.
+src/services/AppointmentBookingService.ts(403,51): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(403,73): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(403,100): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(403,106): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(403,120): error TS1109: Expression expected.
+src/services/AppointmentBookingService.ts(405,12): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(405,85): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(415,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(415,10): error TS1434: Unexpected keyword or identifier.
+src/services/AppointmentBookingService.ts(416,18): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(417,12): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(418,12): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(419,14): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(420,13): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(421,4): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(421,32): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(422,9): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(424,13): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(433,18): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(440,7): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(440,22): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(440,48): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(440,50): error TS1136: Property assignment expected.
+src/services/AppointmentBookingService.ts(459,5): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(459,7): error TS1005: 'try' expected.
+src/services/AppointmentBookingService.ts(466,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(469,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(469,10): error TS1434: Unexpected keyword or identifier.
+src/services/AppointmentBookingService.ts(470,18): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(471,14): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(472,13): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(473,4): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(473,32): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(474,9): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(476,13): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(484,18): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(494,7): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(494,13): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(494,25): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(503,9): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(505,14): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(505,31): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(506,7): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(516,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(516,10): error TS1434: Unexpected keyword or identifier.
+src/services/AppointmentBookingService.ts(516,55): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(516,65): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(535,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(535,11): error TS1434: Unexpected keyword or identifier.
+src/services/AppointmentBookingService.ts(535,52): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(535,61): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(536,9): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(537,13): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(541,18): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(547,7): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(547,14): error TS1005: ':' expected.
+src/services/AppointmentBookingService.ts(547,18): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(548,7): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(555,3): error TS1128: Declaration or statement expected.
+src/services/AppointmentBookingService.ts(555,46): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(555,64): error TS1005: ',' expected.
+src/services/AppointmentBookingService.ts(555,73): error TS1005: ';' expected.
+src/services/AppointmentBookingService.ts(555,75): error TS1434: Unexpected keyword or identifier.
+src/services/AppointmentBookingService.ts(568,1): error TS1128: Declaration or statement expected.

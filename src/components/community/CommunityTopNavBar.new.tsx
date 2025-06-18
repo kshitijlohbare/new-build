@@ -14,9 +14,7 @@ const CommunityTopNavBar: React.FC<CommunityTopNavBarProps> = ({ activeView, onV
   };
 
   return (
-    <div className="community-top-nav-wrapper w-full px-3 py-2">
-      {/* Main container */}
-      <div className="community-top-nav-bar w-full h-[52px] bg-[#F5F5F5] border border-white rounded-[100px] flex items-center justify-between px-2 relative overflow-hidden">
+    <div className="w-full h-[52px] bg-[#F5F5F5] border border-white rounded-[100px] flex items-center justify-between px-2 relative overflow-hidden">
         
         {/* Background highlight pill that moves based on active state */}
         <motion.div
@@ -118,7 +116,6 @@ const CommunityTopNavBar: React.FC<CommunityTopNavBarProps> = ({ activeView, onV
           </div>
         </motion.div>
       </div>
-    </div>
   );
 };
 

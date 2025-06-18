@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import logoImage from '../src/assets/logo.png';
 
 const SplashScreen = () => {
   const [animationState, setAnimationState] = useState({
@@ -42,7 +43,7 @@ const SplashScreen = () => {
     <div style={styles.container}>
       <div style={styles.content}>
         <img 
-          src="/assets/logo.png"
+          src={logoImage}
           alt="Logo"
           style={{
             ...styles.logo,

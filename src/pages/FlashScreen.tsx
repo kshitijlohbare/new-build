@@ -1,9 +1,16 @@
 import React, { useEffect, useRef } from 'react';
-import frameMask from '../assets/Frame 143.svg';
+import frameMask from '../assets/Frame143.svg';
 import './FlashScreen.css';
 
 const FlashScreen: React.FC = () => {
   const rectRef = useRef<HTMLDivElement>(null);
+
+  // Add debugging
+  useEffect(() => {
+    console.log('FlashScreen component mounted');
+    console.log('frameMask URL:', frameMask);
+    return () => console.log('FlashScreen component unmounting');
+  }, []);
 
   useEffect(() => {
     const rect = rectRef.current;
@@ -29,6 +36,19 @@ const FlashScreen: React.FC = () => {
 
   return (
     <div className="flash-screen__container">
+      {/* Add a visible fallback element */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        color: 'white',
+        fontSize: '24px',
+        fontWeight: 'bold',
+        zIndex: 10000
+      }}>
+        Loading...
+      </div>
       <div
         className="flash-screen__moving-rect"
         ref={rectRef}

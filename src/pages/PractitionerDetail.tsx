@@ -93,16 +93,18 @@ const PractitionerDetail: React.FC = () => {
   // State management
   const [practitioner, setPractitioner] = useState<Practitioner | null>(null);
   const [loading, setLoading] = useState(true);
-  const [bookingStep, setBookingStep] = useState<'type' | 'datetime' | 'video' | 'confirm'>('type');
+  const [bookingStep, setBookingStep] = useState<'type' | 'datetime' | 'video' | 'confirm' | 'success'>('type');
   
   // Booking form state
   const [selectedSessionType, setSelectedSessionType] = useState<string>('initial');
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [videoMeetingDetails, setVideoMeetingDetails] = useState<any>(null);
+  const [confirmedAppointmentId, setConfirmedAppointmentId] = useState<number | null>(null);
   
   // UI state
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   // Fetch practitioner data
   useEffect(() => {
@@ -292,7 +294,12 @@ const PractitionerDetail: React.FC = () => {
       return;
     }
 
+    setIsConfirming(true);
+    
     try {
+      // Get full session details
+      const sessionInfo = sessionTypes.find(s => s.id === selectedSessionType);
+      
       // Prepare appointment data for the booking service using correct interface
       const appointmentData = {
         userId: user.id,
@@ -302,12 +309,17 @@ const PractitionerDetail: React.FC = () => {
         userName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
         date: selectedDate,
         time: selectedTime,
-        sessionType: selectedSessionType,
-        videoMeetingConfig: {
-          platform: (practitioner.preferred_video_platform as 'zoom' | 'google-meet' | 'microsoft-teams' | 'other') || 'google-meet',
+        sessionType: sessionInfo?.name || 'Therapy Session',
+        videoMeetingConfig: videoMeetingDetails ? {
+          platform: videoMeetingDetails.platform.toLowerCase(),
+          hostEmail: practitioner.email || `${practitioner.name.toLowerCase().replace(/\s+/g, '.')}@example.com`
+        } : {
+          platform: (practitioner.preferred_video_platform as 'zoom' | 'google-meet' | 'microsoft-teams' | 'other') || 'zoom',
           hostEmail: practitioner.email || `${practitioner.name.toLowerCase().replace(/\s+/g, '.')}@example.com`
         }
       };
+
+      console.log('Creating appointment with data:', JSON.stringify(appointmentData, null, 2));
 
       // Use the appointment booking service to create the appointment
       const result = await appointmentService.createAppointment(appointmentData);
@@ -316,19 +328,36 @@ const PractitionerDetail: React.FC = () => {
         throw new Error(result.error || 'Failed to create appointment');
       }
 
+      // Store the appointment ID for the success view
+      if (result.appointmentId) {
+        setConfirmedAppointmentId(result.appointmentId);
+      }
+
       // Success notification
       toast({
         title: "Appointment Confirmed!",
-        description: `Your session with ${practitioner.name} is confirmed for ${new Date(selectedDate).toLocaleDateString()} at ${selectedTime}. Check your email for details and video meeting information.`,
+        description: `Your session with ${practitioner.name} is confirmed for ${new Date(selectedDate).toLocaleDateString()} at ${selectedTime}.`,
         variant: "success"
       });
 
-      // Reset booking state and close modal
-      resetBookingState();
-      setIsBookingOpen(false);
-
-      // Navigate to appointments page
-      navigate('/appointments');
+      // Show success view
+      setBookingStep('success');
+      
+      // Track analytics event
+      try {
+        // Safely access analytics API if available
+        const analyticsApi = (window as any).gtag || (window as any).analytics;
+        if (analyticsApi) {
+          analyticsApi('event', 'appointment_booked', {
+            practitioner_id: practitioner.id,
+            practitioner_name: practitioner.name,
+            session_type: selectedSessionType,
+            appointment_id: result.appointmentId
+          });
+        }
+      } catch (analyticsError) {
+        console.error('Analytics error:', analyticsError);
+      }
 
     } catch (error: any) {
       console.error('Error creating appointment:', error);
@@ -877,7 +906,7 @@ const PractitionerDetail: React.FC = () => {
             )}
 
             {/* Step 4: Confirmation - Mobile Optimized */}
-            {bookingStep === 'confirm' && (
+            {bookingStep === 'confirm' && !isConfirming && (
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold text-[#208EB1]">Confirm your booking</h3>
                 
@@ -950,6 +979,109 @@ const PractitionerDetail: React.FC = () => {
                         </svg>
                       </div>
                       <span className="text-sm text-[#208EB1]">Secure video session</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Step 5: Success - Mobile Optimized */}
+            {bookingStep === 'success' && (
+              <div className="space-y-6">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <div className="w-16 h-16 bg-[#F7FFFF] rounded-full flex items-center justify-center mb-4">
+                    <svg className="h-8 w-8 text-[#06C4D5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-happy-monkey font-bold text-[#208EB1] mb-2">Booking Confirmed!</h3>
+                  <p className="text-[#208EB1] mb-6">Your appointment has been scheduled successfully.</p>
+                </div>
+                
+                {/* Booking Summary Card */}
+                <div className="bg-gradient-to-br from-[#F7FFFF] to-[#F7FFFF] rounded-2xl p-6 border border-[rgba(4,196,213,0.2)]">
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-[#208EB1] mb-3">Appointment Details</h4>
+                    
+                    <div className="flex justify-between items-start">
+                      <span className="text-[#208EB1] font-medium">Appointment ID</span>
+                      <span className="font-semibold text-right">
+                        {confirmedAppointmentId || 'N/A'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-start">
+                      <span className="text-[#208EB1] font-medium">Session</span>
+                      <span className="font-semibold text-right">
+                        {sessionTypes.find(t => t.id === selectedSessionType)?.name}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-start">
+                      <span className="text-[#208EB1] font-medium">Date</span>
+                      <span className="font-semibold text-right">
+                        {new Date(selectedDate).toLocaleDateString('en-US', {
+                          weekday: 'short',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-start">
+                      <span className="text-[#208EB1] font-medium">Time</span>
+                      <span className="font-semibold">{selectedTime}</span>
+                    </div>
+                    
+                    {videoMeetingDetails && (
+                      <>
+                        <div className="flex justify-between items-start">
+                          <span className="text-[#208EB1] font-medium">Platform</span>
+                          <span className="font-semibold capitalize">{videoMeetingDetails.platform}</span>
+                        </div>
+                        
+                        <div className="flex justify-between items-start">
+                          <span className="text-[#208EB1] font-medium">Meeting Link</span>
+                          <a 
+                            href={videoMeetingDetails.meetingUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-semibold text-blue-500 hover:text-blue-700 transition-colors"
+                          >
+                            Join Meeting
+                          </a>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="bg-white border border-[#208EB1] rounded-xl p-4">
+                  <h4 className="font-semibold text-[#208EB1] mb-3">What's next:</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 bg-[#F7FFFF] rounded-full flex items-center justify-center">
+                        <svg className="h-3 w-3 text-[#06C4D5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <span className="text-sm text-[#208EB1]">Check your email for confirmation details</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 bg-[#F7FFFF] rounded-full flex items-center justify-center">
+                        <svg className="h-3 w-3 text-[#06C4D5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <span className="text-sm text-[#208EB1]">Add this appointment to your calendar</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 bg-[#F7FFFF] rounded-full flex items-center justify-center">
+                        <svg className="h-3 w-3 text-[#06C4D5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                      </div>
+                      <span className="text-sm text-[#208EB1]">You'll receive a reminder 24 hours before</span>
                     </div>
                   </div>
                 </div>

@@ -62,20 +62,20 @@ const musicOptions = [
 ];
 
 const focusPresets = [
-  { label: "quick focus", work: 15, break: 5 },
-  { label: "quick focus", work: 15, break: 5 },
-  { label: "quick focus", work: 15, break: 5 },
-  { label: "quick focus", work: 15, break: 5 },
-  { label: "create", work: 15, break: 5 }, // Index 4
+  { label: "quick focus", work: 25, break: 5 },
+  { label: "power hour", work: 50, break: 10 },
+  { label: "short burst", work: 15, break: 3 },
+  { label: "ultra focus", work: 45, break: 15 },
+  { label: "create", work: 25, break: 5 }, // Index 4
 ];
 
 const FocusTimer = () => {
-  const [selectedPreset, setSelectedPreset] = useState<number | null>(null); // Allow null initially
-  const [workTime, setWorkTime] = useState(3); // Default to 3 minutes as shown in the design
-  const [breakTime, setBreakTime] = useState(3); // Default to 3 minutes as shown in the design
+  const [selectedPreset, setSelectedPreset] = useState<number | null>(0); // Default to first preset
+  const [workTime, setWorkTime] = useState(25); // Default to first preset work time
+  const [breakTime, setBreakTime] = useState(5); // Default to first preset break time
   const [cycles, setCycles] = useState(3);
   const [currentCycle, setCurrentCycle] = useState(1);
-  const [timer, setTimer] = useState(15 * 60); // Initialize with default workTime
+  const [timer, setTimer] = useState(25 * 60); // Initialize with default workTime
   const [isRunning, setIsRunning] = useState(false);
   const [isWorkPhase, setIsWorkPhase] = useState(true); // Track work/break phase
   const [musicDrawerOpen, setMusicDrawerOpen] = useState(false); // State to control music drawer
@@ -166,11 +166,18 @@ const FocusTimer = () => {
   // Update timer ONLY when workTime, breakTime, or selectedPreset changes and timer is not running
   useEffect(() => {
     if (!isRunning) {
-      if (selectedPreset !== null && selectedPreset !== createPresetIndex) {
-        const preset = focusPresets[selectedPreset];
-        setWorkTime(preset.work);
-        setBreakTime(preset.break);
-        setTimer(preset.work * 60); // Reset timer to new work time
+      if (selectedPreset !== null) {
+        if (selectedPreset !== createPresetIndex) {
+          // For regular presets, update based on the preset values
+          const preset = focusPresets[selectedPreset];
+          setWorkTime(preset.work);
+          setBreakTime(preset.break);
+          setTimer(preset.work * 60); // Reset timer to new work time
+        } else {
+          // For "create" preset, update the timer based on the workTime
+          // but don't modify workTime/breakTime as user is setting them manually
+          setTimer(workTime * 60);
+        }
         setIsWorkPhase(true); // Ensure it starts with work phase
         setCurrentCycle(1); // Reset cycle count
       } else if (selectedPreset === createPresetIndex) {
@@ -191,6 +198,20 @@ const FocusTimer = () => {
       setCurrentCycle(1);
     }
   }, [workTime, breakTime, selectedPreset, createPresetIndex, isRunning]);
+
+  // Update timer when workTime changes and we're in create mode
+  useEffect(() => {
+    if (!isRunning && selectedPreset === createPresetIndex && isWorkPhase) {
+      setTimer(workTime * 60);
+    }
+  }, [workTime, isRunning, selectedPreset, createPresetIndex, isWorkPhase]);
+
+  // Update timer when breakTime changes and we're in create mode
+  useEffect(() => {
+    if (!isRunning && selectedPreset === createPresetIndex && !isWorkPhase) {
+      setTimer(breakTime * 60);
+    }
+  }, [breakTime, isRunning, selectedPreset, createPresetIndex, isWorkPhase]);
 
 
   // Time is directly formatted in the render
@@ -242,7 +263,7 @@ const FocusTimer = () => {
                   height: "125%", // 125% of parent size
                   position: "relative",
                   left: "-12.5%", // Center the enlarged frame
-                  top: "-12.5%", // Center the enlarged frame
+                  top: "-12.5%" // Center the enlarged frame
                 }}
               >
                 <iframe 
@@ -266,35 +287,103 @@ const FocusTimer = () => {
                 zIndex: 1
               }}
             >
-              {/* Work/Break Controls */}
-              <div data-testid="work-break-controls" className="flex flex-row justify-center items-start p-0 gap-[10px] w-[149px] h-[26px]">
-                {/* Work Control */}
-                <div className="flex flex-row justify-center items-center p-0 gap-[4px] w-[67px] h-[26px]">
-                  <span className="w-[37px] h-[16px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] lowercase text-[#148BAF]">work :</span>
-                  <div 
-                    data-testid="work-time-display" 
-                    className="box-border flex flex-col justify-center items-center p-[4px_8px] gap-[10px] w-[26px] h-[26px] bg-white border border-[#04C4D5] rounded-[4px]"
-                  >
-                    <div className="w-[10px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] text-center uppercase text-[#148BAF]">{workTime}</div>
+              {/* Work/Break Controls - Only visible when "create" preset is selected */}
+              {selectedPreset === createPresetIndex && (
+                <div data-testid="work-break-controls" className="flex flex-row justify-center items-start p-0 gap-[16px] w-auto h-[26px]">
+                  {/* Work Control */}
+                  <div className="flex flex-row justify-center items-center p-0 gap-[4px] h-[26px]">
+                    <span className="w-[37px] h-[16px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] lowercase text-[#148BAF]">work :</span>
+                    
+                    {/* Decrease Work Button */}
+                    <button 
+                      data-testid="decrease-work-button"
+                      className="box-border flex flex-row justify-center items-center p-[4px] gap-[10px] w-[20px] h-[20px] max-w-[20px] max-h-[20px] bg-[#F7FFFF] border border-[#04C4D5] rounded-[4px]"
+                      onClick={() => setWorkTime(Math.max(1, workTime - 1))}
+                      style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+                      disabled={isRunning}
+                    >
+                      <div className="flex flex-row justify-center items-center p-0 gap-[10px] w-[8px] h-[2px]">
+                        <div className="bg-[#148BAF] rounded-[0.5px] w-[8px] h-[2px]"></div>
+                      </div>
+                    </button>
+                    
+                    {/* Work Time Display */}
+                    <div 
+                      data-testid="work-time-display" 
+                      className="box-border flex flex-col justify-center items-center p-[4px_8px] gap-[10px] w-[26px] h-[26px] bg-white border border-[#04C4D5] rounded-[4px]"
+                    >
+                      <div className="w-[10px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] text-center uppercase text-[#148BAF]">{workTime}</div>
+                    </div>
+                    
+                    {/* Increase Work Button */}
+                    <button 
+                      data-testid="increase-work-button"
+                      className="box-border flex flex-row justify-center items-center p-[4px] gap-[10px] w-[20px] h-[20px] max-w-[20px] max-h-[20px] bg-[#F7FFFF] border border-[#04C4D5] rounded-[4px]"
+                      onClick={() => setWorkTime(Math.min(60, workTime + 1))}
+                      style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+                      disabled={isRunning}
+                    >
+                      <div className="flex flex-col justify-center items-center p-0 gap-[10px]">
+                        <div className="flex flex-row p-0 gap-[10px] w-[8px] h-[8px] relative">
+                          <div className="bg-[#148BAF] rounded-[0.5px] w-[8px] h-[2px] absolute top-[3px]"></div>
+                          <div className="bg-[#148BAF] rounded-[0.5px] w-[2px] h-[8px] absolute left-[3px]"></div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                  
+                  {/* Break Control */}
+                  <div className="flex flex-row justify-center items-center p-0 gap-[4px] h-[26px]">
+                    <span className="w-[42px] h-[16px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] lowercase text-[#148BAF]">break :</span>
+                    
+                    {/* Decrease Break Button */}
+                    <button 
+                      data-testid="decrease-break-button"
+                      className="box-border flex flex-row justify-center items-center p-[4px] gap-[10px] w-[20px] h-[20px] max-w-[20px] max-h-[20px] bg-[#F7FFFF] border border-[#04C4D5] rounded-[4px]"
+                      onClick={() => setBreakTime(Math.max(1, breakTime - 1))}
+                      style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+                      disabled={isRunning}
+                    >
+                      <div className="flex flex-row justify-center items-center p-0 gap-[10px] w-[8px] h-[2px]">
+                        <div className="bg-[#148BAF] rounded-[0.5px] w-[8px] h-[2px]"></div>
+                      </div>
+                    </button>
+                    
+                    {/* Break Time Display */}
+                    <div 
+                      data-testid="break-time-display" 
+                      className="box-border flex flex-col justify-center items-center p-[4px_8px] gap-[10px] w-[26px] h-[26px] bg-white border border-[#04C4D5] rounded-[4px]"
+                    >
+                      <div className="w-[10px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] text-center uppercase text-[#148BAF]">{breakTime}</div>
+                    </div>
+                    
+                    {/* Increase Break Button */}
+                    <button 
+                      data-testid="increase-break-button"
+                      className="box-border flex flex-row justify-center items-center p-[4px] gap-[10px] w-[20px] h-[20px] max-w-[20px] max-h-[20px] bg-[#F7FFFF] border border-[#04C4D5] rounded-[4px]"
+                      onClick={() => setBreakTime(Math.min(30, breakTime + 1))}
+                      style={{ boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)" }}
+                      disabled={isRunning}
+                    >
+                      <div className="flex flex-col justify-center items-center p-0 gap-[10px]">
+                        <div className="flex flex-row p-0 gap-[10px] w-[8px] h-[8px] relative">
+                          <div className="bg-[#148BAF] rounded-[0.5px] w-[8px] h-[2px] absolute top-[3px]"></div>
+                          <div className="bg-[#148BAF] rounded-[0.5px] w-[2px] h-[8px] absolute left-[3px]"></div>
+                        </div>
+                      </div>
+                    </button>
                   </div>
                 </div>
-                
-                {/* Break Control */}
-                <div className="flex flex-row justify-center items-center p-0 gap-[4px] w-[72px] h-[26px]">
-                  <span className="w-[42px] h-[16px] font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] lowercase text-[#148BAF]">break :</span>
-                  <div 
-                    data-testid="break-time-display" 
-                    className="box-border flex flex-col justify-center items-center p-[4px_8px] gap-[10px] w-[26px] h-[26px] bg-white border border-[#04C4D5] rounded-[4px]"
-                  >
-                    <div className="w-[10px] h-[18px] font-['Righteous'] font-normal text-[16px] leading-[18px] text-center uppercase text-[#148BAF]">{breakTime}</div>
-                  </div>
-                </div>
-              </div>
+              )}
               
               {/* Timer Display */}
-              <div data-testid="timer-time" className="w-[157px] h-[77px] font-['Happy_Monkey'] font-normal text-[64px] leading-[77px] lowercase text-[#000000
-              ]">
-                {Math.floor(timer / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}
+              <div className="flex flex-col items-center">
+                <div data-testid="timer-time" className="w-[157px] h-[77px] font-['Happy_Monkey'] font-normal text-[64px] leading-[77px] lowercase text-[#000000]">
+                  {Math.floor(timer / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}
+                </div>
+                <div className={`text-sm font-['Happy_Monkey'] phase-indicator ${isWorkPhase ? 'work-phase text-[#04C4D5]' : 'break-phase text-[#FF9F0A]'}`}>
+                  {isWorkPhase ? `work ${currentCycle}/${cycles}` : 'break time'}
+                </div>
               </div>
               
               {/* Cycles Control */}

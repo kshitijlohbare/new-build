@@ -1,0 +1,202 @@
+/* 
+ * BOOKING JOURNEY CSS FIXES
+ * This file contains UI fixes for the therapist booking journey
+ * to ensure a responsive, pixel-perfect experience
+ */
+
+/* ===== THERAPIST LISTING FIXES ===== */
+
+/* Responsive container for therapist cards */
+.TherapistCardContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
+  margin-top: 15px;
+}
+
+/* Fix for therapist cards to ensure consistent height */
+.TherapistCard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.TherapistCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(73, 218, 234, 0.2);
+}
+
+/* Responsive filter chips */
+.FilterChip {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* Fix for mobile filter view */
+@media (max-width: 768px) {
+  .Frame124 {
+    justify-content: flex-start;
+    padding: 0 10px;
+  }
+  
+  .FilterChip {
+    max-width: 120px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+/* ===== PRACTITIONER DETAIL FIXES ===== */
+
+/* Responsive practitioner header */
+.practitioner-header {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .practitioner-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+  }
+}
+
+/* Responsive booking steps */
+.booking-step-container {
+  width: 100%;
+}
+
+@media (min-width: 992px) {
+  .booking-step-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+}
+
+/* Fix for calendar display */
+.calendar-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px;
+}
+
+/* Improve time slot grid */
+.time-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-top: 15px;
+}
+
+/* ===== VIDEO PLATFORM SELECTION FIXES ===== */
+
+/* Platform option cards */
+.platform-option {
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.platform-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.platform-option.selected {
+  border-color: #148BAF;
+  background-color: rgba(20, 139, 175, 0.05);
+}
+
+/* ===== CONFIRMATION SCREEN FIXES ===== */
+
+/* Success modal animation */
+@keyframes successPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.success-animation {
+  animation: successPulse 1s ease-in-out;
+}
+
+/* Success checkmark */
+.success-checkmark {
+  color: #10b981;
+  font-size: 48px;
+}
+
+/* ===== LOADING STATE FIXES ===== */
+
+/* Skeleton loading for therapist cards */
+.skeleton-card {
+  background: #f9fafb;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 260px;
+}
+
+.skeleton-image {
+  height: 120px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-content {
+  padding: 15px;
+}
+
+.skeleton-title {
+  height: 20px;
+  width: 80%;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.skeleton-text {
+  height: 10px;
+  width: 90%;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ===== ACCESSIBILITY FIXES ===== */
+
+/* Focus indicators */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #148BAF;
+  outline-offset: 2px;
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
