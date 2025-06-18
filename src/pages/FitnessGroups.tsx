@@ -1,16 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Search, Plus } from 'lucide-react';
-import { useToast } from '@/hooks/useToast';
-import { useAuth } from "@/context/AuthContext";
-import { 
-  FitnessGroup, 
-  getFitnessGroups, 
-  getUserGroups, 
-  joinFitnessGroup,
-  leaveFitnessGroup,
-  createFitnessGroup
-} from "@/helpers/fitnessGroupUtils";
-import FitnessGroupCard from '@/components/fitness/FitnessGroupCard';
+import React, { useState, useRef } from "react";
 import SocialFeed from './SocialFeed';
 import '@/pages/FitnessGroups.css';
 
@@ -21,37 +9,9 @@ const TABS = [
 ];
 
 export default function FitnessGroups() {
-  const { toast } = useToast();
-  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('events');
-  const [fitnessGroups, setFitnessGroups] = useState<FitnessGroup[]>([]);
-  const [userGroups, setUserGroups] = useState<FitnessGroup[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activityFilter, setActivityFilter] = useState('');
   const swipeRef = useRef<HTMLDivElement>(null);
   let touchStartX = 0;
-
-  useEffect(() => {
-    const fetchGroups = async () => {
-      if (!user?.id) return;
-      try {
-        setIsLoading(true);
-        const allGroups = await getFitnessGroups();
-        const userJoinedGroups = await getUserGroups(user.id);
-        const groupsWithJoinStatus = allGroups.map(group => ({
-          ...group,
-          isJoined: userJoinedGroups.some(userGroup => userGroup.id === group.id)
-        }));
-        setFitnessGroups(groupsWithJoinStatus);
-        setUserGroups(userJoinedGroups);
-        setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
-      }
-    };
-    fetchGroups();
-  }, [user?.id]);
 
   // Swipe handler for mobile
   const handleTouchStart = (e: React.TouchEvent) => {

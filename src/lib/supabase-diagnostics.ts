@@ -6,11 +6,12 @@
  */
 
 import { supabase } from './browser-safe-supabase';
-import { getSupabaseConfig } from './env-config';
+import env from './env-config';
 
 export async function testSupabaseConnection() {
   // Get configuration details
-  const { supabaseUrl, supabaseKey } = getSupabaseConfig();
+  const supabaseUrl = env.SUPABASE_URL;
+  const supabaseKey = env.SUPABASE_ANON_KEY;
   
   console.group('Supabase Connection Test');
   console.log('Testing Supabase connection...');
@@ -26,13 +27,13 @@ export async function testSupabaseConnection() {
   console.log('Configuration check:', configCheck);
   
   // Test actual connection with simple query
-  let connectionResult = { success: false, latency: 0, error: null, message: '' };
+  let connectionResult: { success: boolean; latency: number; error: string | null; message: string } = { success: false, latency: 0, error: null, message: '' };
   
   try {
     const startTime = performance.now();
     
     // Simple query to test connection
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('practices')
       .select('id')
       .limit(1);
@@ -95,12 +96,13 @@ export async function attemptSupabaseConnectionFix() {
   }
   
   // Reload environment config
-  const { supabaseUrl, supabaseKey } = getSupabaseConfig();
+  const supabaseUrl = env.SUPABASE_URL;
+  const supabaseKey = env.SUPABASE_ANON_KEY;
   
-  // Log important details for debugging
+  // Log important details for debugging  
   console.log('Environment check:', {
-    windowSupabaseUrl: typeof window !== 'undefined' ? !!window.SUPABASE_URL : false,
-    windowSupabaseKey: typeof window !== 'undefined' ? (!!window.SUPABASE_ANON_KEY && window.SUPABASE_ANON_KEY.substring(0, 10) + '...') : false,
+    windowSupabaseUrl: false, // Remove window reference
+    windowSupabaseKey: false, // Remove window reference
     envSupabaseUrl: !!supabaseUrl,
     envSupabaseKey: !!supabaseKey && supabaseKey.substring(0, 10) + '...'
   });

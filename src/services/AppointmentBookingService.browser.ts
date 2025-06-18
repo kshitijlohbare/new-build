@@ -144,7 +144,7 @@ export class AppointmentBookingService {
       return {
         success: true,
         appointmentId,
-        meetingDetails
+        meetingDetails: meetingDetails || undefined
       };
       
     } catch (error) {

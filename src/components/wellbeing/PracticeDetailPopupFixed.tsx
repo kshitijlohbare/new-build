@@ -173,11 +173,7 @@ const PracticeDetailPopupFixed: React.FC<PracticeDetailPopupProps> = ({ practice
     setTimeout(onClose, 300);
   };
 
-  const handleToggleDaily = () => {
-    console.log('Toggle daily handler called via React');
-    if (!practice) return;
-    addPractice({ ...practice, isDaily: !practice.isDaily });
-  };
+  // Removed unused handleToggleDaily function in favor of direct DOM event handler
 
   const showStepDetail = (index: number) => {
     console.log('Showing step detail for index:', index);

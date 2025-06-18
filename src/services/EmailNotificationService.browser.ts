@@ -12,19 +12,12 @@ interface EmailNotificationData {
   notificationType: 'confirmation' | 'reminder' | 'cancellation' | 'rescheduling';
 }
 
-interface EmailTemplate {
-  subject: string;
-  body: string;
-}
-
 // Browser-safe email service class for handling appointment-related notifications
 export class EmailNotificationService {
   private static instance: EmailNotificationService;
-  private emailProvider: 'mock';
   
   private constructor() {
     // In browser, always use mock provider
-    this.emailProvider = 'mock';
     console.log('[EmailService] Using browser-safe mock email provider');
   }
 

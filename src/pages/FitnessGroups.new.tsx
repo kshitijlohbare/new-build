@@ -1,8 +1,22 @@
 import { useState, useEffect } from "react";
-import { Smile } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useAuth } from "@/context/AuthContext";
 import "@/styles/SocialFeed.css";
+
+// Define FitnessGroup interface
+interface FitnessGroup {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  memberCount: number;
+  location?: string;
+  imageUrl?: string;
+  isJoined?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 // Define available fitness group categories
 const groupCategories = {
@@ -16,6 +30,69 @@ const groupCategories = {
   martial_arts: 'martial arts',
   team_sports: 'team sports',
   other: 'other'
+};
+
+// Mock functions for fitness groups API
+const getFitnessGroups = async (): Promise<FitnessGroup[]> => {
+  // Mock data - replace with actual API call
+  return [
+    {
+      id: '1',
+      name: 'Morning Yoga Group',
+      description: 'Join us for peaceful morning yoga sessions',
+      category: 'yoga',
+      memberCount: 24,
+      location: 'Central Park',
+      imageUrl: '/api/placeholder/300/200',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: '2',
+      name: 'Weekend Runners',
+      description: 'Casual weekend running group for all levels',
+      category: 'running',
+      memberCount: 18,
+      location: 'Riverside Trail',
+      imageUrl: '/api/placeholder/300/200',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  ];
+};
+
+const getUserGroups = async (userId: string): Promise<FitnessGroup[]> => {
+  // Mock data - replace with actual API call
+  console.log(`Getting groups for user ${userId}`);
+  return [];
+};
+
+const joinFitnessGroup = async (userId: string, groupId: string): Promise<boolean> => {
+  // Mock API call - replace with actual implementation
+  console.log(`User ${userId} joining group ${groupId}`);
+  return true;
+};
+
+const leaveFitnessGroup = async (userId: string, groupId: string): Promise<boolean> => {
+  // Mock API call - replace with actual implementation
+  console.log(`User ${userId} leaving group ${groupId}`);
+  return true;
+};
+
+const createFitnessGroup = async (groupData: Partial<FitnessGroup>): Promise<FitnessGroup> => {
+  // Mock API call - replace with actual implementation
+  const newGroup: FitnessGroup = {
+    id: Math.random().toString(36).substr(2, 9),
+    name: groupData.name || '',
+    description: groupData.description || '',
+    category: groupData.category || 'other',
+    memberCount: 1,
+    location: groupData.location,
+    imageUrl: groupData.imageUrl,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  return newGroup;
 };
 
 export default function FitnessGroups() {
@@ -115,8 +192,7 @@ export default function FitnessGroups() {
     
     try {
       const newGroup = await createFitnessGroup({
-        ...newGroupForm,
-        creator_id: user.id
+        ...newGroupForm
       });
       
       if (newGroup) {
@@ -167,7 +243,7 @@ export default function FitnessGroups() {
     
     const matchesActivity = !activityFilter || group.category === activityFilter;
     const matchesLocation = !locationFilter.trim() || 
-      group.location.toLowerCase().includes(locationFilter.toLowerCase());
+      (group.location && group.location.toLowerCase().includes(locationFilter.toLowerCase()));
     
     return matchesSearch && matchesActivity && matchesLocation;
   });

@@ -322,7 +322,7 @@ const PractitionerDetail: React.FC = () => {
       console.log('Creating appointment with data:', JSON.stringify(appointmentData, null, 2));
 
       // Use the appointment booking service to create the appointment
-      const result = await appointmentService.createAppointment(appointmentData);
+      const result = await appointmentService.createBooking(appointmentData);
 
       if (!result.success || !result.appointmentId) {
         throw new Error(result.error || 'Failed to create appointment');

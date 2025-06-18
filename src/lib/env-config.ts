@@ -3,6 +3,10 @@ const env = {
   // Default to 'development' if not set
   NODE_ENV: import.meta.env.MODE || 'development',
   
+  // Supabase
+  SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+  SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
+  
   // Email provider settings (default to mock in development)
   EMAIL_PROVIDER: import.meta.env.VITE_EMAIL_PROVIDER || 'mock',
   EMAIL_FROM: import.meta.env.VITE_EMAIL_FROM || 'noreply@mindfulcare.com',
