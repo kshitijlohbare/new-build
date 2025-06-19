@@ -1,0 +1,33 @@
+/* Additional fixes for fitness groups tabs to ensure text fits and shadows are visible */
+.fitnessgroups-topnav {
+  padding: 20px 5px 15px 5px !important;
+  margin: 0 -5px !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+.fitnessgroups-tab {
+  padding: 0 22px !important;
+  height: 36px !important;
+  overflow: visible !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  font-size: 16px !important;
+}
+
+/* Allow shadow to be visible */
+.fitnessgroups-tab.active {
+  z-index: 5 !important;
+  box-shadow: 0 3px 10px rgba(73, 218, 234, 0.4) !important;
+}
+
+/* Make the text fit properly */
+.fitnessgroups-tab span {
+  display: inline-block !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}

@@ -5,12 +5,12 @@ const getSupabaseConfig = () => {
   if (typeof window !== 'undefined') {
     return {
       url: window.SUPABASE_URL || 'https://svnczxevigicuskppyfz.supabase.co',
-      key: window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bmN6eGV2aWdpY3Vza3BweWZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwNDk1NDAsImV4cCI6MjA1OTYyNTU0MH0.00MNZRYjGKHTEFvF0enW-VCZ4qgDnXC4LeV8XsjGaEU'
+      key: window.SUPABASE_ANON_KEY || 'sb_publishable_SwYftYe96k-CZCD6UFLOrg_tFWUI55b'
     };
   }
   return {
     url: 'https://svnczxevigicuskppyfz.supabase.co',
-    key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bmN6eGV2aWdpY3Vza3BweWZ6Iiwicm9zZSI6ImFub24iLCJpYXQiOjE3NDQwNDk1NDAsImV4cCI6MjA1OTYyNTU0MH0.00MNZRYjGKHTEFvF0enW-VCZ4qgDnXC4LeV8XsjGaEU'
+    key: 'sb_publishable_SwYftYe96k-CZCD6UFLOrg_tFWUI55b'
   };
 };
 

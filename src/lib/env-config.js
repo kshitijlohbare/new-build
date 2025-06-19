@@ -24,7 +24,7 @@ export const getSupabaseConfig = () => {
       // Check for process.env (Node.js)
       (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_ANON_KEY) ||
       // Default value
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2bmN6eGV2aWdpY3Vza3BweWZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwNDk1NDAsImV4cCI6MjA1OTYyNTU0MH0.00MNZRYjGKHTEFvF0enW-VCZ4qgDnXC4LeV8XsjGaEU',
+      'sb_publishable_SwYftYe96k-CZCD6UFLOrg_tFWUI55b',
   };
 };
 

@@ -1,0 +1,30 @@
+/* CSS fix for practice card source alignment */
+[data-testid^="practice-card-source-"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 4px 8px !important;
+}
+
+/* Source text centered */
+[data-testid^="practice-card-source-"] > div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  width: auto !important;
+  flex-grow: 1 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Quote images positioning */
+[data-testid^="practice-card-source-"] img:first-child {
+  margin-right: 4px !important;
+  flex-shrink: 0 !important;
+}
+
+[data-testid^="practice-card-source-"] img:last-child {
+  margin-left: 4px !important;
+  flex-shrink: 0 !important;
+}

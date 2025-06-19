@@ -5,6 +5,7 @@ import { moreConcepts2 } from "./MoreConcepts2";
 import { moreConcepts3 } from "./MoreConcepts3";
 import { neuroscienceConcepts } from "./NeuroscienceConcepts";
 import { navalConcepts } from "./NavalConcepts";
+import '@/styles/ChipFixes.css';
 
 // CSS animation keyframes
 const animationStyles = `
@@ -705,7 +706,7 @@ export function Home() {
                 e.stopPropagation();
                 setActiveFilter(category.id);
               }}
-              className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] w-auto min-w-max cursor-pointer pointer-events-auto ${
+              className={`filter-chip box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] w-auto cursor-pointer pointer-events-auto ${
                 activeFilter === category.id 
                   ? 'bg-[#FCDF4D] border border-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)]' 
                   : `border ${category.id === 'all' ? 'border-white' : 'border-[#04C4D5]'}`

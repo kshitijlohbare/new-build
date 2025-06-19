@@ -1,0 +1,79 @@
+/* 
+   Fix for filter chips in Practices and Learn pages
+   - Ensures proper width to fit text content
+   - Adds consistent spacing and alignment
+*/
+
+/* Chip container styles */
+#practices-filter-chips-container,
+#learn-filter-chips-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#practices-filter-chips-container::-webkit-scrollbar,
+#learn-filter-chips-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual chip styles */
+#practices-filter-chips-container button,
+#learn-filter-chips-container button,
+.filter-chip {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: 36px !important;
+  padding: 0 16px !important; /* Further increased horizontal padding */
+  border-radius: 20px !important;
+  white-space: nowrap !important;
+  min-width: fit-content !important; /* Ensures the chip fits the text */
+  width: auto !important;
+  transition: all 0.2s ease;
+  box-sizing: border-box !important;
+}
+
+#practices-filter-chips-container button span,
+#learn-filter-chips-container button span {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+}
+
+/* Very specific overrides to ensure text fits in chips */
+.filter-chip {
+  width: auto !important;
+  min-width: fit-content !important;
+  max-width: none !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.filter-chip span {
+  width: auto !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+  text-overflow: unset !important;
+}
+
+/* Override any potential padding issues */
+#practices-filter-chips-container button span,
+#learn-filter-chips-container button span,
+.filter-chip span {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+}

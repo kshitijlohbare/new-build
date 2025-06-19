@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import PlayIconPath from '../assets/icons/play.svg';
 import PauseIconPath from '../assets/icons/Pause.svg';
 import StopIconPath from '../assets/icons/stop.svg';
+import '@/styles/FocusTimerFix.css';
 
 // Music options array with SVG icons that match the reference image
 const musicOptions = [
@@ -222,7 +223,7 @@ const FocusTimer = () => {
       {/* Main Container */}
       <div data-testid="focus-timer-container" className="container mx-auto">
         {/* Header Bar */}
-        <header data-testid="focus-timer-header-bar" className="flex flex-col items-center justify-center">
+        <header data-testid="focus-timer-header-bar">
           <p className="font-size-[#16px] font-['Happy_Monkey'] text-[#04C4D5] mt-2">get things done!</p>
         </header>
 

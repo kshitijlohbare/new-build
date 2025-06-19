@@ -5,6 +5,8 @@ import AddPracticeDialog from "@/components/wellbeing/AddPracticeDialog";
 import SimplePracticePopup from '@/components/wellbeing/SimplePracticePopup';
 import ClickablePortal from '@/components/common/ClickablePortal';
 import '@/components/wellbeing/popupFix.css';
+import '@/styles/ChipFixes.css';
+import '@/styles/PracticeCardFixes.css';
 
 // Import icons
 import QuotesIcon from "../assets/icons/quotes.svg";
@@ -382,7 +384,7 @@ const Practices = () => {
           {filterCategories.map((category) => (
             <button 
               key={category.id}
-              className={`box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] w-auto min-w-max ${
+              className={`filter-chip box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] w-auto ${
                 activeTab === category.id as ActiveTabType 
                   ? 'bg-[#FCDF4D] border border-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)]' 
                   : `border ${category.id === 'all' ? 'border-white' : 'border-[#04C4D5]'}`

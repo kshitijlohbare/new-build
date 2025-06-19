@@ -1,141 +1,158 @@
 const MobileWellbeingTipsSection = () => {
   return (
     <div 
-      className="tips-container"
+      className="tips-and-quotes-container"
       style={{
-        display: 'flex',
+        alignSelf: 'stretch',
+        paddingTop: '20px',
+        paddingBottom: '10px',
+        paddingLeft: '10px',
+        paddingRight: '10px',
         flexDirection: 'column',
-        alignItems: 'flex-start',
-        padding: '0px',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
         gap: '20px',
-        width: '360px',
-        height: '258px',
-        flex: 'none',
-        order: 1,
-        flexGrow: 0,
-        margin: '0 auto'
+        display: 'inline-flex'
       }}
     >
       {/* Daily Tip by Huberman */}
       <div 
-        className="tip-card relative rounded-[20px] bg-[#F5F5F5]"
+        className="tip"
         style={{
-          display: 'flex',
+          alignSelf: 'stretch',
+          padding: '10px',
+          position: 'relative',
+          borderRadius: '10px',
+          outline: '1px var(--TEXTColor, #04C4D5) solid',
+          outlineOffset: '-1px',
           flexDirection: 'column',
-          alignItems: 'flex-start',
-          padding: '20px 10px',
-          gap: '10px',
-          width: '360px',
-          height: '105px',
-          flex: 'none',
-          order: 0,
-          flexGrow: 0
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          gap: '20px',
+          display: 'flex'
         }}
       >
         <div 
-          className="practices-title"
+          className="title"
           style={{
-            display: 'flex',
-            flexDirection: 'row',
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            paddingTop: '2px',
+            paddingBottom: '2px',
+            left: '65px',
+            top: '-17px',
+            position: 'absolute',
+            background: 'var(--BGColor, white)',
+            borderRadius: '4px',
+            outline: '1px #49DAEA solid',
+            outlineOffset: '-1px',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: '0px',
             gap: '10px',
-            width: '340px',
-            height: '18px',
-            flex: 'none',
-            order: 0,
-            alignSelf: 'stretch',
-            flexGrow: 0
+            display: 'inline-flex'
           }}
         >
-          <span 
-            className="text-[#148BAF] font-righteous text-center uppercase text-base"
+          <div 
             style={{
-              width: '340px',
-              height: '18px',
+              textAlign: 'center',
+              color: 'var(--TEXTColor, #04C4D5)',
+              fontSize: '16px',
+              fontFamily: 'Righteous',
+              fontWeight: '400',
+              textTransform: 'uppercase',
               lineHeight: '18px',
-              flex: 'none',
-              order: 0,
-              flexGrow: 1
+              wordWrap: 'break-word'
             }}
           >
-            DAILY TIP BY HUBERMAN
-          </span>
+            Daily tip by huberman
+          </div>
         </div>
         
-        <p 
-          className="text-center text-[#148BAF] font-happy-monkey lowercase text-base"
+        <div 
           style={{
-            width: '340px',
-            lineHeight: '1.5',
-            flex: 1,
-            padding: '0 10px'
+            alignSelf: 'stretch',
+            textAlign: 'center',
+            color: 'var(--Primary, #148BAF)',
+            fontSize: '12px',
+            fontFamily: 'Happy Monkey',
+            fontWeight: '400',
+            textTransform: 'lowercase',
+            lineHeight: '16px',
+            wordWrap: 'break-word'
           }}
         >
-          improve your mental health with practices shared by andrew huberman and naval ravikant
-        </p>
+          Improve your mental health with practices shared by andrew huberman and naval RAvikant
+        </div>
       </div>
       
       {/* Today's Quote by Naval */}
       <div 
-        className="quote-card relative rounded-[20px] bg-[#F5F5F5]"
+        className="quote"
         style={{
-          display: 'flex',
+          alignSelf: 'stretch',
+          padding: '10px',
+          position: 'relative',
+          borderRadius: '10px',
+          outline: '1px var(--TEXTColor, #04C4D5) solid',
+          outlineOffset: '-1px',
           flexDirection: 'column',
-          alignItems: 'flex-start',
-          padding: '20px 10px',
-          gap: '10px',
-          width: '360px',
-          height: '105px',
-          flex: 'none',
-          order: 1,
-          flexGrow: 0
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          gap: '20px',
+          display: 'flex'
         }}
       >
         <div 
-          className="practices-title"
+          className="title"
           style={{
-            display: 'flex',
-            flexDirection: 'row',
+            paddingLeft: '10px',
+            paddingRight: '10px',
+            paddingTop: '2px',
+            paddingBottom: '2px',
+            left: '58.50px',
+            top: '-11px',
+            position: 'absolute',
+            background: 'var(--BGColor, white)',
+            borderRadius: '4px',
+            outline: '1px #49DAEA solid',
+            outlineOffset: '-1px',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: '0px',
             gap: '10px',
-            width: '340px',
-            height: '18px',
-            flex: 'none',
-            order: 0,
-            alignSelf: 'stretch',
-            flexGrow: 0
+            display: 'inline-flex'
           }}
         >
-          <span 
-            className="text-[#148BAF] font-righteous text-center uppercase text-base"
+          <div 
             style={{
-              width: '340px',
-              height: '18px',
+              textAlign: 'center',
+              color: 'var(--TEXTColor, #04C4D5)',
+              fontSize: '16px',
+              fontFamily: 'Righteous',
+              fontWeight: '400',
+              textTransform: 'uppercase',
               lineHeight: '18px',
-              flex: 'none',
-              order: 0,
-              flexGrow: 1
+              wordWrap: 'break-word'
             }}
           >
-            TODAYS QOUTE BY NAVAL
-          </span>
+            Todays qoute by naval
+          </div>
         </div>
         
-        <p 
-          className="text-center text-[#148BAF] font-happy-monkey lowercase text-base"
+        <div 
           style={{
-            width: '340px',
-            lineHeight: '1.5',
-            flex: 1,
-            padding: '0 10px'
+            alignSelf: 'stretch',
+            textAlign: 'center',
+            color: 'var(--Primary, #148BAF)',
+            fontSize: '12px',
+            fontFamily: 'Happy Monkey',
+            fontWeight: '400',
+            textTransform: 'lowercase',
+            lineHeight: '16px',
+            wordWrap: 'break-word'
           }}
         >
-          improve your mental health with practices shared by andrew huberman and naval ravikant
-        </p>
+          Improve your mental health with practices shared by andrew huberman and naval RAvikant
+        </div>
       </div>
     </div>
   );

@@ -492,6 +492,7 @@ header {
   background: #fff;
   min-height: 100vh;
   font-family: 'Happy Monkey', 'Righteous', sans-serif;
+  overflow: visible !important; /* Allow shadows to overflow */
 }
 
 .fitnessgroups-topnav {
@@ -504,10 +505,11 @@ header {
   position: sticky;
   top: 0;
   z-index: 10;
+  overflow: visible; /* Allow shadow to overflow */
 }
 .fitnessgroups-tab {
   border: none;
-  background: #FCDF4D;
+  background: #EEFFFF;
   color: #04C4D5;
   font-family: 'Happy Monkey', cursive;
   font-size: 1.1rem;
@@ -515,14 +517,20 @@ header {
   padding: 8px 22px;
   margin: 0 2px;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  box-shadow: 0 2px 8px rgba(73,218,234,0.08);
-  opacity: 0.7;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(73,218,234,0.2);
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  line-height: 1;
 }
 .fitnessgroups-tab.active {
   background: #04C4D5;
   color: #fff;
   opacity: 1;
+  box-shadow: 0 3px 10px rgba(73,218,234,0.4);
 }
 
 .fitnessgroups-section {
