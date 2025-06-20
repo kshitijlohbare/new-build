@@ -17,17 +17,7 @@ const MobileDailyPractices = () => {
   
   if (isLoading) {
     return (
-      <div 
-        className="wellness-section" 
-        style={{
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-          gap: '20px',
-          display: 'inline-flex',
-          padding: '0 20px'
-        }}
-      >
+      <div className="wellness-section responsive-component">
         <div className="loading-message">Loading practices...</div>
       </div>
     );
@@ -43,7 +33,8 @@ const MobileDailyPractices = () => {
           justifyContent: 'flex-start',
           alignItems: 'flex-start',
           gap: '20px',
-          display: 'inline-flex',
+          display: 'flex',
+          width: '100%',
           padding: '0 20px'
         }}
       >
@@ -57,106 +48,102 @@ const MobileDailyPractices = () => {
   
   return (
     <div 
-      className="wellness-section" 
+      className="wellness-section responsive-component" 
       id="daily-practices-section"
-      style={{
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
-        gap: '20px',
-        display: 'inline-flex'
-      }}
     >
-      {/* Progress bar */}
+      {/* Progress bar - Improved */}
       <div 
         className="progress-bar" 
         style={{
-          width: '360px',
+          width: '100%',
           height: '24px',
           justifyContent: 'flex-start',
           alignItems: 'center',
           gap: '10px',
-          display: 'inline-flex'
+          display: 'flex'
         }}
       >
+        {/* Shield icon with level indicator */}
         <div className="vector">
-          <svg width="24" height="26" viewBox="0 0 24 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M11.6662 1.04836L1.60896 4.24833C1.25294 4.36267 0.999272 4.67529 1 4.99824V15.1311C1 17.3362 2.55687 19.1397 4.57505 20.6729C6.59323 22.2058 9.14016 23.5327 11.4795 24.8562C11.8021 25.0518 12.2001 25.0441 12.5205 24.8562C14.8601 23.5329 17.4068 22.206 19.425 20.6729C21.4431 19.14 23 17.3364 23 15.1311V4.99824C23.001 4.67529 22.7471 4.36266 22.391 4.24833L12.3338 1.04836C12.096 0.972066 11.8723 0.996877 11.6662 1.04836Z" fill="#04C4D5"/>
-            <path d="M16.5585 14.9687C16.5585 15.525 16.4503 16.0469 16.2339 16.5344C16.0174 17.0219 15.7214 17.45 15.3458 17.8187C14.9766 18.1812 14.5437 18.4687 14.0472 18.6812C13.5507 18.8937 13.0192 19 12.4526 19H6.9717V16.3094H12.4526C12.6436 16.3094 12.8218 16.275 12.9873 16.2062C13.1528 16.1375 13.2961 16.0437 13.417 15.925C13.5443 15.8 13.643 15.6562 13.713 15.4937C13.783 15.3312 13.8181 15.1562 13.8181 14.9687C13.8181 14.7812 13.783 14.6062 13.713 14.4437C13.643 14.2812 13.5443 14.1406 13.417 14.0219C13.2961 13.8969 13.1528 13.8 12.9873 13.7312C12.8218 13.6625 12.6436 13.6281 12.4526 13.6281H8.7191V10.9375H12.4526C12.6436 10.9375 12.8218 10.9031 12.9873 10.8344C13.1528 10.7656 13.2961 10.6719 13.417 10.5531C13.5443 10.4281 13.643 10.2844 13.713 10.1219C13.783 9.95312 13.8181 9.775 13.8181 9.5875C13.8181 9.4 13.783 9.225 13.713 9.0625C13.643 8.9 13.5443 8.75937 13.417 8.64062C13.2961 8.51562 13.1528 8.41875 12.9873 8.35C12.8218 8.28125 12.6436 8.24687 12.4526 8.24687H6.9717V5.55625H12.4526C13.0192 5.55625 13.5507 5.6625 14.0472 5.875C14.5437 6.0875 14.9766 6.37812 15.3458 6.74687C15.7214 7.10937 16.0174 7.53437 16.2339 8.02187C16.4503 8.50937 16.5585 9.03125 16.5585 9.5875C16.5585 10.0812 16.4662 10.5625 16.2816 11.0312C16.097 11.4937 15.836 11.9094 15.4986 12.2781C15.836 12.6469 16.097 13.0656 16.2816 13.5344C16.4662 13.9969 16.5585 14.475 16.5585 14.9687Z" fill="var(--BGColor, white)"/>
-            <path d="M11.5449 0.563477C11.7963 0.500712 12.1241 0.456137 12.4863 0.572266L12.4854 0.573242L22.543 3.77148L22.5439 3.77246C23.0632 3.93923 23.5009 4.41551 23.5 4.99805V15.1309C23.5 17.5865 21.7688 19.5209 19.7275 21.0713C17.6742 22.6311 15.0814 23.9818 12.7666 25.291L12.7656 25.29C12.3004 25.5597 11.7166 25.5767 11.2334 25.29V25.291C8.9189 23.9816 6.32577 22.6309 4.27246 21.0713C2.23123 19.5206 0.5 17.5862 0.5 15.1309V4.99805C0.499348 4.41587 0.936428 3.93937 1.45605 3.77246L1.45703 3.77148L11.5146 0.572266L11.5293 0.567383L11.5449 0.563477Z" stroke="var(--BGColor, white)"/>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" fill="#04C4D5"/>
+            <text x="12" y="15" textAnchor="middle" fill="white" fontFamily="Happy Monkey" fontSize="12px">
+              {Math.ceil(completionPoints / 200)}
+            </text>
           </svg>
         </div>
         
+        {/* Progress bar container with dynamic fill */}
         <div 
-          className="progress-bar-container"
+          className="progress-bar-outer"
           style={{
-            height: '16px',
-            paddingTop: '16px',
-            paddingBottom: '16px',
+            height: '24px',
             position: 'relative',
-            background: 'linear-gradient(180deg, #49DAEA 0%, rgba(195.50, 253.79, 255, 0.20) 100%)',
             borderRadius: '4px',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            gap: '10px',
-            display: 'inline-flex'
+            background: 'rgba(195.50, 253.79, 255, 0.20)',
+            overflow: 'hidden',
+            flex: 1,
+            width: '100%'
           }}
         >
+          {/* Dynamic fill based on completion percentage */}
+          <div
+            className="progress-bar-fill"
+            style={{
+              position: 'absolute',
+              height: '100%',
+              width: `${completionPercentage}%`,
+              background: 'linear-gradient(90deg, #49DAEA 0%, rgba(73, 218, 234, 0.8) 100%)',
+              borderRadius: '4px',
+              transition: 'width 0.5s ease-in-out'
+            }}
+          />
+          
+          {/* Percentage indicator */}
           <div 
             style={{
-              transform: 'rotate(-90deg)',
-              transformOrigin: 'top left',
+              position: 'absolute',
+              left: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
               color: 'var(--BGColor, white)',
               fontSize: '12px',
               fontFamily: 'Happy Monkey',
               fontWeight: 400,
               textTransform: 'lowercase',
               lineHeight: '16px',
-              wordWrap: 'break-word'
+              zIndex: 2
             }}
           >
             {completionPercentage}%
           </div>
           
+          {/* Points indicator with star */}
           <div 
-            className="frame-100"
+            className="points-indicator"
             style={{
-              width: '23px',
-              height: '16px',
-              left: '193px',
-              top: '-1.50px',
-              position: 'absolute'
+              position: 'absolute',
+              right: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              zIndex: 2
             }}
           >
-            <div 
-              className="star-2"
-              style={{
-                left: '-10px',
-                top: '-13px',
-                position: 'absolute'
-              }}
-            >
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14.0979 2.3541C14.6966 0.511483 17.3034 0.511479 17.9021 2.3541L20.2658 9.62868C20.5335 10.4527 21.3014 11.0106 22.1679 11.0106H29.8168C31.7543 11.0106 32.5598 13.4899 30.9924 14.6287L24.8043 19.1246C24.1033 19.6339 23.81 20.5366 24.0777 21.3607L26.4414 28.6353C27.0401 30.4779 24.9311 32.0101 23.3637 30.8713L17.1756 26.3754C16.4746 25.8661 15.5254 25.8661 14.8244 26.3754L8.63631 30.8713C7.06888 32.0101 4.95992 30.4779 5.55862 28.6353L7.92228 21.3607C8.19002 20.5366 7.89671 19.6339 7.19573 19.1246L1.00761 14.6287C-0.559815 13.4899 0.245734 11.0106 2.18318 11.0106H9.83212C10.6986 11.0106 11.4665 10.4527 11.7342 9.62868L14.0979 2.3541Z" fill="var(--textcolor, #49DADD)"/>
+            <div className="star-icon">
+              <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14.0979 2.3541C14.6966 0.511483 17.3034 0.511479 17.9021 2.3541L20.2658 9.62868C20.5335 10.4527 21.3014 11.0106 22.1679 11.0106H29.8168C31.7543 11.0106 32.5598 13.4899 30.9924 14.6287L24.8043 19.1246C24.1033 19.6339 23.81 20.5366 24.0777 21.3607L26.4414 28.6353C27.0401 30.4779 24.9311 32.0101 23.3637 30.8713L17.1756 26.3754C16.4746 25.8661 15.5254 25.8661 14.8244 26.3754L8.63631 30.8713C7.06888 32.0101 4.95992 30.4779 5.55862 28.6353L7.92228 21.3607C8.19002 20.5366 7.89671 19.6339 7.19573 19.1246L1.00761 14.6287C-0.559815 13.4899 0.245734 11.0106 2.18318 11.0106H9.83212C10.6986 11.0106 11.4665 10.4527 11.7342 9.62868L14.0979 2.3541Z" fill="var(--BGColor, white)"/>
               </svg>
             </div>
-            <div 
+            <div
               style={{
-                left: '-2px',
-                top: '0px',
-                position: 'absolute',
-                transform: 'rotate(-90deg)',
-                transformOrigin: 'top left',
-                justifyContent: 'flex-end',
-                display: 'flex',
-                flexDirection: 'column',
                 color: 'var(--BGColor, white)',
                 fontSize: '12px',
                 fontFamily: 'Happy Monkey',
                 fontWeight: 400,
-                textTransform: 'lowercase',
-                lineHeight: '16px',
-                wordWrap: 'break-word'
+                lineHeight: '16px'
               }}
             >
               {completionPoints}
@@ -164,6 +151,7 @@ const MobileDailyPractices = () => {
           </div>
         </div>
         
+        {/* Total points indicator */}
         <div 
           style={{
             color: 'var(--TEXTColor, #04C4D5)',
@@ -172,10 +160,10 @@ const MobileDailyPractices = () => {
             fontWeight: 400,
             textTransform: 'uppercase',
             lineHeight: '18px',
-            wordWrap: 'break-word'
+            whiteSpace: 'nowrap'
           }}
         >
-          1000 pts
+          {Math.ceil(completionPoints / 100) * 100}/1000
         </div>
       </div>
       
@@ -186,14 +174,15 @@ const MobileDailyPractices = () => {
           flexDirection: 'column',
           justifyContent: 'flex-start',
           alignItems: 'flex-start',
-          gap: '20px',
-          display: 'flex'
+          gap: '4px',
+          display: 'flex',
+          width: '100%'
         }}
       >
         <div 
           className="daily-practice-todo-list"
           style={{
-            width: '360px',
+            width: '100%',
             paddingLeft: '10px',
             paddingRight: '10px',
             paddingTop: '20px',
@@ -229,7 +218,9 @@ const MobileDailyPractices = () => {
                 fontWeight: 400,
                 textTransform: 'uppercase',
                 lineHeight: '18px',
-                wordWrap: 'break-word'
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
               }}
             >
               your daily practices
@@ -244,7 +235,7 @@ const MobileDailyPractices = () => {
               flexDirection: 'column',
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
-              gap: '10px',
+              gap: '4px',
               display: 'flex'
             }}
           >
@@ -255,7 +246,7 @@ const MobileDailyPractices = () => {
                 flexDirection: 'column',
                 justifyContent: 'flex-start',
                 alignItems: 'flex-start',
-                gap: '10px',
+                gap: '4px',
                 display: 'flex'
               }}
             >

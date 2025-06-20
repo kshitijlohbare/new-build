@@ -25,14 +25,13 @@ nav.app-navbar * {
   margin: 0 !important;
   padding: 0 !important;
 }
+
+/* Fixed container styling */
 .mobile-home-container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Add extra padding at the top of the input bar for the swipe indicator */
-.input-bar {
-  padding-top: 20px;
-  padding-bottom: 15px;
-} padding: 0;
+  align-items: center;
+  padding: 0;
   padding-bottom: 100px; /* Space for the floating input bubble */
   position: relative;
   width: 100%;
@@ -43,6 +42,141 @@ nav.app-navbar * {
   font-family: var(--font-happy-monkey), sans-serif;
   color: #148BAF;
   overflow-x: hidden;
+}
+
+/* Input bar styling */
+.input-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #15A9D6;
+  z-index: 100;
+  padding: 8px 5px;
+  padding-top: 12px;
+  border-radius: 200px;
+  box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.swipe-indicator {
+  width: 36px;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  margin: 0 auto 2px auto;
+}
+
+.input-bar form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  justify-content: space-between;
+}
+
+/* Floating button */
+.add-delight-floating-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #15A9D6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 99;
+  border: none;
+  font-size: 24px;
+}
+
+/* Ensure all section children expand to full width */
+.wellbeing-section > * {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Responsive padding adjustments */
+@media (max-width: 375px) {
+  .wellbeing-section,
+  .hero-section {
+    padding: 8px;
+  }
+}
+
+@media (min-width: 640px) {
+  .wellbeing-section,
+  .hero-section {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Ensure all components within sections take the full width */
+.wellbeing-section > div {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix any potential horizontal overflow issues */
+.mobile-home-container * {
+  max-width: 100%;
+}
+
+/* Ensure proper spacing between sections */
+.wellbeing-section + .wellbeing-section {
+  margin-top: 15px;
+}
+
+/* Add responsive container for all components */
+.responsive-component {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Ensure scrollable areas don't cause horizontal overflow */
+.overflow-x-auto, .overflow-auto {
+  max-width: 100%;
+  scrollbar-width: thin;
+}
+
+/* Handle screen size adjustments */
+@media (min-width: 768px) {
+  .wellbeing-section {
+    padding: 15px 20px;
+  }
+}
+
+/* Fixed container styling */
+.mobile-home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  padding-bottom: 100px; /* Space for the floating input bubble */
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  background: #FFFFFF;
+  font-family: var(--font-happy-monkey), sans-serif;
+  color: #148BAF;
+  overflow-x: hidden;
+}
+
+/* Input bar styling */
+.input-bar {
+  padding-top: 20px;
+  padding-bottom: 15px;
 }
 
 @keyframes fadeInUp {
@@ -90,45 +224,34 @@ nav.app-navbar * {
 }
 
 .welcome-title {
-  font-family: 'Happy Monkey', sans-serif;
-  font-style: normal;
+  color: var(--Primary, #148BAF);
+  font-size: 12px;
+  font-family: 'Happy Monkey', cursive;
   font-weight: 400;
-  font-size: 14px;
-  line-height: 16px;
-  text-align: center;
   text-transform: lowercase;
-  color: #148BAF;
-  animation: fadeInUp 0.3s ease-out forwards;
-  flex-grow: 1;
+  line-height: 12px;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
-.delights-title {
-  width: 100%;
-  font-family: 'Happy Monkey', sans-serif;
-  font-style: normal;
+.delights-title,
+.section-title {
+  flex: 1 1 0;
+  text-align: center;
+  color: var(--Primary, #148BAF);
+  font-size: 16px;
+  font-family: 'Righteous', cursive;
   font-weight: 400;
-  font-size: 24px;
-  line-height: 29px;
-  text-align: center; /* Center align the title */
   text-transform: uppercase;
-  color: #000000;
-  order: 0; /* Position it at the top */
-  align-self: center; /* Center align horizontally */
-  display: flex;
-  flex-direction: row;
-  justify-content: center; /* Center align content */
-  align-items: center;
-  gap: 10px;
-  height: 29px;
-  margin-top: 0; /* Removed top margin */
-  margin-bottom: 0; /* Removed bottom margin */
-  padding: 0; /* Removed all padding */
-  flex-grow: 0;
+  line-height: 18px;
+  word-wrap: break-word;
+  margin-bottom: 10px;
 }
 
 .delights-wrapper {
   width: 100%;
-  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: center; /* Center align contents */
@@ -143,14 +266,13 @@ nav.app-navbar * {
 /* Navigation buttons removed */
 
 .delights-container {
+  width: 100%;
   display: flex;
-  flex-direction: column;
   flex-wrap: wrap;
-  width: calc(100vw - 20px); /* Adjusted width with reduced side padding */
-  max-width: 100%;
-  max-height: 154px; /* Match the reference design height */
-  gap: 8px; /* Changed to 8px consistent spacing */
-  align-content: flex-start;
+  justify-content: center;
+  gap: 10px;
+  padding: 5px;
+  box-sizing: border-box;
   overflow-x: auto;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
@@ -161,6 +283,12 @@ nav.app-navbar * {
   padding: 0; /* Removed all padding */
   flex-grow: 0;
   margin: 0 auto; /* Center horizontally */
+}
+
+.column-wrapper {
+  width: calc(50% - 10px);
+  margin-bottom: 10px;
+  box-sizing: border-box;
 }
 
 .delights-container > * {
@@ -179,18 +307,19 @@ nav.app-navbar * {
   align-items: center; /* Center the bubbles horizontally */
 }
 
-.delights-container::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-  display: none;
-}
-
-.delights-container::-webkit-scrollbar-thumb {
-  background: transparent;
-}
-
-.delights-container::-webkit-scrollbar-track {
-  background: transparent;
+.delight-bubble {
+  background: rgba(83, 252, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0px 1px 3px rgba(73, 218, 234, 0.3);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Happy Monkey', cursive;
+  color: #148BAF;
+  word-break: break-word;
 }
 
 /* Enhanced horizontal scrolling indicators */
@@ -381,16 +510,18 @@ nav.app-navbar * {
 .input-bar {
   position: fixed;
   bottom: 20px;
-  left: 20px;
-  right: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 500px;
   background-color: #FFD400; /* Changed from #15A9D6 to #49DADD */
-  padding: 20px 10px 15px;
+  padding: 10px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 100px;
   border: 1px solid white;
-  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
+  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.5);
   z-index: 100;
   animation: slideInFromBottom 0.5s ease-out;
   transition: box-shadow 0.2s ease, transform 0.3s ease, opacity 0.3s ease;
@@ -435,25 +566,99 @@ nav.app-navbar * {
 }
 
 .post-button {
-  background-color: white;
-  color: #49DADD;
-  border: none;
-  border-radius: 100px;
-  padding: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  /* post button */
+  box-sizing: border-box;
+  
+  /* Auto layout */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 10px;
+  gap: 4px;
+  
+  width: 48px;
+  height: 32px;
+  
+  background: #FFFFFF;
+  border: 1px solid #FFFFFF;
+  border-radius: 50px;
+  
+  /* Inside auto layout */
+  flex: none;
+  order: 2;
+  align-self: stretch;
+  flex-grow: 0;
   cursor: pointer;
-  min-width: 60px;
+}
+
+.post-button {
+  /* POST text styling */
+  font-family: 'Happy Monkey';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  /* identical to box height, or 133% */
+  display: flex;
+  align-items: center;
+  text-align: center;
+  text-transform: lowercase;
+  
+  color: #148BAF;
+}
+
+/* Disabled state for post button */
+.post-button:disabled {
+  opacity: 1;
+  cursor: not-allowed;
+  background: #FFFFFF;
+  color: #148BAF;
 }
 
 /* Daily Practices Styling */
 .wellness-section {
-  margin-bottom: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Titles inside wellness section */
+.wellness-section .practices-title,
+.wellness-section h2,
+.wellness-section [style*="text-align: center"],
+.wellness-section .wellbeing-section h2 {
+  width: 100%;
+  text-align: center !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Wellbeing tips section styles */
+#wellbeing-tips-section .title {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  text-align: center !important;
 }
 
 .progress-bar {
   position: relative;
   overflow: visible;
+  width: 100%;
+  height: 24px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  display: flex;
 }
 
 .daily-practice-list {
@@ -544,118 +749,302 @@ nav.app-navbar * {
   will-change: transform;
 }
 
-/* Responsive adjustments for different device sizes */
+/* Common styles for all wellbeing sections */
+.wellbeing-section {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Hero section styling */
+.hero-section {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Welcome header styling */
+.welcome-header {
+  width: 100%;
+  text-align: center;
+  padding: 15px 0;
+}
+
+/* Delight wrapper styling */
+.delights-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Ensure all section children expand to full width */
+.wellbeing-section > * {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Responsive padding adjustments */
 @media (max-width: 375px) {
-  .delights-container {
-    width: calc(100vw - 20px);
-    max-height: 154px;
-    height: 154px;
-    padding: 0;
-  }
-  
-  .delight-bubble, .delight-bubble.add-delight {
-    width: 95%;
-    font-size: 13px; /* Slightly smaller font for very small screens */
-    padding: 8px 0; /* Vertical padding only, remove horizontal padding */
-    margin: 0; /* Ensure no margins */
-  }
-  
+  .wellbeing-section,
   .hero-section {
-    max-height: 250px;
-    height: 249px;
-    padding: 10px 10px 20px;
-  }
-  
-  .delights-title {
-    margin-bottom: 8px;
+    padding: 8px;
   }
 }
 
-@media (min-width: 480px) {
-  .delights-container {
-    width: calc(100vw - 20px);
-    max-height: 154px;
-    height: 154px;
-    padding: 0;
-  }
-  
-  .delight-bubble, .delight-bubble.add-delight {
-    width: 95%;
-    padding: 8px 0; /* Vertical padding only, remove horizontal padding */
-    margin: 0; /* Ensure no margins */
-  }
-  
+@media (min-width: 640px) {
+  .wellbeing-section,
   .hero-section {
-    max-height: 250px;
-    height: 249px;
-  }
-  
-  .delights-title {
-    margin-bottom: 10px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
-/* Floating add button that appears when input bar is hidden */
-.add-delight-floating-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  background-color: #FFD400;
-  color: white;
-  border: none;
-  border-radius: 50%;
+/* Ensure all components within sections take the full width */
+.wellbeing-section > div {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix any potential horizontal overflow issues */
+.mobile-home-container * {
+  max-width: 100%;
+}
+
+/* Ensure proper spacing between sections */
+.wellbeing-section + .wellbeing-section {
+  margin-top: 15px;
+}
+
+/* Add responsive container for all components */
+.responsive-component {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Ensure scrollable areas don't cause horizontal overflow */
+.overflow-x-auto, .overflow-auto {
+  max-width: 100%;
+  scrollbar-width: thin;
+}
+
+/* Handle screen size adjustments */
+@media (min-width: 768px) {
+  .wellness-section {
+    padding: 0;
+    max-width: 600px;
+    margin: 0;
+  }
+}
+
+/* Concept Card Structure - New Layout */
+.concept-card-wrapper {
+  align-self: stretch;
+  padding: 10px;
+  background: rgba(167.54, 167.54, 167.54, 0.10);
+  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
+  overflow: hidden;
+  border-radius: 10px;
+  outline: 1px var(--BGColor, white) solid;
+  outline-offset: -1px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  display: inline-flex;
+}
+
+.concept-card-container {
+  align-self: stretch;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 4px;
+  display: flex;
+}
+
+.concept-card-header {
+  align-self: stretch;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+  display: inline-flex;
+}
+
+.concept-card-icon-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
-  z-index: 100;
-  animation: fadeIn 0.3s ease-out;
-  transition: transform 0.2s, background-color 0.2s;
 }
 
-.add-delight-floating-button:hover,
-.add-delight-floating-button:focus {
-  background-color: #FFC400;
-  transform: scale(1.1);
+.concept-card-content-wrapper {
+  flex: 1 1 0;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
 }
 
-.add-delight-floating-button:active {
-  transform: scale(0.95);
+.concept-card-title-container {
+  height: 18px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  display: flex;
 }
 
-.plus-icon {
-  font-size: 30px;
-  line-height: 1;
-  font-weight: bold;
+.concept-card-title {
+  width: 257px;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--Primary, #148BAF);
+  font-size: 16px;
+  font-family: Righteous;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 18px;
+  word-wrap: break-word;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.concept-card-category {
+  padding: 4px 8px;
+  background: var(--CARDSNEW, rgba(83, 252, 255, 0.10));
+  overflow: hidden;
+  border-radius: 8px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  display: inline-flex;
 }
 
-/* Swipe indicator for input bar */
-.swipe-indicator {
-  width: 40px;
-  height: 4px;
-  background-color: rgba(255, 255, 255, 0.5);
+.concept-card-category-text {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--Primary, #148BAF);
+  font-size: 12px;
+  font-family: 'Happy Monkey';
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}
+
+.concept-card-description-row {
+  align-self: stretch;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+}
+
+.concept-card-description {
+  flex: 1 1 0;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--DARKBGColor, black);
+  font-size: 12px;
+  font-family: 'Happy Monkey';
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}
+
+.concept-card-more-button {
+  padding: 4px 8px;
+  background: var(--BGColor, white);
+  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
+  overflow: hidden;
+  border-radius: 8px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.concept-card-more-text {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--Primary, #148BAF);
+  font-size: 12px;
+  font-family: 'Happy Monkey';
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}
+
+/* Therapy section styles */
+.therapy-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-self: stretch;
+  gap: 20px;
+}
+
+.therapist-cards {
+  display: flex;
+  align-self: stretch;
+  justify-content: flex-start;
+  align-items: stretch; /* Allow children to fill height */
+  gap: 4px;
+  overflow-x: auto;
+  width: 100%;
+  padding-bottom: 10px;
+  min-height: 220px; /* Set a minimum height for the container */
+  height: 100%; /* Ensure the container takes full height */
+}
+
+.therapist-banner {
+  padding: 15px;
+  background: linear-gradient(180deg, #49DAEA 0%, rgba(195.50, 253.79, 255, 0.20) 100%);
+  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
   border-radius: 10px;
-  margin: 0 auto 8px;
-  position: absolute;
-  top: 5px;
-  left: 50%;
-  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 200px;
+  max-width: 300px; /* Match the max-width of therapist-card */
+  height: 220px; /* Set fixed height to match therapist-card */
+  flex: 1 1 0; /* Same flex value as therapist-card */
 }
 
-/* Add extra padding at the top of the input bar for the swipe indicator */
-.input-bar {
-  padding-top: 15px;
+.therapist-card {
+  padding: 10px;
+  background: var(--CARDSNEW, rgba(83, 252, 255, 0.10));
+  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  height: 220px; /* Fixed height for consistency */
+  min-width: 160px;
+  max-width: 300px;
+  flex: 1 1 0; /* Same flex value as therapist-banner */
 }

@@ -273,7 +273,7 @@ const MobileHome = () => {
   
   // Variables for swipe-to-dismiss input bar
   const inputBarTouchStartY = useRef<number | null>(null);
-  const inputBarSwipeThreshold = 30; // Minimum distance to trigger dismiss
+  const inputBarSwipeThreshold = 15; // Reduced threshold to make swipe more sensitive
   
   // Handle touch events for input bar swipe dismissal
   const handleInputBarTouchStart = (e: React.TouchEvent) => {
@@ -347,7 +347,7 @@ const MobileHome = () => {
         <HomeHeader />
         
         {/* Main content that scrolls under the header */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto w-full" style={{ maxWidth: '100%' }}>
           {/* Combined welcome header and delights section */}
       <section 
         className="hero-section" 
@@ -361,13 +361,13 @@ const MobileHome = () => {
           id="mobile-welcome-header"
           data-testid="mobile-welcome-header"
         >
-          <h1 
+          <div 
             className="welcome-title" 
             id="welcome-title-text"
             data-testid="welcome-title"
           >
             welcome to your wellness home
-          </h1>
+          </div>
         </div>
         
         {/* Today's delights section - properly positioned above the bubbles */}
@@ -457,34 +457,16 @@ const MobileHome = () => {
         id="daily-practices-section" 
         data-testid="daily-practices-section"
         className="wellbeing-section"
-        aria-labelledby="daily-practices-heading"
       >
-        <h2 
-          id="daily-practices-heading"
-          data-testid="daily-practices-heading"
-          className="text-[#06C4D5] text-xl font-happy-monkey lowercase text-center mb-2"
-        >
-          daily practices
-        </h2>
         <MobileDailyPractices />
       </section>
       
-      {/* Wellbeing Tips Section - Exactly as per design */}
+      {/* Wellbeing Tips Section - Responsive design */}
       <section 
         id="wellbeing-tips-section" 
         data-testid="wellbeing-tips-section"
         className="wellbeing-section"
         aria-labelledby="wellbeing-tips-heading"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          padding: '10px 0',
-          width: '100%',
-          maxWidth: '360px',
-          margin: '0 auto',
-          backgroundColor: 'transparent'
-        }}
       >
         <MobileWellbeingTipsSection />
       </section>
@@ -496,13 +478,6 @@ const MobileHome = () => {
         className="wellbeing-section"
         aria-labelledby="book-session-heading"
       >
-        <h2 
-          id="book-session-heading"
-          data-testid="book-session-heading"
-          className="text-[#06C4D5] text-xl font-happy-monkey lowercase text-center mb-2"
-        >
-          book a session
-        </h2>
         <MobileBookSessionSection />
       </section>
       
@@ -545,7 +520,7 @@ const MobileHome = () => {
               </div>
             </div>
           )}
-          {/* Swipe indicator with a subtle hint */}
+          {/* Swipe indicator with a more noticeable hint */}
           <div 
             className="swipe-indicator" 
             id="swipe-indicator"
@@ -553,56 +528,62 @@ const MobileHome = () => {
             aria-hidden="true"
           ></div>
           <p 
-            className="text-[8px] text-white text-opacity-70 text-center -mt-1 mb-1" 
+            className="text-[9px] text-white text-opacity-80 text-center mb-1" 
             id="swipe-hint-text"
             data-testid="swipe-hint-text"
             aria-hidden="true"
+            style={{fontWeight: 500, lineHeight: 1}}
           >
             swipe down to dismiss
           </p>
           <form 
             onSubmit={handleSubmitDelight} 
-            className="flex items-center gap-2 w-full" 
+            className="flex items-center w-full" 
             id="delight-submit-form"
             data-testid="delight-submit-form"
+            style={{justifyContent: "space-between"}}
           >
-            <KeyboardAwareInput
-              type="text"
-              id="delight-input-field"
-              data-testid="delight-input-field"
-              value={newDelight}
-              onChange={(e) => setNewDelight(e.target.value)}
-              placeholder="what delighted you today?"
-              className="w-full bg-transparent outline-none text-white placeholder-white placeholder-opacity-90 pl-1"
-              style={{caretColor: "white"}}
-            />
-            <button 
-              type="button" 
-              id="emoji-toggle-button"
-              data-testid="emoji-toggle-button"
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)} 
-              className="emoji-button flex-shrink-0"
-              aria-label="Open emoji picker"
-            >
-              <img 
-                src={emojiButtonIcon} 
-                alt="Emoji" 
-                width="32" 
-                height="32" 
-                id="emoji-button-icon"
-                data-testid="emoji-button-icon"
+            <div className="flex-grow mr-3">
+              <KeyboardAwareInput
+                type="text"
+                id="delight-input-field"
+                data-testid="delight-input-field"
+                value={newDelight}
+                onChange={(e) => setNewDelight(e.target.value)}
+                placeholder="what delighted you today?"
+                className="w-full bg-transparent outline-none text-white placeholder-white placeholder-opacity-90 pl-1"
+                style={{caretColor: "white", fontSize: "14px"}}
               />
-            </button>
-            <button 
-              type="submit" 
-              id="delight-post-button"
-              data-testid="delight-post-button"
-              disabled={!newDelight.trim()}
-              className={`post-button flex-shrink-0 ${!newDelight.trim() ? 'opacity-100' : ''}`}
-              aria-label="Post your delight"
-            >
-              post
-            </button>
+            </div>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <button 
+                type="button" 
+                id="emoji-toggle-button"
+                data-testid="emoji-toggle-button"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)} 
+                className="emoji-button flex-shrink-0"
+                aria-label="Open emoji picker"
+              >
+                <img 
+                  src={emojiButtonIcon} 
+                  alt="Emoji" 
+                  width="24" 
+                  height="24" 
+                  id="emoji-button-icon"
+                  data-testid="emoji-button-icon"
+                />
+              </button>
+              <button 
+                type="submit" 
+                id="delight-post-button"
+                data-testid="delight-post-button"
+                disabled={!newDelight.trim()}
+                className="post-button"
+                aria-label="Post your delight"
+              >
+                post
+              </button>
+            </div>
           </form>
         </div>
       )}

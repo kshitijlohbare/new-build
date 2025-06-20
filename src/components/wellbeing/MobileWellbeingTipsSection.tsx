@@ -3,6 +3,8 @@ const MobileWellbeingTipsSection = () => {
     <div 
       className="tips-and-quotes-container"
       style={{
+        width: '100%',
+        maxWidth: '100%',
         alignSelf: 'stretch',
         paddingTop: '20px',
         paddingBottom: '10px',
@@ -12,13 +14,14 @@ const MobileWellbeingTipsSection = () => {
         justifyContent: 'flex-start',
         alignItems: 'center',
         gap: '20px',
-        display: 'inline-flex'
+        display: 'flex'
       }}
     >
       {/* Daily Tip by Huberman */}
       <div 
         className="tip"
         style={{
+          width: '100%',
           alignSelf: 'stretch',
           padding: '10px',
           position: 'relative',
@@ -39,7 +42,8 @@ const MobileWellbeingTipsSection = () => {
             paddingRight: '10px',
             paddingTop: '2px',
             paddingBottom: '2px',
-            left: '65px',
+            left: '50%', /* Center horizontally */
+            transform: 'translateX(-50%)', /* Perfect centering */
             top: '-17px',
             position: 'absolute',
             background: 'var(--BGColor, white)',
@@ -70,6 +74,8 @@ const MobileWellbeingTipsSection = () => {
         
         <div 
           style={{
+            width: '100%',
+            maxWidth: '100%',
             alignSelf: 'stretch',
             textAlign: 'center',
             color: 'var(--Primary, #148BAF)',
@@ -78,7 +84,8 @@ const MobileWellbeingTipsSection = () => {
             fontWeight: '400',
             textTransform: 'lowercase',
             lineHeight: '16px',
-            wordWrap: 'break-word'
+            wordWrap: 'break-word',
+            overflow: 'hidden'
           }}
         >
           Improve your mental health with practices shared by andrew huberman and naval RAvikant
@@ -89,6 +96,7 @@ const MobileWellbeingTipsSection = () => {
       <div 
         className="quote"
         style={{
+          width: '100%',
           alignSelf: 'stretch',
           padding: '10px',
           position: 'relative',
@@ -140,6 +148,8 @@ const MobileWellbeingTipsSection = () => {
         
         <div 
           style={{
+            width: '100%',
+            maxWidth: '100%',
             alignSelf: 'stretch',
             textAlign: 'center',
             color: 'var(--Primary, #148BAF)',
@@ -148,7 +158,8 @@ const MobileWellbeingTipsSection = () => {
             fontWeight: '400',
             textTransform: 'lowercase',
             lineHeight: '16px',
-            wordWrap: 'break-word'
+            wordWrap: 'break-word',
+            overflow: 'hidden'
           }}
         >
           Improve your mental health with practices shared by andrew huberman and naval RAvikant
