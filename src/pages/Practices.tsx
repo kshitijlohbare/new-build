@@ -7,6 +7,7 @@ import ClickablePortal from '@/components/common/ClickablePortal';
 import '@/components/wellbeing/popupFix.css';
 import '@/styles/ChipFixes.css';
 import '@/styles/PracticeCardFixes.css';
+import '@/styles/HappyMonkeyFont.css'; // Import Happy Monkey font for title
 
 // Import icons
 import QuotesIcon from "../assets/icons/quotes.svg";
@@ -357,7 +358,7 @@ const Practices = () => {
   return (
     <div className="min-h-screen flex flex-col p-[20px] bg-transparent relative pointer-events-none" id="practices-page" data-testid="practices-page-container">
       {/* Background embed frame */}
-      <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0" id="practices-background-container">
+      <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0 pointer-events-auto" id="practices-background-container">
         <iframe 
           src='https://my.spline.design/glassmorphlandingpage-dTRlb7D9jEqp40V25exFI0oj/' 
           frameBorder='0' 
@@ -374,7 +375,7 @@ const Practices = () => {
            id="practices-title-filters-container" data-testid="title-filters-container">
         {/* Page Title - "your practices" */}
         <div className="w-full h-[18px] text-center relative z-20" id="practices-page-title" data-testid="practices-page-title">
-          <span className="font-['Happy_Monkey'] font-normal text-[16px] leading-[18px] text-center lowercase text-[#04C4D5]" 
+          <span className="happy-monkey font-normal text-[16px] leading-[18px] text-center lowercase text-[#04C4D5]" 
                 id="practices-title-text" data-testid="practices-title-text">your practices</span>
         </div>
 
@@ -405,7 +406,7 @@ const Practices = () => {
       <div className="grid grid-cols-2 gap-2 justify-items-center justify-center relative z-10 pointer-events-auto" id="practices-grid" data-testid="practices-grid-container">
         {filteredPractices.map((practice) => (
           <div key={practice.id} 
-               className={`flex flex-col justify-start items-stretch p-[10px] gap-[10px] w-full h-[220px] ${practice.isDaily ? 'bg-[#F5F5F5]/80':'bg-[#EDFEFF]/80'} backdrop-blur-xl shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[8px]`}
+               className={`flex flex-col justify-start items-stretch p-[10px] gap-[10px] w-full h-[220px] ${practice.isDaily ? 'bg-[#F5F5F5]/80':'bg-[#EDFEFF]/80'} backdrop-blur-xl shadow-[1px_2px 4px rgba(73,218,234,0.5)] rounded-[8px]`}
                data-testid={`practice-card-${practice.id}`}
                onClick={() => handlePracticeNameClick(practice.id)}
                style={{ 

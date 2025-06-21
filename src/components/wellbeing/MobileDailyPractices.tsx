@@ -88,7 +88,22 @@ const MobileDailyPractices = () => {
       
       {/* Daily practice to-do list */}
       <div className="daily-practices-container">
-        <div className="daily-practice-todo-list">
+        <div 
+          className="daily-practice-todo-list" 
+          style={{ 
+            padding: '16px', 
+            margin: '12px 0', 
+            gap: '8px', 
+            boxSizing: 'border-box',
+            width: '100%',
+            background: '#F5F5F5',
+            borderRadius: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start'
+          }}
+          data-fixed-spacing="true"
+        >
           {/* Title */}
           <div className="practices-title">
             <div className="wellness-section-title">
@@ -97,7 +112,7 @@ const MobileDailyPractices = () => {
           </div>
           
           {/* Practices list */}
-          <div className="practices-list">
+          <div className="practices-list" style={{ width: '100%' }}>
             <div className="left-section" style={{ width: "100%" }}>
               {/* Practice items */}
               {displayedPractices.map((practice, index) => (

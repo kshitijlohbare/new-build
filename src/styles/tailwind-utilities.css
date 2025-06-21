@@ -1,0 +1,88 @@
+/**
+ * Tailwind Utilities Extension
+ * 
+ * This file provides custom utilities and extensions to Tailwind
+ * for consistent styling across the application.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom utility classes using @apply */
+@layer components {
+  /* Common layout patterns */
+  .page-container {
+    @apply min-h-screen w-full flex flex-col bg-transparent px-5;
+  }
+  
+  .section-container {
+    @apply w-full flex flex-col items-center gap-4 my-4;
+  }
+  
+  /* Card styles */
+  .card-base {
+    @apply bg-white rounded-xl shadow-md p-4 border border-gray-100;
+  }
+  
+  .card-interactive {
+    @apply card-base hover:shadow-lg transition-shadow duration-200;
+  }
+  
+  /* Button styles */
+  .btn-primary {
+    @apply bg-primary text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-primary border border-primary px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors;
+  }
+  
+  /* Form element styles */
+  .input-standard {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+  }
+  
+  /* Specific component patterns */
+  .delight-bubble {
+    @apply bg-white rounded-full p-3 shadow-md flex items-center justify-center whitespace-normal break-words;
+  }
+  
+  .emoji-button {
+    @apply text-xl p-1.5 hover:bg-gray-100 rounded-lg transition-colors;
+  }
+  
+  .swipe-indicator-line {
+    @apply w-16 h-1 bg-white bg-opacity-50 rounded-full mx-auto mb-2;
+  }
+  
+  /* Mobile specific components */
+  .mobile-header {
+    @apply w-full flex items-center justify-between p-4 bg-primary text-white;
+  }
+  
+  .bottom-input-container {
+    @apply fixed bottom-5 left-0 right-0 flex justify-center px-5;
+  }
+}
+
+/* Critical styles that need to override Tailwind */
+.critical-override {
+  padding: var(--padding-value) !important;
+  color: var(--text-color) !important;
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Helper for transitions */
+.transition-standard {
+  transition: all 0.2s ease-in-out;
+}

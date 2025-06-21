@@ -344,7 +344,7 @@ const MobileHome = () => {
         <HomeHeader />
         
         {/* Main content that scrolls under the header */}
-        <div className="flex-1 overflow-y-auto w-full" style={{ maxWidth: '100%' }}>
+        <div className="flex-1 overflow-y-auto w-full max-w-full">
           {/* Combined welcome header and delights section */}
       <section 
         className="hero-section" 
@@ -354,10 +354,9 @@ const MobileHome = () => {
       >
         {/* Welcome title */}
         <div 
-          className="welcome-header" 
+          className="welcome-header bg-none" 
           id="mobile-welcome-header"
           data-testid="mobile-welcome-header"
-          style={{ background: 'none' }}
         >
           <div 
             className="welcome-title" 
@@ -398,7 +397,7 @@ const MobileHome = () => {
               >
                 <div 
                   ref={el => delightRefs.current[index] = el}
-                  className="delight-bubble" 
+                  className="delight-bubble bg-white rounded-full p-3 shadow-md flex items-center justify-center whitespace-normal break-words" 
                   id={`delight-item-${index}`}
                   data-testid={`delight-item-${index}`}
                   aria-label={`Delight entry: ${delight}`}
@@ -486,6 +485,23 @@ const MobileHome = () => {
           id="delights-input-container"
           data-testid="delights-input-container"
           aria-label="Enter a new delight"
+          style={{ 
+            padding: '16px', 
+            margin: '12px 0',
+            gap: '8px',
+            backgroundColor: '#FFD400', 
+            border: '2px solid white', 
+            boxSizing: 'border-box',
+            position: 'fixed',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'calc(100% - 40px)',
+            maxWidth: '500px',
+            borderRadius: '50px',
+            zIndex: 1000
+          }}
+          data-fixed-spacing="true"
           onTouchStart={handleInputBarTouchStart}
           onTouchMove={handleInputBarTouchMove}
           onTouchEnd={handleInputBarTouchEnd}
@@ -526,20 +542,18 @@ const MobileHome = () => {
             aria-hidden="true"
           ></div>
           <p 
-            className="text-[9px] text-white text-opacity-80 text-center mb-1" 
+            className="text-[9px] text-white text-opacity-80 text-center mb-1 font-medium leading-none" 
             id="swipe-hint-text"
             data-testid="swipe-hint-text"
             aria-hidden="true"
-            style={{fontWeight: 500, lineHeight: 1}}
           >
             swipe down to dismiss
           </p>
           <form 
             onSubmit={handleSubmitDelight} 
-            className="flex items-center w-full" 
+            className="flex items-center justify-between w-full" 
             id="delight-submit-form"
             data-testid="delight-submit-form"
-            style={{justifyContent: "space-between"}}
           >
             <div className="flex-grow mr-3">
               <KeyboardAwareInput
@@ -549,8 +563,7 @@ const MobileHome = () => {
                 value={newDelight}
                 onChange={(e) => setNewDelight(e.target.value)}
                 placeholder="what delighted you today?"
-                className="w-full bg-transparent outline-none text-white placeholder-white placeholder-opacity-90 pl-1"
-                style={{caretColor: "white", fontSize: "14px"}}
+                className="w-full bg-transparent outline-none text-white placeholder-white placeholder-opacity-90 pl-1 caret-white text-sm"
               />
             </div>
             <div className="flex items-center gap-3 flex-shrink-0">

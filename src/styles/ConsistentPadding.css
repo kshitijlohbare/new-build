@@ -1,0 +1,139 @@
+/**
+ * ConsistentPadding.css
+ * 
+ * This file ensures padding remains consistent between browser viewing mode and inspect mode.
+ * It enforces !important rules for critical padding values to prevent browser-specific overrides.
+ */
+
+/* Global padding enforcement for key containers */
+#root, 
+.app-container, 
+main,
+.content-container,
+.page-container,
+[id$="-page"],
+[id$="-container"],
+[class*="container"] {
+  padding: inherit !important;
+  box-sizing: border-box !important;
+}
+
+/* Specific overrides for common components */
+.mobile-home-root,
+.mobile-home-container {
+  padding: 0 !important;
+}
+
+/* Ensure card padding stays consistent */
+[class*="card"],
+.filter-container,
+.content-box {
+  padding: var(--padding, 8px) !important;
+  box-sizing: border-box !important;
+}
+
+/* Fix for forms and input containers */
+form,
+.input-container,
+[id$="-input-container"],
+.form-container,
+.form-group {
+  padding: var(--form-padding, 12px) !important;
+  box-sizing: border-box !important;
+}
+
+/* Custom fixes for pages with known issues */
+#concepts-grid > div {
+  padding: 8px !important;
+}
+
+#practices-container .practice-card {
+  padding: 12px !important;
+}
+
+/* Ensure elements with specific CSS variables maintain their values */
+[style*="--padding"] {
+  padding: var(--padding) !important;
+}
+
+/* Specifically target inline padding values > 20px */
+[style*="padding: 20px"],
+[style*="padding:20px"],
+[style*="padding-top: 20px"],
+[style*="padding-bottom: 20px"],
+[style*="padding-left: 20px"],
+[style*="padding-right: 20px"] {
+  box-sizing: border-box !important;
+}
+
+/* Target elements with p-[20px] Tailwind class */
+.p-\[20px\] {
+  padding: 20px !important;
+  box-sizing: border-box !important;
+}
+
+/* Fix gap values that may affect perceived padding */
+[class*="gap-[20px]"] {
+  gap: 16px !important;
+}
+
+[class*="gap-6"] {
+  gap: 1.25rem !important; /* Slightly reduced from 1.5rem */
+}
+
+/* Fix for any browser-specific resets */
+@media screen {
+  body * {
+    box-sizing: inherit;
+  }
+  
+  /* Prevent DevTools transitions from affecting normal browsing */
+  * {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+  
+  /* Reset animations after page load */
+  .loaded * {
+    transition-duration: inherit !important;
+    animation-duration: inherit !important;
+  }
+}
+
+/* Enforce consistent padding for daily-practice-todo-list */
+.daily-practice-todo-list {
+  padding: 20px 10px !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+/* Enforce consistent padding and border for delights-input-container */
+#delights-input-container {
+  padding: 0 16px !important; /* Adjust as needed for visual match */
+  background-color: #FFD400 !important;
+  border: 2px solid white !important;
+  box-sizing: border-box !important;
+}
+
+/* ULTRA-HIGH SPECIFICITY: Force consistent spacing for daily-practice-todo-list */
+.daily-practice-todo-list,
+.daily-practice-todo-list[style],
+.daily-practice-todo-list:not([style='']),
+.daily-practice-todo-list[style*="padding"],
+.daily-practice-todo-list[style*="gap"] {
+  padding: 20px 10px !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+/* ULTRA-HIGH SPECIFICITY: Force consistent spacing for delights-input-container */
+#delights-input-container,
+#delights-input-container[style],
+#delights-input-container:not([style='']),
+#delights-input-container[style*="padding"],
+#delights-input-container[style*="gap"] {
+  padding: 0 16px !important;
+  background-color: #FFD400 !important;
+  border: 2px solid white !important;
+  box-sizing: border-box !important;
+}

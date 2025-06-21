@@ -6,6 +6,7 @@ import { moreConcepts3 } from "./MoreConcepts3";
 import { neuroscienceConcepts } from "./NeuroscienceConcepts";
 import { navalConcepts } from "./NavalConcepts";
 import '@/styles/ChipFixes.css';
+import '@/styles/LearnCards.css'; // Import the new CSS for cards
 
 // CSS animation keyframes
 const animationStyles = `
@@ -676,7 +677,7 @@ export function Home() {
   return (
     <div className="min-h-screen flex flex-col p-[20px] bg-transparent relative pointer-events-none" id="learn-page" aria-label="Psychology Concepts Learning Page">
       {/* Background embed frame */}
-      <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0">
+      <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0 pointer-events-auto">
         <iframe 
           src='https://my.spline.design/particleaibrain-az4SiexShAY1WrpvxP1RuP9A/' 
           frameBorder='0' 
@@ -747,20 +748,20 @@ export function Home() {
       </div>
 
       {/* Concepts Grid Container */}
-      <div className="max-w-3xl mx-auto relative z-10 pointer-events-auto" id="concepts-container">
+      <div className="max-w-3xl mx-auto relative z-10 pointer-events-auto px-0 sm:px-1" id="concepts-container">
         {filteredTerms.length === 0 ? (
           <p className="text-center text-gray-500 py-4" id="no-results-message">No concepts found. Try a different search term or filter.</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 px-2 sm:px-0 mx-auto" style={{ justifyItems: 'center' }} id="concepts-grid" role="list" aria-label="Psychology concepts">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2" style={{ justifyItems: 'center' }} id="concepts-grid" role="list" aria-label="Psychology concepts">
             {filteredTerms.map((term, index) => (
               <div
                 key={`${term.term}-${term.category}-${index}`}
                 id={`concept-card-${term.term.toLowerCase().replace(/\s+/g, '-')}-${index}`}
-                style={{ width: '100%', maxWidth: '360px' }}
-                className={`box-border flex flex-col justify-center items-center p-2 sm:p-[10px] gap-2 sm:gap-[8px]
+                style={{ width: '100%', maxWidth: '350px' }}
+                className={`box-border flex flex-col justify-center items-center p-1 sm:p-[6px] gap-1 sm:gap-[4px] 
                   ${expandedCards[term.term] 
-                    ? 'h-auto sm:h-[188.7px] bg-white/80 backdrop-blur-xl' 
-                    : 'h-auto sm:h-[92.7px] bg-[#F5F5F5]/80 backdrop-blur-xl'} 
+                    ? 'h-auto sm:h-[180px] bg-white/80 backdrop-blur-xl card-expanded' 
+                    : 'h-auto sm:h-[86px] bg-[#F5F5F5]/80 backdrop-blur-xl card-collapsed'} 
                   border border-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[10px] card-hover cursor-pointer 
                   ${index === 0 ? 'animate-slide-down' : ''} transition-all duration-300`}
                 onClick={(event) => handleTermSelect(term, event)}
@@ -769,18 +770,18 @@ export function Home() {
                 aria-label={`${term.term} concept card`}
               >
                 {/* Concept Card Content */}
-                <div className={`flex flex-col items-start p-0 gap-2 sm:gap-[8px] w-full ${expandedCards[term.term] ? '' : 'sm:h-[72.7px]'}`}>
+                <div className={`flex flex-col items-start p-0 gap-1 sm:gap-[4px] w-full ${expandedCards[term.term] ? '' : 'sm:h-[70px]'}`}>
                   
                   {/* Concept Card Header */}
-                  <div className="flex flex-row items-center flex-wrap sm:flex-nowrap p-0 gap-2 sm:gap-[10px] w-full min-h-[32.7px]" id={`concept-header-${term.term.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <div className="flex flex-row items-center flex-wrap sm:flex-nowrap p-0 gap-1 sm:gap-[8px] w-full min-h-[30px]" id={`concept-header-${term.term.toLowerCase().replace(/\s+/g, '-')}`}>
                     {/* Concept Icon Container */}
                     <div 
-                      className={`flex flex-col justify-center items-center p-[4px] gap-[4px] min-w-[36.63px] h-[32.7px] 
+                      className={`flex flex-col justify-center items-center p-[3px] gap-[2px] min-w-[32px] h-[30px] 
                         ${expandedCards[term.term] ? 'bg-[rgba(83,252,255,0.1)]' : 'bg-white'} rounded-[8px]`} 
                       id={`concept-icon-container-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
                       aria-hidden="true"
                     >
-                      <div className="w-[28.63px] h-[24.7px] flex items-center justify-center" id={`concept-icon-${term.term.toLowerCase().replace(/\s+/g, '-')}`}>
+                      <div className="w-[26px] h-[22px] flex items-center justify-center" id={`concept-icon-${term.term.toLowerCase().replace(/\s+/g, '-')}`}>
                         {getIconComponent(term.icon)}
                       </div>
                     </div>
@@ -798,18 +799,18 @@ export function Home() {
                     
                     {/* Concept Category Badge */}
                     <div 
-                      className="flex flex-col justify-center items-center p-1 sm:p-[4px_8px] gap-[4px] min-w-[70px] sm:w-[98px] h-[24px] bg-[rgba(83,252,255,0.1)] rounded-[8px]" 
+                      className="flex flex-col justify-center items-center p-1 sm:p-[2px_6px] gap-[2px] min-w-[60px] sm:w-[90px] h-[22px] bg-[rgba(83,252,255,0.1)] rounded-[8px]" 
                       id={`concept-category-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
                       aria-label={`Category: ${term.category}`}
                     >
-                      <span className="w-full sm:w-[82px] h-[16px] font-happy-monkey font-normal text-[10px] sm:text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#148BAF]">
+                      <span className="w-full h-[14px] font-happy-monkey font-normal text-[10px] sm:text-[11px] leading-[14px] flex items-center justify-center text-center lowercase text-[#148BAF]">
                         {term.category}
                       </span>
                     </div>
                   </div>
                   
                   {/* Concept Description Row */}
-                  <div className="flex flex-row justify-between items-center p-0 gap-2 sm:gap-[10px] w-full min-h-[32px]" id={`concept-description-row-${term.term.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <div className="flex flex-row justify-between items-center p-0 gap-1 sm:gap-[8px] w-full min-h-[28px]" id={`concept-description-row-${term.term.toLowerCase().replace(/\s+/g, '-')}`}>
                     {/* Concept Summary Text */}
                     <p 
                       className="flex-1 max-w-[calc(100%-50px)] font-happy-monkey font-normal text-[11px] sm:text-[12px] leading-tight sm:leading-[16px] flex items-center lowercase text-black line-clamp-2"
@@ -820,7 +821,7 @@ export function Home() {
                     
                     {/* Expand/Collapse Button */}
                     <div 
-                      className={`flex flex-col justify-center items-center p-1 sm:p-[4px_8px] gap-[4px] min-w-[40px] h-[24px] 
+                      className={`flex flex-col justify-center items-center p-1 sm:p-[2px_6px] gap-[2px] min-w-[36px] h-[22px] 
                         ${expandedCards[term.term] ? 'bg-white' : 'bg-[#F5F5F5]'} shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[8px]`}
                       onClick={(e) => toggleCardExpansion(term.term, e)}
                       id={`expand-button-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
@@ -829,7 +830,7 @@ export function Home() {
                       aria-controls={`expanded-content-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
                       aria-expanded={expandedCards[term.term]}
                     >
-                      <span className="w-full sm:w-[24px] h-[16px] font-happy-monkey font-normal text-[10px] sm:text-[12px] leading-[16px] flex items-center justify-center text-center lowercase text-[#148BAF]">
+                      <span className="w-full h-[14px] font-happy-monkey font-normal text-[10px] sm:text-[11px] leading-[14px] flex items-center justify-center text-center lowercase text-[#148BAF]">
                         {expandedCards[term.term] ? 'less' : 'more'}
                       </span>
                     </div>
@@ -838,12 +839,12 @@ export function Home() {
                   {/* Expanded Content - Yellow Box (Only shown when expanded) */}
                   {expandedCards[term.term] && (
                     <div 
-                      className="flex flex-row justify-center items-center p-2 sm:p-[4px] gap-[10px] w-full sm:w-[340px] h-auto min-h-[88px] bg-[#FCDF4D] rounded-[10px] mt-2 sm:mt-[8px]"
+                      className="flex flex-row justify-center items-center p-1 gap-[5px] w-full sm:w-[338px] h-auto min-h-[80px] bg-[#FCDF4D] rounded-[10px] mt-1 sm:mt-[4px]"
                       id={`expanded-content-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
                       aria-label={`Additional information about ${term.term}`}
                     >
                       <p 
-                        className="w-full sm:w-[332px] font-happy-monkey font-normal text-[11px] sm:text-[12px] leading-tight sm:leading-[16px] flex items-center lowercase text-black"
+                        className="w-full font-happy-monkey font-normal text-[11px] sm:text-[12px] leading-tight sm:leading-[16px] flex items-center lowercase text-black"
                         id={`concept-story-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
                       >
                         {term.story || "Start your day right with our energetic morning running group. All paces welcome! Every Sunday morning the run starts. Need more explanation..."}

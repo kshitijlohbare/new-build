@@ -1,0 +1,21 @@
+/**
+ * Essential Spacing Fix
+ * Simple, lightweight CSS that ensures consistent spacing
+ * without the overhead of complex selectors
+ */
+
+/* Basic spacing for daily practice list */
+.daily-practice-todo-list {
+  padding: 16px !important;
+  margin: 12px 0 !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+}
+
+/* Basic spacing for delights input container */
+#delights-input-container {
+  padding: 16px !important;
+  margin: 12px 0 !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+}

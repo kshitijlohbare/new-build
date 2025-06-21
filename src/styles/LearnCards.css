@@ -1,0 +1,61 @@
+/* 
+   Fix for Learn page cards
+   - Removes unnecessary spaces and margins
+   - Improves layout consistency
+*/
+
+/* Card grid container */
+#concepts-grid {
+  gap: 8px !important;  /* Reduce gap between cards */
+  padding: 0 !important;
+}
+
+/* Individual card styles */
+#concepts-grid > div {
+  padding: 8px !important; /* Reduce padding */
+  gap: 4px !important;   /* Reduce gap between elements */
+}
+
+/* Card header spacing */
+#concepts-grid .flex-row.items-center {
+  gap: 8px !important;
+}
+
+/* Category badge - make it more compact */
+#concepts-grid [id^="concept-category-"] {
+  padding: 2px 6px !important;
+  min-width: 60px !important;
+  height: 22px !important;
+}
+
+/* Description row spacing */
+#concepts-grid [id^="concept-description-row-"] {
+  margin-top: 2px !important;
+  min-height: 28px !important;
+}
+
+/* Expand/Collapse button - make it more compact */
+#concepts-grid [id^="expand-button-"] {
+  padding: 2px 6px !important;
+  min-width: 36px !important;
+  height: 22px !important;
+}
+
+/* Expanded content yellow box */
+#concepts-grid [id^="expanded-content-"] {
+  padding: 8px !important;
+  margin-top: 4px !important;
+  min-height: 80px !important;
+}
+
+/* Optimize for different screen sizes */
+@media (min-width: 640px) {
+  /* Adjusted heights for collapsed and expanded cards */
+  .card-collapsed {
+    height: 86px !important;
+  }
+  
+  .card-expanded {
+    height: 180px !important;
+  }
+}

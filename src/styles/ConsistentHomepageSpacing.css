@@ -1,0 +1,84 @@
+/**
+ * ConsistentHomepageSpacing.css
+ * 
+ * This CSS file enforces consistent spacing for two specific elements:
+ * - .daily-practice-todo-list
+ * - #delights-input-container
+ * 
+ * These rules have ultra-high specificity and !important flags to override
+ * any existing or dynamically added styles.
+ */
+
+/* Global reset for these specific elements */
+.daily-practice-todo-list,
+.daily-practice-todo-list *,
+#delights-input-container,
+#delights-input-container * {
+  box-sizing: border-box !important;
+}
+
+/* Ultra-specific selector for daily-practice-todo-list */
+.daily-practice-todo-list,
+div.daily-practice-todo-list,
+.daily-practices-container .daily-practice-todo-list,
+.wellness-section .daily-practices-container .daily-practice-todo-list,
+.mobile-home-container .daily-practices-container .daily-practice-todo-list,
+body .mobile-home-container .daily-practices-container .daily-practice-todo-list,
+html body .mobile-home-container .daily-practices-container .daily-practice-todo-list {
+  /* Core box model properties with !important */
+  width: 100% !important;
+  padding: 20px 10px !important;
+  margin: 0 !important;
+  background: #F5F5F5 !important;
+  overflow: hidden !important;
+  border-radius: 20px !important;
+  
+  /* Flexbox properties with !important */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+}
+
+/* Ultra-specific selector for delights-input-container */
+#delights-input-container,
+div#delights-input-container,
+.input-bar#delights-input-container,
+.mobile-home-container .input-bar#delights-input-container,
+body .mobile-home-container .input-bar#delights-input-container,
+html body .mobile-home-container .input-bar#delights-input-container {
+  /* Core box model properties with !important */
+  padding: 0 16px !important;
+  background-color: #FFD400 !important;
+  border: 2px solid white !important;
+  box-sizing: border-box !important;
+  
+  /* Position and display properties */
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: calc(100% - 40px) !important;
+  max-width: 500px !important;
+  
+  /* Appearance */
+  border-radius: 50px !important;
+  z-index: 1000 !important;
+}
+
+/* Force an exact height on the delights input bar */
+#delights-input-container .delights-input-wrapper {
+  height: 56px !important;
+}
+
+/* Force specific padding on the input field */
+#delights-input-container input {
+  padding: 12px 8px !important;
+}
+
+/* Add these attributes for DOM checking */
+.daily-practice-todo-list[data-fixed-spacing],
+#delights-input-container[data-fixed-spacing] {
+  /* This is just a marker attribute for the JS to check */
+}

@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import './styles/tailwind-utilities.css'; // Import Tailwind and custom utilities first
 import './index.css'; // CSS with timestamp will be handled in the build
 import './styles/GlobalTypographyFix.css'; // Ensure typography fix is always applied
-import './styles/ConsistentSpacing.css'; // Ensure consistent spacing between browse and inspect mode
+import './styles/EssentialSpacingFix.css'; // Simple, lightweight spacing fix
 import './styles/homeHeader.css'; // Ensure home header has the correct background color
 import './styles/sidebar.css'; // Add blur effect to sidebar
 import loadDebugStyles from './utils/conditionalDebugStyles.ts'; // Import the conditional loader

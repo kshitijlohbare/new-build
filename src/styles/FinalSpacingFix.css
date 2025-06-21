@@ -1,0 +1,93 @@
+/**
+ * Final Spacing Fix - This CSS contains the most specific selectors possible
+ * to ensure consistent spacing between the daily practice list and delights input container
+ */
+
+/* Daily Practice Todo List - Ultra-specific selectors */
+html body div.daily-practice-todo-list,
+html body div.daily-practice-todo-list[class],
+html body div[class].daily-practice-todo-list,
+html body div[class^="daily-practice-todo-list"],
+html body div[class*=" daily-practice-todo-list"],
+html body .daily-practice-todo-list:not(#_),
+html body div:not(#_).daily-practice-todo-list,
+html body main div.daily-practice-todo-list,
+html body section div.daily-practice-todo-list,
+html body article div.daily-practice-todo-list,
+html body *:not(style):not(script) > .daily-practice-todo-list,
+div.daily-practice-todo-list[class][class][class] {
+  padding: 16px !important;
+  margin: 12px 0 !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+}
+
+/* Delights Input Container - Ultra-specific selectors */
+html body div#delights-input-container,
+html body div#delights-input-container[id],
+html body div[id="delights-input-container"],
+html body div[id^="delights-input-container"],
+html body div[id*="delights-input-container"],
+html body #delights-input-container:not(._),
+html body div:not(._)#delights-input-container,
+html body main div#delights-input-container,
+html body section div#delights-input-container,
+html body article div#delights-input-container,
+html body *:not(style):not(script) > #delights-input-container,
+div#delights-input-container[id][id][id] {
+  padding: 16px !important;
+  margin: 12px 0 !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+}
+
+/* Apply the same reset to both elements to ensure everything is consistent */
+html body .daily-practice-todo-list,
+html body #delights-input-container {
+  /* Reset any flex or grid properties to ensure consistent behavior */
+  display: flex !important;
+  flex-direction: column !important;
+  
+  /* Reset any positioning that might affect layout */
+  position: relative !important;
+  
+  /* Ensure consistent width behavior */
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  
+  /* Apply consistent border, shadow and rounding */
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  
+  /* Ensure consistent box model behavior */
+  box-sizing: border-box !important;
+  
+  /* Ensure all children inherit the box-sizing */
+  & * {
+    box-sizing: inherit !important;
+  }
+}
+
+/* When in inspect mode, add a visual indicator */
+html body .daily-practice-todo-list::before,
+html body #delights-input-container::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  z-index: 100 !important;
+  border: 2px solid transparent !important;
+  box-sizing: border-box !important;
+  border-radius: 6px !important;
+  transition: border-color 0.3s ease !important;
+}
+
+/* Change border color when hovering in inspect mode */
+html body .daily-practice-todo-list:hover::before,
+html body #delights-input-container:hover::before {
+  border-color: rgba(66, 133, 244, 0.5) !important;
+}

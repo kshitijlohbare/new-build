@@ -1,0 +1,125 @@
+/**
+ * LargePaddingFix.css
+ * 
+ * This CSS file specifically targets elements with large padding values (> 20px)
+ * to ensure they display consistently in both browsing and inspect modes.
+ */
+
+/* Learn and Practices pages main container */
+#learn-page,
+#practices-page {
+  padding: 20px !important;
+  box-sizing: border-box !important;
+}
+
+/* Title and filters containers */
+#learn-title-filters-container,
+#practices-title-filters-container {
+  gap: 16px !important; /* Reducing from 20px */
+}
+
+/* TherapistListing large paddings */
+.therapist-section {
+  padding: 40px 20px !important;
+}
+
+/* Fix for TherapistListing_New.css large paddings */
+[class*="therapist"] [class*="section"] {
+  padding-top: 40px !important;
+  padding-bottom: 40px !important;
+}
+
+/* Fix for FitnessGroups large paddings */
+.fitness-group-content {
+  padding: 20px !important;
+}
+
+.fitness-group-footer {
+  padding-bottom: 30px !important;
+}
+
+/* Fix for components in Card components */
+.card,
+[class*="card"] {
+  padding: 16px !important; /* Standard card padding */
+}
+
+/* Exception for smaller cards */
+.small-card,
+[class*="small-card"] {
+  padding: 12px !important;
+}
+
+/* Fix for MobileHome components */
+.section-root {
+  padding: 24px 16px !important;
+}
+
+.wellbeing-section {
+  padding: 20px !important;
+}
+
+/* Fix for component inline styles with large paddings */
+[style*="padding: 50px"],
+[style*="padding:50px"] {
+  padding: 40px !important;
+}
+
+[style*="padding: 40px"],
+[style*="padding:40px"] {
+  padding: 32px !important;
+}
+
+[style*="padding: 30px"],
+[style*="padding:30px"] {
+  padding: 24px !important;
+}
+
+/* Fix for Tailwind classes with large paddings */
+.p-6 {
+  padding: 1.25rem !important; /* Slightly reduced from 1.5rem (24px) */
+}
+
+.p-8 {
+  padding: 1.75rem !important; /* Slightly reduced from 2rem (32px) */
+}
+
+/* Fix for large rem-based paddings */
+[style*="padding: 2rem"],
+[style*="padding:2rem"] {
+  padding: 1.75rem !important;
+}
+
+[style*="padding: 1.5rem"],
+[style*="padding:1.5rem"] {
+  padding: 1.25rem !important;
+}
+
+/* Fix for in-page specific elements */
+#focus-timer-page .controls-container {
+  padding-bottom: 16px !important;
+}
+
+/* Media queries to ensure proper padding on different devices */
+@media (max-width: 640px) {
+  /* Reduce padding on mobile */
+  #learn-page,
+  #practices-page,
+  .section-root,
+  .wellbeing-section {
+    padding: 16px !important;
+  }
+  
+  .card,
+  [class*="card"] {
+    padding: 12px !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  /* Allow slightly larger padding on big screens, but still controlled */
+  #learn-page,
+  #practices-page {
+    padding: 24px !important;
+  }
+}

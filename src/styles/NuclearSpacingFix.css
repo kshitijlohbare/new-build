@@ -1,0 +1,76 @@
+/*
+ * NUCLEAR CSS - Ultra-aggressive spacing overrides
+ * These rules use very high specificity and !important flags
+ * to ensure consistent spacing regardless of other styles.
+ */
+
+/* Daily practice todo list - Ultra-specific selector */
+html body #root .mobile-home-container .wellness-section .daily-practices-container .daily-practice-todo-list,
+.daily-practice-todo-list,
+div.daily-practice-todo-list,
+*[class*="daily-practice-todo-list"],
+.daily-practices-container > .daily-practice-todo-list,
+.daily-practices-container .daily-practice-todo-list,
+div.daily-practices-container div.daily-practice-todo-list,
+.daily-practice-todo-list[style],
+div[class="daily-practice-todo-list"],
+body div.daily-practice-todo-list,
+#root div.daily-practice-todo-list,
+body .daily-practice-todo-list,
+.wellness-section .daily-practices-container .daily-practice-todo-list,
+.mobile-home-container .daily-practices-container .daily-practice-todo-list {
+  /* Core box model properties */
+  width: 100% !important;
+  padding: 20px 10px !important;
+  margin: 0 !important;
+  background-color: #F5F5F5 !important;
+  overflow: hidden !important;
+  border-radius: 20px !important;
+  box-sizing: border-box !important;
+  
+  /* Flexbox properties */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+}
+
+/* Delights input container - Ultra-specific selector */
+html body #root .mobile-home-container #delights-input-container,
+#delights-input-container,
+div#delights-input-container,
+.input-bar#delights-input-container,
+[id="delights-input-container"],
+div[id="delights-input-container"],
+.mobile-home-container div[id="delights-input-container"],
+#delights-input-container[style],
+body #delights-input-container,
+#root #delights-input-container,
+div.input-bar#delights-input-container,
+.mobile-home-container .input-bar#delights-input-container,
+div.mobile-home-container div.input-bar#delights-input-container {
+  /* Core box model properties */
+  padding: 0 16px !important;
+  background-color: #FFD400 !important;
+  border: 2px solid white !important;
+  box-sizing: border-box !important;
+  
+  /* Position and display properties */
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: calc(100% - 40px) !important;
+  max-width: 500px !important;
+  border-radius: 50px !important;
+  z-index: 1000 !important;
+}
+
+/* Additional selector for elements with data attributes */
+[data-testid="delights-input-container"] {
+  padding: 0 16px !important;
+  background-color: #FFD400 !important;
+  border: 2px solid white !important;
+  box-sizing: border-box !important;
+}
