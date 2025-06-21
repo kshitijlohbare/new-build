@@ -1,6 +1,16 @@
 /* Fitness Groups CSS - Caktus Coco App */
 @import url('https://fonts.googleapis.com/css2?family=Happy+Monkey&family=Righteous&display=swap');
 
+/* Global typography rule - line height equals font size */
+html {
+  line-height: 1;  /* Sets base line height to be equal to font size */
+}
+
+/* Reset line height for all text elements */
+h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
+  line-height: 1 !important; /* Force line height to equal font size */
+}
+
 :root {
   --primary: #148BAF;
   --text-color: #04C4D5;
@@ -119,7 +129,7 @@ header {
   font-style: normal;
   font-weight: 400;
   font-size: 16px;
-  line-height: 18px;
+  line-height: 1;
   display: flex;
   align-items: center;
   text-align: center;
@@ -173,39 +183,6 @@ header {
   text-transform: uppercase;
   font-size: 24px;
   letter-spacing: 1px;
-}
-
-/* Tab Navigation */
-.tab-navigation {
-  display: flex;
-  height: 40px;
-  background-color: #F7FFFF;
-  border-radius: 8px;
-  border: 1px solid var(--text-color);
-  overflow: hidden;
-  width: 100%;
-  margin-bottom: 16px;
-}
-
-.tab-button {
-  flex: 1;
-  background: none;
-  border: none;
-  font-family: 'Happy Monkey', cursive;
-  font-size: 14px;
-  color: #888;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.tab-button:not(:last-child) {
-  border-right: 1px solid var(--text-color);
-}
-
-.tab-button.active {
-  background-color: var(--text-color);
-  color: white;
-  font-weight: bold;
 }
 
 /* Search Bar */
@@ -513,24 +490,59 @@ header {
   color: #04C4D5;
   font-family: 'Happy Monkey', cursive;
   font-size: 1.1rem;
-  border-radius: 20px;
-  padding: 8px 22px;
+  border-radius: 500px;
+  padding: 8px;
   margin: 0 2px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(73,218,234,0.2);
+  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.2);
   height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
   line-height: 1;
+  gap: 6px;
+  min-width: 36px;
 }
+
+.tab-icon {
+  height: 18px;
+  width: 18px;
+  object-fit: contain;
+}
+
+.fitnessgroups-tab.active .tab-icon {
+  filter: brightness(0) invert(1); /* Makes the icon white */
+}
+
+.fitnessgroups-tab:not(.active) .tab-icon {
+  filter: invert(43%) sepia(83%) saturate(463%) hue-rotate(152deg) brightness(91%) contrast(87%); /* Makes the icon #148BAF */
+}
+
+.fitnessgroups-tab span {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .fitnessgroups-tab.active {
-  background: #04C4D5;
+  background: var(--yellow, #FCDF4D);
   color: #fff;
   opacity: 1;
-  box-shadow: 0 3px 10px rgba(73,218,234,0.4);
+  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
+  border-radius: 500px;
+  padding: 8px 22px;
+  border: 1px solid white;
 }
 
 .fitnessgroups-section {
@@ -595,69 +607,160 @@ header {
 .tribe-section {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  margin-top: 10px;
+  gap: 12px;
+  padding: 10px;
 }
 /* Removed tribe-chips-row and tribe-chip styles */
 .tribe-card {
-  background: #f6fdff;
-  border-radius: 18px;
-  box-shadow: 0 2px 8px rgba(73,218,234,0.08);
-  padding: 16px 14px 12px 14px;
+  align-self: stretch;
+  padding: 10px;
+  background: var(--CARDSNEW, rgba(83, 252, 255, 0.10));
+  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
+  overflow: hidden;
+  border-radius: 8px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+  margin-bottom: 10px;
+}
+
+.tribe-title-container {
+  align-self: stretch;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+  display: inline-flex;
+}
+
+.tribe-title {
+  flex: 1 1 0;
+  text-align: center;
+  justify-content: center;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  color: var(--Primary, #148BAF);
+  font-size: 16px;
+  font-family: Righteous;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 18px;
+  word-wrap: break-word;
 }
-.tribe-title {
-  font-family: 'Righteous', cursive;
-  color: #04C4D5;
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-.tribe-desc {
-  color: #148BAF;
-  font-size: 0.95rem;
-}
-.tribe-meta-row {
-  display: flex;
+
+.tribe-content-row {
+  align-self: stretch;
+  justify-content: center;
+  align-items: flex-start;
   gap: 10px;
-  font-size: 0.9rem;
-  color: #04C4D5;
-  margin: 4px 0 6px 0;
+  display: inline-flex;
 }
-.tribe-meta {
-  display: flex;
+
+.tribe-activity-badge {
+  padding: 4px 8px;
+  background: #F5F5F5;
+  overflow: hidden;
+  border-radius: 8px;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   gap: 4px;
-  background: #fff;
-  border-radius: 12px;
-  padding: 2px 8px;
+  display: inline-flex;
 }
-.tribe-meta-cat {
-  background: #e6fcff;
-  color: #04C4D5;
-  font-weight: bold;
-}
-.tribe-btn {
-  width: 100%;
-  border: none;
-  border-radius: 10px;
+
+.activity-name {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--Primary, #148BAF);
+  font-size: 12px;
   font-family: 'Happy Monkey', cursive;
-  font-size: 1rem;
-  padding: 8px 0;
-  margin-top: 4px;
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}
+
+.tribe-desc {
+  flex: 1 1 0;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--DARKBGColor, black);
+  font-size: 12px;
+  font-family: 'Happy Monkey', cursive;
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}
+
+.tribe-meta-row {
+  align-self: stretch;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  display: inline-flex;
+}
+
+.tribe-meta {
+  flex: 1 1 0;
+  height: 24px;
+  padding: 4px 8px;
+  background: var(--BGColor, white);
+  overflow: hidden;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  display: flex;
+}
+
+.meta-text, .location-text {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--Primary, #148BAF);
+  font-size: 12px;
+  font-family: 'Happy Monkey', cursive;
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}
+
+.tribe-join-button {
+  align-self: stretch;
+  padding: 4px 8px;
+  background: var(--BGColor, white);
+  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
+  overflow: hidden;
+  border-radius: 8px;
+  outline: 1px var(--TEXTColor, #04C4D5) solid;
+  outline-offset: -1px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  display: flex;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
 }
-.tribe-btn-join {
-  background: #fff;
-  color: #04C4D5;
-  border: 2px solid #04C4D5;
-}
-.tribe-btn-member {
-  background: #FCDF4D;
-  color: #fff;
-  border: none;
+
+.join-text {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--Primary, #148BAF);
+  font-size: 16px;
+  font-family: Righteous;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 18px;
+  word-wrap: break-word;
 }
 
 /* Feels Section */
@@ -665,6 +768,76 @@ header {
   margin-top: 10px;
 }
 /* Removed feels-chips-row and feels-chip styles */
+
+/* Groups Button */
+.groups-btn {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-color, white);
+  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Calendar Button */
+.calendar-btn {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+/* Override SocialFeed styling when embedded in FitnessGroups */
+.feels-section .news-feed-container {
+  width: 100%;
+  height: auto;
+}
+
+.feels-section .news-feed-item {
+  background: var(--BGColor, white);
+}
+
+/* Additional Styles */
+.activity-icon, .activity-dot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.member-icon, .location-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Adjust tribe section spacing */
+.tribe-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px;
+}
+
+/* Add hover effects */
+.tribe-join-button:hover {
+  background-color: #F7FFFF;
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+.tribe-card:hover {
+  box-shadow: 1px 3px 6px rgba(73, 217.90, 234, 0.70);
+  transition: all 0.2s ease;
+}
 
 /* Responsive */
 @media (max-width: 500px) {
@@ -674,5 +847,23 @@ header {
   }
   .fitnessgroups-section {
     padding: 0 2vw 30px 2vw;
+  }
+}
+
+@media (max-width: 375px) {
+  .tribe-content-row {
+    flex-direction: column;
+  }
+  
+  .tribe-activity-badge {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+@media (min-width: 640px) {
+  .tribe-card {
+    max-width: 600px;
+    margin: 0 auto 10px auto;
   }
 }

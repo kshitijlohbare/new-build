@@ -1,0 +1,46 @@
+/* 
+   Consistent Spacing CSS
+   Ensures elements display consistently between browse mode and inspect mode
+*/
+
+/* Global spacing consistency fixes */
+* {
+  /* Ensure box-sizing is consistent */
+  box-sizing: border-box !important;
+}
+
+/* Fix for input bar on homepage */
+.input-bar {
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: calc(100% - 40px) !important;
+  max-width: 500px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+/* Fix for player controls in Focus Timer */
+[data-testid="player-controls-center-panel"] {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 20px !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Ensure container layouts are consistent */
+.container, .mx-auto, [class*="container"] {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Fix for potential spacing issues */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}

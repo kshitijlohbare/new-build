@@ -15,6 +15,11 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Force home-header to have the correct background color */
+#home-header {
+  background-color: #FCDF4D !important;
+}
+
 /* Custom animations for nav elements */
 @keyframes pulse-subtle {
   0% { transform: scale(1); }
@@ -424,7 +429,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* ... existing styles ... */
+/* ... existing styles... */
 
 /* Remove old slider thumb styles if they exist */
 .slider-thumb-square::-webkit-slider-thumb,
@@ -1167,4 +1172,37 @@ div[data-testid="circular-timer-section"] {
 
 .break-phase {
   background-color: rgba(255, 159, 10, 0.1);
+}
+
+/* Nav bar gradient override */
+#main-header-bar {
+  background: linear-gradient(180deg, #49DAEA 0%, rgba(196, 254, 255, 0.2) 100%) !important;
+}
+
+/* Additional navbar and header gradient overrides */
+.app-navbar, 
+nav[class*="navbar"],
+header:not(#home-header):not(#mobile-welcome-header), 
+.header-bar,
+[class*="header"]:not(#home-header):not(#mobile-welcome-header):not(.welcome-header),
+[class*="nav-bar"],
+.app-header {
+  background: linear-gradient(180deg, #49DAEA 0%, rgba(196, 254, 255, 0.2) 100%) !important;
+}
+
+/* Reusable gradient class */
+.gradient-header {
+  background: linear-gradient(180deg, #49DAEA 0%, rgba(196, 254, 255, 0.2) 100%) !important;
+}
+
+/* Specific overrides for home-header and welcome-header */
+#home-header {
+  background-color: #FCDF4D !important;
+  background-image: none !important;
+}
+
+#mobile-welcome-header, .welcome-header {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
 }

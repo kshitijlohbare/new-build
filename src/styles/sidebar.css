@@ -1,0 +1,54 @@
+/* Sidebar blur effect styling */
+.sidebar-blur {
+  /* Fallback for browsers that don't support backdrop-filter */
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  
+  /* Modern browsers will use this instead */
+  @supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.7) !important;
+  }
+  
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+/* Additional styling for sidebar container */
+.sidebar-container {
+  box-shadow: 0px 0px 15px rgba(4, 196, 213, 0.2);
+}
+
+/* Style the scrollbar for the sidebar */
+.sidebar-blur nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-blur nav::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.sidebar-blur nav::-webkit-scrollbar-thumb {
+  background-color: rgba(4, 196, 213, 0.3);
+  border-radius: 10px;
+}
+
+/* For Firefox */
+.sidebar-blur nav {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(4, 196, 213, 0.3) rgba(255, 255, 255, 0.2);
+}
+
+/* Sidebar overlay with blur */
+.sidebar-overlay {
+  /* Fallback for browsers that don't support backdrop-filter */
+  background-color: rgba(0, 0, 0, 0.4);
+  
+  /* Modern browsers will use this instead */
+  @supports (backdrop-filter: blur(3px)) or (-webkit-backdrop-filter: blur(3px)) {
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+}

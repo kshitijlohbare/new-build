@@ -1,0 +1,67 @@
+/* Global Typography Fix - Setting line height equal to font size for all text elements */
+
+/* Base HTML rule */
+html {
+  line-height: 1 !important;
+}
+
+/* All text elements */
+h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a, li {
+  line-height: 1 !important;
+}
+
+/* Additional common text wrappers */
+.text,
+.title,
+.label,
+.heading,
+.description,
+.content,
+[class*="text"],
+[class*="title"],
+[class*="label"],
+[class*="heading"],
+[class*="description"] {
+  line-height: 1 !important;
+}
+
+/* Special cases for multiline text that needs minimum spacing */
+.multiline-text {
+  line-height: 1.2 !important;
+}
+
+/* Fix for typography in specific contexts */
+body {
+  line-height: 1 !important;
+}
+
+figure, figcaption, blockquote, dl, dd {
+  line-height: 1 !important;
+}
+/* Additional consistency fixes */
+
+/* Fix for scrollbar-induced layout shifts */
+:root {
+  /* The script will dynamically calculate this value */
+  --scrollbar-width: 0px;
+  
+  /* Prevent horizontal scrollbar by default */
+  overflow-x: hidden;
+}
+
+/* Fix for inconsistent font rendering */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+}
+
+/* Fix for scroll anchoring issues */
+* {
+  overflow-anchor: none;
+}
+
+html {
+  overflow-anchor: auto;
+}

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import MobileViewport from "@/components/ui/MobileViewport";
 import { KeyboardAwareInput } from "@/components/ui/KeyboardAwareInput";
 import "@/styles/mobileHome.css";
+import "@/styles/mobileHomeBackgroundFix.css"; // Import the background fix CSS
 import MobileWellbeingTipsSection from "../components/wellbeing/MobileWellbeingTipsSection";
 import MobileDailyPractices from "../components/wellbeing/MobileDailyPractices";
 import MobileBookSessionSection from "../components/wellbeing/MobileBookSessionSection";
@@ -210,15 +211,13 @@ const MobileHome = () => {
   
   // Hide input bar after first scroll
   useEffect(() => {
-    let lastScrollPosition = 0;
-    let scrollThreshold = 30; // Increased threshold to avoid hiding on small scroll
+    let scrollThreshold = 1000; // Threshold to hide input bar only after significant scroll (1000px)
     
     const handlePageScroll = () => {
       const currentScrollPosition = window.scrollY;
-      const scrolledDown = currentScrollPosition > lastScrollPosition;
       
-      // Hide input bar when scrolling down past the threshold
-      if (scrolledDown && currentScrollPosition > scrollThreshold && showInputBar) {
+      // Hide input bar when scrolling down past the threshold (1000px)
+      if (currentScrollPosition > scrollThreshold && showInputBar) {
         setShowInputBar(false);
         setHasScrolled(true);
       }
@@ -226,8 +225,6 @@ const MobileHome = () => {
       else if (currentScrollPosition <= 10 && !showInputBar && hasScrolled) {
         setShowInputBar(true);
       }
-      
-      lastScrollPosition = currentScrollPosition;
     };
     
     window.addEventListener('scroll', handlePageScroll);
@@ -360,6 +357,7 @@ const MobileHome = () => {
           className="welcome-header" 
           id="mobile-welcome-header"
           data-testid="mobile-welcome-header"
+          style={{ background: 'none' }}
         >
           <div 
             className="welcome-title" 

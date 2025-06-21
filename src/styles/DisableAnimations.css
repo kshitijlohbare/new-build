@@ -1,0 +1,50 @@
+/* 
+   This file selectively disables animations and transitions 
+   to fix discrepancies between normal view and inspect mode
+   Highly optimized for better performance
+*/
+
+/* Only target the most problematic animations */
+.welcome-header, 
+.delights-wrapper,
+.delights-container {
+  /* Disable transitions for these specific elements only */
+  transition: none !important;
+  -webkit-transition: none !important;
+  animation: none !important;
+  -webkit-animation: none !important;
+}
+
+/* Reduce animation durations instead of disabling completely */
+.practice-item,
+.streak-badge,
+.duration-badge,
+.input-bar,
+.view-all-button,
+.practice-toggle-button {
+  transition-duration: 0.1s !important;
+  -webkit-transition-duration: 0.1s !important;
+  animation-duration: 0.1s !important;
+  -webkit-animation-duration: 0.1s !important;
+}
+
+/* Preserve critical animations for user interaction feedback */
+.delight-bubble:active,
+.delight-bubble.active-hold {
+  transition-duration: 0.1s !important;
+  -webkit-transition-duration: 0.1s !important;
+}
+
+/* Override default keyframe animations to reduce animation load */
+@keyframes disabled-animation {
+  from { opacity: 1; }
+  to { opacity: 1; }
+}
+
+/* Apply this animation to elements where we want to disable the original animation */
+.delight-bubble.show-delete,
+.delight-bubble.deleting,
+.delight-bubble:active:not(.active-hold) {
+  animation-name: disabled-animation !important;
+  -webkit-animation-name: disabled-animation !important;
+}

@@ -47,15 +47,20 @@ nav.app-navbar * {
 /* Input bar styling */
 .input-bar {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #15A9D6;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 500px;
+  background-color: transparent; /* Removed background color */
   z-index: 100;
   padding: 8px 5px;
   padding-top: 12px;
   border-radius: 200px;
   box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .swipe-indicator {
@@ -177,6 +182,11 @@ nav.app-navbar * {
 .input-bar {
   padding-top: 20px;
   padding-bottom: 15px;
+  /* Preserve the central alignment */
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 @keyframes fadeInUp {
@@ -196,7 +206,7 @@ nav.app-navbar * {
   align-items: flex-start;
   width: 100vw;
   margin-top: 0; /* Remove gap between nav and hero */
-  background: linear-gradient(180.0deg, #FCDF4D 0.05%, #FFD400 99.95%);
+  background: linear-gradient(180.0deg, #FCDF4D 0.05%, #FFFFFF 99.95%);
   border-radius: 0px 0px 20px 20px;
   padding: 10px 10px 25px; /* Slightly increased bottom padding */
   gap: 8px; /* Reduced gap between elements */
@@ -221,6 +231,14 @@ nav.app-navbar * {
   align-self: stretch;
   flex-grow: 0;
   margin-bottom: 0; /* Removed margin */
+  background-color: transparent; /* Remove background color */
+}
+
+/* Force removal of any background on welcome header */
+#mobile-welcome-header.welcome-header {
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
 }
 
 .welcome-title {
@@ -308,69 +326,31 @@ nav.app-navbar * {
 }
 
 .delight-bubble {
-  background: rgba(83, 252, 255, 0.1);
-  border-radius: 10px;
-  padding: 12px;
-  text-align: center;
-  box-shadow: 0px 1px 3px rgba(73, 218, 234, 0.3);
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Happy Monkey', cursive;
-  color: #148BAF;
-  word-break: break-word;
-}
-
-/* Enhanced horizontal scrolling indicators */
-.delights-container::after {
-  content: '';
-  flex: 0 0 20px;
-  height: 1px;
-  order: 99999;
-  /* Creates some padding at end of scroll to make it clearer there's more content */
-}
-
-/* Ensure content doesn't exceed 250px height */
-.hero-section {
-  overflow-y: hidden; /* Prevent vertical scrolling */
-}
-
-/* Remove column separators since we don't need them without the carousel */
-.delights-container::before {
-  content: none;
-}
-
-/* Scroll indicators removed */
-
-.delight-bubble {
   background-color: white;
   color: #04C4D5;
   border-radius: 10px;
-  padding: 8px 0; /* Vertical padding only, remove horizontal padding */
+  padding: 8px 12px; /* Adjusted padding for better spacing */
   text-align: center;
   box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
   font-family: 'Happy Monkey', sans-serif;
   font-style: normal;
   font-weight: 400;
-  font-size: 14px; /* Reduced font size to 14px */
-  line-height: 16px; /* Adjusted line height for smaller font */
+  font-size: 14px;
+  line-height: 16px;
   text-transform: lowercase;
   animation: fadeInUp 0.3s ease-out forwards;
-  width: 95%; /* Slightly narrower for better visual appearance */
-  min-height: 44px; /* Reduced min-height for smaller bubbles */
-  max-height: 60px; /* Reduced max-height to match */
+  width: fit-content; /* Let the bubble fit its content */
+  max-width: 95%; /* Prevent it from getting too wide */
+  min-height: 44px; /* Maintain a minimum height */
   flex: 0 0 auto;
   position: relative;
-  margin: 0; /* Ensure no margins */
+  margin: 0;
   user-select: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  align-self: center; /* Center align horizontally */
+  align-self: center;
   flex-grow: 0;
 }
 
@@ -506,7 +486,7 @@ nav.app-navbar * {
   100% { transform: scale(1.2); }
 }
 
-/* Floating input bar */
+/* Floating input bar - Main definition */
 .input-bar {
   position: fixed;
   bottom: 20px;
@@ -514,18 +494,24 @@ nav.app-navbar * {
   transform: translateX(-50%);
   width: calc(100% - 40px);
   max-width: 500px;
-  background-color: #FFD400; /* Changed from #15A9D6 to #49DADD */
+  background-color: transparent; /* Removed background color */
   padding: 10px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 100px;
-  border: 1px solid white;
-  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.5);
+  border: 1px solid rgba(73, 218, 234, 0.5);
+  box-shadow: 1px 2px 6px rgba(73, 218, 234, 0.6);
   z-index: 100;
   animation: slideInFromBottom 0.5s ease-out;
   transition: box-shadow 0.2s ease, transform 0.3s ease, opacity 0.3s ease;
   font-size: 14px;
+}
+
+/* Set delights-input-container background to #FFD400 with white border */
+#delights-input-container {
+  background-color: #FFD400 !important;
+  border: 2px solid white;
 }
 
 /* Animation for input bar appearance/disappearance */
@@ -626,6 +612,8 @@ nav.app-navbar * {
   gap: 0;
   padding: 0;
   box-sizing: border-box;
+  margin-bottom: 15px;
+  border-radius: 15px;
 }
 
 /* Titles inside wellness section */
@@ -638,9 +626,29 @@ nav.app-navbar * {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Specific style for practices title to ensure it's on one line with fixed width */
+.wellness-section .practices-title div {
+  width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Specific wellness section title style */
+.wellness-section-title {
+  width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  color: var(--Primary, #148BAF);
+  font-size: 16px;
+  font-family: 'Righteous', cursive;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 18px;
 }
 
 /* Wellbeing tips section styles */
@@ -650,6 +658,7 @@ nav.app-navbar * {
   text-align: center !important;
 }
 
+/* Progress bar styling */
 .progress-bar {
   position: relative;
   overflow: visible;
@@ -659,14 +668,136 @@ nav.app-navbar * {
   align-items: center;
   gap: 10px;
   display: flex;
+  margin-bottom: 10px;
+  padding: 0 10px;
 }
 
-.daily-practice-list {
-  border: 1px solid rgba(4, 196, 213, 0.3);
+.progress-bar-outer {
+  height: 24px;
+  position: relative;
+  border-radius: 4px;
+  background: rgba(195.50, 253.79, 255, 0.20);
+  overflow: hidden;
+  flex: 1;
+  width: 100%;
+}
+
+.progress-bar-fill {
+  position: absolute;
+  height: 100%;
+  background: linear-gradient(90deg, #49DAEA 0%, rgba(73, 218, 234, 0.8) 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease-in-out;
+}
+
+.percentage-indicator {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--BGColor, white);
+  font-size: 12px;
+  font-family: 'Happy Monkey', cursive;
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  z-index: 2;
+}
+
+.points-indicator {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 2;
+}
+
+.points-text {
+  color: var(--BGColor, white);
+  font-size: 12px;
+  font-family: 'Happy Monkey', cursive;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+.total-points {
+  color: var(--TEXTColor, #04C4D5);
+  font-size: 16px;
+  font-family: 'Righteous', cursive;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+/* Daily practice container */
+.daily-practices-container {
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 4px;
+  display: flex;
+  width: 100%;
+  padding: 0 10px;
+}
+
+.daily-practice-todo-list {
+  width: 100%;
+  padding: 20px 10px;
+  background: #F5F5F5;
+  overflow: hidden;
+  border-radius: 20px;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  display: flex;
+}
+
+.practices-title {
+  align-self: stretch;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+  margin-bottom: 5px;
+}
+
+.practices-list {
+  align-self: stretch;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 8px;
+  display: flex;
+  width: 100%;
+}
+
+.left-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .practice-item {
+  align-self: stretch;
+  padding: 10px;
+  background: var(--BGColor, white);
+  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
+  border-radius: 10px;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  width: 100%;
   transition: all 0.3s ease;
+}
+
+.practice-card-alt {
+  background: var(--CARDSNEW, rgba(83, 252, 255, 0.10)) !important;
 }
 
 .practice-item:hover {
@@ -674,377 +805,233 @@ nav.app-navbar * {
   box-shadow: 0px 4px 8px rgba(73, 218, 234, 0.4);
 }
 
-/* Star points icon styling */
-.practice-item .practice-name > div > div:first-child {
-  position: relative;
+.practice-name {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+}
+
+.practice-name-container {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+}
+
+.practice-icon-container {
   width: 15px;
   height: 15px;
-}
-
-.practice-item .practice-name > div > div:first-child > div {
-  position: absolute;
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-  background-color: #49DADD;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: rotate(0deg);
-}
-
-/* Duration button with dropdown indicator */
-.practice-item .box-border div {
   position: relative;
 }
 
-.practice-item .box-border div::after {
-  content: "^";
-  position: absolute;
-  right: 2px;
-  top: 0;
-  transform: rotate(180deg);
-  font-size: 10px;
-}
-
-/* Checkmark animation */
-@keyframes checkmark {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.practice-item button svg path {
-  transition: all 0.3s ease;
-}
-
-.practice-item button:active svg {
-  animation: checkmark 0.3s ease-in-out;
-}
-
-/* Progress bar styling */
-.progress-bar {
-  position: relative;
-  height: 24px;
-  margin-bottom: 10px;
-  overflow: visible;
-}
-
-/* Star styling for progress bar */
-.progress-bar .w-6.h-6 > div {
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Improved rotation for progress bar */
-.progress-bar .transform-gpu {
-  will-change: transform;
-}
-
-/* Common styles for all wellbeing sections */
-.wellbeing-section {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: 12px;
-  margin: 10px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Hero section styling */
-.hero-section {
-  width: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Welcome header styling */
-.welcome-header {
-  width: 100%;
-  text-align: center;
-  padding: 15px 0;
-}
-
-/* Delight wrapper styling */
-.delights-wrapper {
-  width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden;
-}
-
-/* Ensure all section children expand to full width */
-.wellbeing-section > * {
-  width: 100%;
-  max-width: 100%;
-}
-
-/* Responsive padding adjustments */
-@media (max-width: 375px) {
-  .wellbeing-section,
-  .hero-section {
-    padding: 8px;
-  }
-}
-
-@media (min-width: 640px) {
-  .wellbeing-section,
-  .hero-section {
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-/* Ensure all components within sections take the full width */
-.wellbeing-section > div {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* Fix any potential horizontal overflow issues */
-.mobile-home-container * {
-  max-width: 100%;
-}
-
-/* Ensure proper spacing between sections */
-.wellbeing-section + .wellbeing-section {
-  margin-top: 15px;
-}
-
-/* Add responsive container for all components */
-.responsive-component {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden;
-}
-
-/* Ensure scrollable areas don't cause horizontal overflow */
-.overflow-x-auto, .overflow-auto {
-  max-width: 100%;
-  scrollbar-width: thin;
-}
-
-/* Handle screen size adjustments */
-@media (min-width: 768px) {
-  .wellness-section {
-    padding: 0;
-    max-width: 600px;
-    margin: 0;
-  }
-}
-
-/* Concept Card Structure - New Layout */
-.concept-card-wrapper {
-  align-self: stretch;
-  padding: 10px;
-  background: rgba(167.54, 167.54, 167.54, 0.10);
-  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
-  overflow: hidden;
-  border-radius: 10px;
-  outline: 1px var(--BGColor, white) solid;
-  outline-offset: -1px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  display: inline-flex;
-}
-
-.concept-card-container {
-  align-self: stretch;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 4px;
-  display: flex;
-}
-
-.concept-card-header {
-  align-self: stretch;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 4px;
-  display: inline-flex;
-}
-
-.concept-card-icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.concept-card-content-wrapper {
-  flex: 1 1 0;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: center;
-}
-
-.concept-card-title-container {
-  height: 18px;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 10px;
-  display: flex;
-}
-
-.concept-card-title {
-  width: 257px;
-  justify-content: center;
-  display: flex;
-  flex-direction: column;
-  color: var(--Primary, #148BAF);
+.practice-text {
+  color: var(--DARKBGColor, black);
   font-size: 16px;
-  font-family: Righteous;
+  font-family: 'Happy Monkey', cursive;
   font-weight: 400;
-  text-transform: uppercase;
+  text-transform: lowercase;
   line-height: 18px;
   word-wrap: break-word;
 }
 
-.concept-card-category {
-  padding: 4px 8px;
-  background: var(--CARDSNEW, rgba(83, 252, 255, 0.10));
-  overflow: hidden;
-  border-radius: 8px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  display: inline-flex;
-}
-
-.concept-card-category-text {
-  text-align: center;
-  justify-content: center;
-  display: flex;
-  flex-direction: column;
-  color: var(--Primary, #148BAF);
-  font-size: 12px;
-  font-family: 'Happy Monkey';
-  font-weight: 400;
-  text-transform: lowercase;
-  line-height: 16px;
-  word-wrap: break-word;
-}
-
-.concept-card-description-row {
-  align-self: stretch;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  display: inline-flex;
-}
-
-.concept-card-description {
-  flex: 1 1 0;
-  justify-content: center;
-  display: flex;
-  flex-direction: column;
-  color: var(--DARKBGColor, black);
-  font-size: 12px;
-  font-family: 'Happy Monkey';
-  font-weight: 400;
-  text-transform: lowercase;
-  line-height: 16px;
-  word-wrap: break-word;
-}
-
-.concept-card-more-button {
-  padding: 4px 8px;
+.streak-badge {
+  padding: 2px 4px;
   background: var(--BGColor, white);
-  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
   overflow: hidden;
-  border-radius: 8px;
-  flex-direction: column;
+  border-radius: 4px;
+  outline: 1px var(--TEXTColor, #04C4D5) solid;
+  outline-offset: -1px;
   justify-content: center;
   align-items: center;
-  gap: 4px;
-  display: inline-flex;
-  cursor: pointer;
+  gap: 2px;
+  display: flex;
 }
 
-.concept-card-more-text {
-  text-align: center;
-  justify-content: center;
-  display: flex;
-  flex-direction: column;
-  color: var(--Primary, #148BAF);
+.streak-text {
+  color: var(--TEXTColor, #04C4D5);
   font-size: 12px;
-  font-family: 'Happy Monkey';
+  font-family: 'Happy Monkey', cursive;
   font-weight: 400;
   text-transform: lowercase;
   line-height: 16px;
   word-wrap: break-word;
 }
 
-/* Therapy section styles */
-.therapy-section {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  align-self: stretch;
-  gap: 20px;
-}
-
-.therapist-cards {
-  display: flex;
-  align-self: stretch;
+/* Action buttons */
+.action-buttons {
   justify-content: flex-start;
-  align-items: stretch; /* Allow children to fill height */
-  gap: 4px;
-  overflow-x: auto;
-  width: 100%;
-  padding-bottom: 10px;
-  min-height: 220px; /* Set a minimum height for the container */
-  height: 100%; /* Ensure the container takes full height */
-}
-
-.therapist-banner {
-  padding: 15px;
-  background: linear-gradient(180deg, #49DAEA 0%, rgba(195.50, 253.79, 255, 0.20) 100%);
-  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   align-items: center;
-  min-width: 200px;
-  max-width: 300px; /* Match the max-width of therapist-card */
-  height: 220px; /* Set fixed height to match therapist-card */
-  flex: 1 1 0; /* Same flex value as therapist-card */
+  gap: 4px;
+  display: flex;
 }
 
-.therapist-card {
-  padding: 10px;
-  background: var(--CARDSNEW, rgba(83, 252, 255, 0.10));
-  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
+.duration-badge {
+  padding: 2px 8px;
+  background: var(--BGColor, white);
+  overflow: hidden;
+  border-radius: 4px;
+  outline: 1px var(--TEXTColor, #04C4D5) solid;
+  outline-offset: -1px;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  height: 220px; /* Fixed height for consistency */
-  min-width: 160px;
-  max-width: 300px;
-  flex: 1 1 0; /* Same flex value as therapist-banner */
+  display: flex;
+}
+
+.duration-text {
+  color: var(--Primary, #148BAF);
+  font-size: 12px;
+  font-family: 'Happy Monkey', cursive;
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}
+
+/* View all practices link */
+.view-all-link {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.view-all-button {
+  display: inline-block;
+  background-color: white;
+  border-radius: 10px;
+  padding: 6px 16px;
+  color: #148BAF;
+  font-family: 'Happy Monkey', cursive;
+  font-size: 14px;
+  text-transform: lowercase;
+  border: 1px solid #04C4D5;
+  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.view-all-button:hover {
+  background-color: #F7FFFF;
+  transform: translateY(-1px);
+  box-shadow: 1px 3px 5px rgba(73, 218, 234, 0.6);
+}
+
+.practice-toggle-button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.practice-toggle-button:hover {
+  transform: scale(1.05);
+}
+
+.practice-toggle-button:active {
+  transform: scale(0.95);
+}
+
+/* Empty practices message styling */
+.empty-practices-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+  padding: 30px 20px;
+  background: #F5F5F5;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.empty-practices-message p {
+  color: var(--DARKBGColor, black);
+  font-size: 16px;
+  font-family: 'Happy Monkey', cursive;
+  font-weight: 400;
+  margin: 0;
+}
+
+.practices-link {
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.vector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Loading state */
+.loading-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  background: #F5F5F5;
+  border-radius: 20px;
+  color: var(--Primary, #148BAF);
+  font-family: 'Happy Monkey', cursive;
+  font-size: 16px;
+}
+
+/* Responsive adjustments for Daily Practices section */
+@media (max-width: 375px) {
+  .daily-practice-todo-list {
+    padding: 15px 8px;
+  }
+  
+  .practice-item {
+    padding: 8px;
+  }
+  
+  .practice-text {
+    font-size: 14px;
+  }
+}
+
+/* Tablet-specific adjustments */
+@media (min-width: 640px) and (max-width: 1024px) {
+  .wellness-section {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .daily-practice-todo-list {
+    padding: 25px 15px;
+  }
+  
+  .practice-item {
+    padding: 12px;
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 1025px) {
+  .wellness-section {
+    max-width: 768px;
+    margin: 0 auto;
+  }
+  
+  .daily-practice-todo-list {
+    padding: 30px 20px;
+  }
+  
+  .practice-item {
+    padding: 15px;
+  }
+  
+  .practice-text {
+    font-size: 18px;
+  }
+  
+  .wellness-section-title {
+    font-size: 18px;
+  }
 }

@@ -26,21 +26,10 @@ const MobileDailyPractices = () => {
   // Check for empty daily practices and show a message
   if (displayedPractices.length === 0) {
     return (
-      <div 
-        className="wellness-section" 
-        style={{
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-          gap: '20px',
-          display: 'flex',
-          width: '100%',
-          padding: '0 20px'
-        }}
-      >
-        <div className="empty-practices-message">
+      <div className="wellness-section responsive-component">
+        <div className="empty-practices-message" style={{padding: '0 20px', gap: '20px'}}>
           <p>You don't have any daily practices yet</p>
-          <Link to="/Practices" className="practices-link">Add daily practice</Link>
+          <Link to="/Practices" className="practices-link view-all-button">Add daily practice</Link>
         </div>
       </div>
     );
@@ -51,18 +40,8 @@ const MobileDailyPractices = () => {
       className="wellness-section responsive-component" 
       id="daily-practices-section"
     >
-      {/* Progress bar - Improved */}
-      <div 
-        className="progress-bar" 
-        style={{
-          width: '100%',
-          height: '24px',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          gap: '10px',
-          display: 'flex'
-        }}
-      >
+      {/* Progress bar */}
+      <div className="progress-bar">
         {/* Shield icon with level indicator */}
         <div className="vector">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -74,295 +53,85 @@ const MobileDailyPractices = () => {
         </div>
         
         {/* Progress bar container with dynamic fill */}
-        <div 
-          className="progress-bar-outer"
-          style={{
-            height: '24px',
-            position: 'relative',
-            borderRadius: '4px',
-            background: 'rgba(195.50, 253.79, 255, 0.20)',
-            overflow: 'hidden',
-            flex: 1,
-            width: '100%'
-          }}
-        >
+        <div className="progress-bar-outer">
           {/* Dynamic fill based on completion percentage */}
           <div
             className="progress-bar-fill"
             style={{
-              position: 'absolute',
-              height: '100%',
-              width: `${completionPercentage}%`,
-              background: 'linear-gradient(90deg, #49DAEA 0%, rgba(73, 218, 234, 0.8) 100%)',
-              borderRadius: '4px',
-              transition: 'width 0.5s ease-in-out'
+              width: `${completionPercentage}%`
             }}
           />
           
           {/* Percentage indicator */}
-          <div 
-            style={{
-              position: 'absolute',
-              left: '10px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: 'var(--BGColor, white)',
-              fontSize: '12px',
-              fontFamily: 'Happy Monkey',
-              fontWeight: 400,
-              textTransform: 'lowercase',
-              lineHeight: '16px',
-              zIndex: 2
-            }}
-          >
+          <div className="percentage-indicator">
             {completionPercentage}%
           </div>
           
           {/* Points indicator with star */}
-          <div 
-            className="points-indicator"
-            style={{
-              position: 'absolute',
-              right: '10px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              zIndex: 2
-            }}
-          >
+          <div className="points-indicator">
             <div className="star-icon">
               <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M14.0979 2.3541C14.6966 0.511483 17.3034 0.511479 17.9021 2.3541L20.2658 9.62868C20.5335 10.4527 21.3014 11.0106 22.1679 11.0106H29.8168C31.7543 11.0106 32.5598 13.4899 30.9924 14.6287L24.8043 19.1246C24.1033 19.6339 23.81 20.5366 24.0777 21.3607L26.4414 28.6353C27.0401 30.4779 24.9311 32.0101 23.3637 30.8713L17.1756 26.3754C16.4746 25.8661 15.5254 25.8661 14.8244 26.3754L8.63631 30.8713C7.06888 32.0101 4.95992 30.4779 5.55862 28.6353L7.92228 21.3607C8.19002 20.5366 7.89671 19.6339 7.19573 19.1246L1.00761 14.6287C-0.559815 13.4899 0.245734 11.0106 2.18318 11.0106H9.83212C10.6986 11.0106 11.4665 10.4527 11.7342 9.62868L14.0979 2.3541Z" fill="var(--BGColor, white)"/>
               </svg>
             </div>
-            <div
-              style={{
-                color: 'var(--BGColor, white)',
-                fontSize: '12px',
-                fontFamily: 'Happy Monkey',
-                fontWeight: 400,
-                lineHeight: '16px'
-              }}
-            >
+            <div className="points-text">
               {completionPoints}
             </div>
           </div>
         </div>
         
         {/* Total points indicator */}
-        <div 
-          style={{
-            color: 'var(--TEXTColor, #04C4D5)',
-            fontSize: '16px',
-            fontFamily: 'Righteous',
-            fontWeight: 400,
-            textTransform: 'uppercase',
-            lineHeight: '18px',
-            whiteSpace: 'nowrap'
-          }}
-        >
+        <div className="total-points">
           {Math.ceil(completionPoints / 100) * 100}/1000
         </div>
       </div>
       
       {/* Daily practice to-do list */}
-      <div 
-        className="daily-practices-container"
-        style={{
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-          gap: '4px',
-          display: 'flex',
-          width: '100%'
-        }}
-      >
-        <div 
-          className="daily-practice-todo-list"
-          style={{
-            width: '100%',
-            paddingLeft: '10px',
-            paddingRight: '10px',
-            paddingTop: '20px',
-            paddingBottom: '20px',
-            background: '#F5F5F5',
-            overflow: 'hidden',
-            borderRadius: '20px',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-start',
-            gap: '10px',
-            display: 'flex'
-          }}
-        >
+      <div className="daily-practices-container">
+        <div className="daily-practice-todo-list">
           {/* Title */}
-          <div 
-            className="practices-title"
-            style={{
-              alignSelf: 'stretch',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '10px',
-              display: 'inline-flex'
-            }}
-          >
-            <div 
-              style={{
-                flex: '1 1 0',
-                textAlign: 'center',
-                color: 'var(--Primary, #148BAF)',
-                fontSize: '16px',
-                fontFamily: 'Righteous',
-                fontWeight: 400,
-                textTransform: 'uppercase',
-                lineHeight: '18px',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}
-            >
+          <div className="practices-title">
+            <div className="wellness-section-title">
               your daily practices
             </div>
           </div>
           
           {/* Practices list */}
-          <div 
-            className="practices-list"
-            style={{
-              alignSelf: 'stretch',
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              gap: '4px',
-              display: 'flex'
-            }}
-          >
-            <div 
-              className="left-section"
-              style={{
-                alignSelf: 'stretch',
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                alignItems: 'flex-start',
-                gap: '4px',
-                display: 'flex'
-              }}
-            >
+          <div className="practices-list">
+            <div className="left-section" style={{ width: "100%" }}>
               {/* Practice items */}
               {displayedPractices.map((practice, index) => (
                 <div 
                   key={practice.id} 
                   className={`practice-item ${index % 2 === 0 ? '' : 'practice-card-alt'}`}
-                  style={{
-                    alignSelf: 'stretch',
-                    padding: '10px',
-                    background: index % 2 === 0 ? 'var(--BGColor, white)' : 'var(--CARDSNEW, rgba(83, 252, 255, 0.10))',
-                    boxShadow: '1px 2px 4px rgba(73, 217.90, 234, 0.50)',
-                    borderRadius: '10px',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    display: 'inline-flex'
-                  }}
                 >
                   {/* Practice name */}
-                  <div 
-                    className="practice-name"
-                    style={{
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
-                      gap: '10px',
-                      display: 'flex'
-                    }}
-                  >
-                    <div 
-                      style={{
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        gap: '10px',
-                        display: 'flex'
-                      }}
-                    >
-                      <div 
-                        className="points-indicator"
-                        style={{
-                          borderRadius: '4px',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          gap: '2px',
-                          display: 'flex'
-                        }}
-                      >
-                        <div 
-                          style={{
-                            width: '15px',
-                            height: '15px',
-                            position: 'relative'
-                          }}
-                        >
-                          <div 
-                            style={{
-                              left: '-2px',
-                              top: '-2.50px',
-                              position: 'absolute'
-                            }}
-                          >
+                  <div className="practice-name">
+                    <div className="practice-name-container">
+                      <div className="points-indicator" style={{position: 'static', transform: 'none'}}>
+                        <div className="practice-icon-container">
+                          <div style={{left: '-2px', top: '-2.50px', position: 'relative'}}>
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <path d="M8.7977 0.912485C9.17613 -0.30416 10.8239 -0.304163 11.2023 0.912482L12.6963 5.71573C12.8656 6.25983 13.351 6.62822 13.8986 6.62822H18.7334C19.958 6.62822 20.4672 8.2652 19.4765 9.01713L15.565 11.9857C15.122 12.322 14.9366 12.918 15.1058 13.4621L16.5998 18.2654C16.9783 19.482 15.6452 20.4937 14.6545 19.7418L10.7431 16.7732C10.3 16.437 9.70001 16.437 9.25694 16.7732L5.34552 19.7418C4.35477 20.4937 3.02173 19.482 3.40016 18.2654L4.89419 13.4621C5.06343 12.918 4.87803 12.322 4.43495 11.9857L0.523533 9.01713C-0.467214 8.2652 0.0419615 6.62822 1.26659 6.62822H6.10137C6.64905 6.62822 7.13443 6.25983 7.30367 5.71573L8.7977 0.912485Z" fill="var(--textcolor, #49DADD)"/>
                             </svg>
                           </div>
-                          <div 
-                            style={{
-                              left: '0px',
-                              top: '0.50px',
-                              position: 'absolute',
-                              justifyContent: 'flex-end',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              color: '#FCDF4D',
-                              fontSize: '12px',
-                              fontFamily: 'Happy Monkey',
-                              fontWeight: 400,
-                              textTransform: 'lowercase',
-                              lineHeight: '16px',
-                              wordWrap: 'break-word'
-                            }}
-                          >
+                          <div style={{
+                            left: '0px',
+                            top: '0.50px',
+                            position: 'absolute',
+                            color: '#FCDF4D',
+                            fontSize: '12px',
+                            fontFamily: 'Happy Monkey',
+                            fontWeight: 400
+                          }}>
                             88
                           </div>
                         </div>
                       </div>
-                      <div 
-                        style={{
-                          color: 'var(--DARKBGColor, black)',
-                          fontSize: '16px',
-                          fontFamily: 'Happy Monkey',
-                          fontWeight: 400,
-                          textTransform: 'lowercase',
-                          lineHeight: '18px',
-                          wordWrap: 'break-word'
-                        }}
-                      >
+                      <div className="practice-text">
                         {practice.name}
                       </div>
-                      <div 
-                        style={{
-                          paddingLeft: '4px',
-                          paddingRight: '4px',
-                          paddingTop: '2px',
-                          paddingBottom: '2px',
-                          background: 'var(--BGColor, white)',
-                          overflow: 'hidden',
-                          borderRadius: '4px',
-                          outline: '1px var(--TEXTColor, #04C4D5) solid',
-                          outlineOffset: '-1px',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          gap: '2px',
-                          display: 'flex'
-                        }}
-                      >
+                      <div className="streak-badge">
                         <div style={{ position: 'relative' }}>
                           <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_681_26)">
@@ -376,17 +145,7 @@ const MobileDailyPractices = () => {
                             </defs>
                           </svg>
                         </div>
-                        <div 
-                          style={{
-                            color: 'var(--TEXTColor, #04C4D5)',
-                            fontSize: '12px',
-                            fontFamily: 'Happy Monkey',
-                            fontWeight: 400,
-                            textTransform: 'lowercase',
-                            lineHeight: '16px',
-                            wordWrap: 'break-word'
-                          }}
-                        >
+                        <div className="streak-text">
                           {practice.streak || 2}
                         </div>
                       </div>
@@ -394,48 +153,15 @@ const MobileDailyPractices = () => {
                   </div>
                   
                   {/* Duration and completion buttons */}
-                  <div 
-                    className="action-buttons"
-                    style={{
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
-                      gap: '4px',
-                      display: 'flex'
-                    }}
-                  >
-                    <div 
-                      style={{
-                        paddingLeft: '8px',
-                        paddingRight: '8px',
-                        paddingTop: '2px',
-                        paddingBottom: '2px',
-                        background: 'var(--BGColor, white)',
-                        overflow: 'hidden',
-                        borderRadius: '4px',
-                        outline: '1px var(--TEXTColor, #04C4D5) solid',
-                        outlineOffset: '-1px',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '10px',
-                        display: 'flex'
-                      }}
-                    >
-                      <div 
-                        style={{
-                          color: 'var(--Primary, #148BAF)',
-                          fontSize: '12px',
-                          fontFamily: 'Happy Monkey',
-                          fontWeight: 400,
-                          textTransform: 'lowercase',
-                          lineHeight: '16px',
-                          wordWrap: 'break-word'
-                        }}
-                      >
+                  <div className="action-buttons">
+                    <div className="duration-badge">
+                      <div className="duration-text">
                         {practice.duration || 30} min
                       </div>
                     </div>
                     <button
                       onClick={() => togglePracticeCompletion(practice.id)}
+                      className="practice-toggle-button"
                       style={{background: 'transparent', border: 'none', padding: 0, cursor: 'pointer'}}
                       aria-label={practice.completed ? "Mark practice as incomplete" : "Mark practice as complete"}
                     >
@@ -459,10 +185,10 @@ const MobileDailyPractices = () => {
               ))}
               
               {/* Link to all practices */}
-              <div className="flex justify-center w-full mt-5">
+              <div className="view-all-link">
                 <Link 
                   to="/Practices"
-                  className="inline-block bg-white hover:bg-[#F7FFFF] rounded-lg px-4 py-1.5 text-[#148BAF] font-happy-monkey text-sm lowercase border border-[#04C4D5] shadow-[1px_2px_4px_rgba(73,218,234,0.5)] transition-all"
+                  className="view-all-button"
                 >
                   view all practices
                 </Link>

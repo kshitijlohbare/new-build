@@ -1,0 +1,27 @@
+/* Home Header specific styles */
+#home-header {
+  background-color: #FCDF4D !important;
+  background-image: none !important;
+}
+
+/* Ensure nothing overrides this background color */
+#home-header[style*="background"] {
+  background-color: #FCDF4D !important;
+  background-image: none !important;
+}
+
+/* Welcome header should be transparent */
+#mobile-welcome-header,
+.welcome-header {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
+}
+
+/* When welcome-header has inline styles */
+#mobile-welcome-header[style*="background"],
+.welcome-header[style*="background"] {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
+}

@@ -2,6 +2,18 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css'; // CSS with timestamp will be handled in the build
+import './styles/GlobalTypographyFix.css'; // Ensure typography fix is always applied
+import './styles/ConsistentSpacing.css'; // Ensure consistent spacing between browse and inspect mode
+import './styles/homeHeader.css'; // Ensure home header has the correct background color
+import './styles/sidebar.css'; // Add blur effect to sidebar
+import loadDebugStyles from './utils/conditionalDebugStyles.ts'; // Import the conditional loader
+
+// Only load debug styles when explicitly requested via URL parameter
+// This ensures better performance by default
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('debug') || urlParams.has('debugStyles')) {
+  loadDebugStyles();
+}
 
 // Simple favicon injector (acts as a fallback if public/favicon.ico is missing or not picked up)
 const injectFavicon = () => {
@@ -45,6 +57,48 @@ window.addEventListener('unhandledrejection', (event) => {
 
 // Inject favicon (best effort)
 injectFavicon();
+
+// Add inspector-changes script to fix alignment
+const scriptTag = document.createElement('script');
+scriptTag.src = '/inspector-changes.js';
+scriptTag.defer = true;
+document.head.appendChild(scriptTag);
+
+// More efficient script loading - combine into a single load function
+// This avoids creating multiple script elements simultaneously
+interface ScriptInfo {
+  src: string;
+}
+
+const loadScripts = (scripts: ScriptInfo[]) => {
+  let index = 0;
+  
+  const loadNextScript = () => {
+    if (index >= scripts.length) return;
+    
+    const scriptInfo = scripts[index++];
+    const scriptTag = document.createElement('script');
+    scriptTag.src = scriptInfo.src;
+    scriptTag.defer = true;
+    
+    // Load scripts sequentially to prevent performance issues
+    scriptTag.onload = loadNextScript;
+    scriptTag.onerror = loadNextScript; // Continue even if one fails
+    
+    document.head.appendChild(scriptTag);
+  };
+  
+  // Start loading scripts sequentially
+  loadNextScript();
+};
+
+// All header and container background styles are now handled by CSS - no scripts needed
+loadScripts([
+  // Removed '/public/remove-welcome-header-bg.js' - handled by CSS
+  // Removed '/header-gradient-update.js' - handled by CSS
+  // Removed '/enforce-home-header-color.js' - handled by CSS
+  // Removed '/remove-input-container-bg.js' - handled by CSS
+]);
 
 // Simple render with error handling
 try {

@@ -1,0 +1,8 @@
+/* Mobile Home Background Fix
+   Removes the white background from the mobile home container
+   This overrides the multiple definitions in mobileHome.css
+*/
+
+.mobile-home-container, #mobile-home-root {
+  background: transparent !important;
+}

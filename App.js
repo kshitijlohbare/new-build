@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SplashScreen from './components/SplashScreen';
 import TherapistListing from './src/pages/TherapistListing_New';
 import { BrowserRouter as Router } from 'react-router-dom';
+import './src/styles/GlobalTypographyFix.css'; // Import global typography fix
 
 // Error boundary component
 class ErrorBoundary extends React.Component {

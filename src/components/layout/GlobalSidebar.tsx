@@ -14,7 +14,7 @@ const GlobalSidebar: React.FC = () => {
     <>
       {/* Sidebar overlay */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-30"
+        className="fixed inset-0 bg-black bg-opacity-40 sidebar-overlay"
         onClick={toggleSidebar}
         style={{ 
           zIndex: 99998,
@@ -24,7 +24,7 @@ const GlobalSidebar: React.FC = () => {
       
       {/* Sidebar */}
       <aside 
-        className="fixed inset-y-0 left-0 w-[220px] sm:w-[200px]"
+        className="fixed inset-y-0 left-0 w-[220px] sm:w-[200px] sidebar-container sidebar-blur"
         style={{ zIndex: 99999 }}
       >
         <Sidebar onNavigate={toggleSidebar} />

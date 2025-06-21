@@ -1,0 +1,225 @@
+/* Therapy Section Styles */
+.TherapySection {
+  align-self: stretch;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 20px;
+  display: inline-flex;
+  width: 100%;
+}
+.Title {
+  align-self: stretch;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+}
+.BookYourSession {
+  width: 100%;
+  text-align: center;
+  color: var(--Primary, #148BAF);
+  font-size: 16px;
+  font-family: Righteous, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 18px;
+  word-wrap: break-word;
+}
+.TherapistCards {
+  align-self: stretch;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  display: inline-flex;
+  width: 100%;
+}
+.Banner {
+  align-self: stretch;
+  padding: 10px;
+  background: linear-gradient(180deg, #49DAEA 0%, rgba(196, 254, 255, 0.2) 100%);
+  box-shadow: 1px 2px 4px rgba(73, 217, 234, 0.5);
+  border-radius: 10px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  display: inline-flex;
+  min-width: 300px;
+  max-width: 500px;
+  flex: 1 1 0;
+  gap: 10px;
+  min-height: 180px; /* Match card min-height if set, or adjust as needed */
+}
+.GetYourTherapySessionWithOurBestOfTheTherapist {
+  width: 172px;
+  color: var(--Primary, #148BAF);
+  font-size: 16px;
+  font-family: Righteous, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 18px;
+  word-wrap: break-word;
+}
+.TherapyPageButton {
+  padding: 10px;
+  background: var(--Primary, #148BAF);
+  overflow: hidden;
+  border-radius: 10px;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  display: flex;
+  cursor: pointer;
+}
+.DiscoverTherapist {
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--Secondary-button, #F7FFFF);
+  font-size: 16px;
+  font-family: Righteous, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 18px;
+  word-wrap: break-word;
+}
+.Card1, .Card2, .Card3, .Card4 {
+  flex: 1 1 0;
+  max-width: 500px;
+  min-width: 300px;
+  padding: 10px;
+  background: var(--CARDSNEW, rgba(83, 252, 255, 0.10));
+  box-shadow: 1px 2px 4px rgba(73, 217, 234, 0.5);
+  border-radius: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+  min-height: 180px; /* Ensure cards and banner have the same min-height */
+}
+.ProfilePhoto {
+  align-self: stretch;
+  height: 100px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  background-size: cover;
+  background-position: center;
+}
+.Frame5 {
+  padding: 6px;
+  left: 10px;
+  top: 9px;
+  position: absolute;
+  background: var(--DARKBGColor, black);
+  overflow: hidden;
+  border-radius: 10px;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  display: inline-flex;
+}
+.TopRated, .New, .Experienced {
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--BGColor, white);
+  font-size: 12px;
+  font-family: 'Happy Monkey', sans-serif;
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}
+.Name {
+  align-self: stretch;
+  color: var(--DARKBGColor, black);
+  font-size: 16px;
+  font-family: Righteous, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 18px;
+  word-wrap: break-word;
+}
+.Description {
+  align-self: stretch;
+  color: var(--Primary, #148BAF);
+  font-size: 12px;
+  font-family: 'Happy Monkey', sans-serif;
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}
+.Degree {
+  align-self: stretch;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 2px;
+  display: inline-flex;
+}
+.DegreeIcon {
+  position: relative;
+}
+.DegreeText {
+  flex: 1 1 0;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--Primary, #148BAF);
+  font-size: 12px;
+  font-family: 'Happy Monkey', sans-serif;
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}
+.RatingsAndPrice {
+  align-self: stretch;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: inline-flex;
+}
+.Reviews {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 2px;
+  display: flex;
+}
+.Star1 {
+  display: flex;
+  align-items: center;
+}
+.Star1 svg {
+  display: block;
+}
+.ThreeFourReviews, .ReviewsText, .PriceText, .NineHundredSession, .PricePerSession {
+  color: var(--Primary, #148BAF);
+  font-size: 12px;
+  font-family: 'Happy Monkey', sans-serif;
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}
+.PricePerSession {
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+}
+.NineHundredSession {
+  width: 127.62px;
+  text-align: right;
+  color: var(--DARKBGColor, black);
+  font-size: 12px;
+  font-family: 'Happy Monkey', sans-serif;
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+}

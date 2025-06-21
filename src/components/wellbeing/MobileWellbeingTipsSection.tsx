@@ -1,3 +1,5 @@
+import "../../../src/styles/wellbeingTips.css";
+
 const MobileWellbeingTipsSection = () => {
   return (
     <div 

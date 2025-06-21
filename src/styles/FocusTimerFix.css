@@ -1,6 +1,5 @@
 /* Focus Timer Header Styles */
 [data-testid="focus-timer-header-bar"] {
-  background-color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
