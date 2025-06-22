@@ -21,6 +21,7 @@
     .header {
       text-align: center;
       margin-bottom: 30px;
+      background: none !important;
     }
     
     .header h1 {
@@ -262,11 +263,13 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      padding: 0 !important;
     }
     
     .reset-button {
       width: 38px;
       height: 38px;
+      padding: 0 !important;
     }
     
     .reset-button-inner {
@@ -289,6 +292,42 @@
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       transform: rotate(-90deg);
       cursor: pointer;
+    }
+    
+    .music-drawer {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 8px 0;
+      width: auto;
+      min-width: 0;
+      max-width: 90vw;
+      position: absolute;
+      right: 0;
+      top: 60px;
+      z-index: 10;
+    }
+    
+    .music-drawer button {
+      background: none;
+      border: none;
+      padding: 6px 16px;
+      margin: 0;
+      font-size: 16px;
+      color: #148BAF;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    
+    .music-drawer button:hover {
+      background: #FAF8EC;
     }
     
     @media (max-width: 480px) {
@@ -318,6 +357,7 @@
     <div class="header">
       <h1>Focus Timer</h1>
       <p>Stay focused and productive</p>
+      <div style="font-size:12px; color:gray;">This is the standalone HTML version</div>
     </div>
     
     <div class="main-content">
@@ -397,11 +437,24 @@
           </button>
         </div>
         
-        <div class="music-button">
+        <div class="music-button" id="music-button">
           <svg width="21" height="24" viewBox="0 0 21 24" fill="#148BAF">
             <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
           </svg>
         </div>
+        <div class="music-drawer" id="music-drawer" style="display:none;">
+          <button data-music="lofi">Lofi Chill</button>
+          <button data-music="nature">Nature Sounds</button>
+          <button data-music="piano">Piano Focus</button>
+          <button data-music="rain">Rain Ambience</button>
+        </div>
+      </div>
+      
+      <div class="music-drawer">
+        <button>Music Track 1</button>
+        <button>Music Track 2</button>
+        <button>Music Track 3</button>
+        <button>Music Track 4</button>
       </div>
     </div>
   </div>
@@ -411,10 +464,8 @@
     document.addEventListener('DOMContentLoaded', function() {
       const playButton = document.getElementById('play-button');
       let isPlaying = false;
-      
       playButton.addEventListener('click', function() {
         isPlaying = !isPlaying;
-        
         if (isPlaying) {
           playButton.innerHTML = `
             <div style="display: flex; flex-row; align-items: center; justify-content: center; gap: 2px; padding: 0 2px;">
@@ -431,6 +482,31 @@
             </div>
           `;
         }
+      });
+      // Music drawer logic
+      const musicButton = document.getElementById('music-button');
+      const musicDrawer = document.getElementById('music-drawer');
+      musicButton.addEventListener('click', function() {
+        musicDrawer.style.display = musicDrawer.style.display === 'none' ? 'flex' : 'none';
+      });
+      // Play music on button click
+      const musicMap = {
+        lofi: 'https://cdn.pixabay.com/audio/2022/10/16/audio_12b6b7b2e2.mp3',
+        nature: 'https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b2e2e.mp3',
+        piano: 'https://cdn.pixabay.com/audio/2022/07/26/audio_124b7b2e2e.mp3',
+        rain: 'https://cdn.pixabay.com/audio/2022/03/15/audio_116b9b2e2e.mp3'
+      };
+      let currentAudio = null;
+      musicDrawer.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', function() {
+          if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+          const src = musicMap[btn.dataset.music];
+          if (src) {
+            currentAudio = new Audio(src);
+            currentAudio.loop = true;
+            currentAudio.play();
+          }
+        });
       });
     });
   </script>

@@ -1,0 +1,63 @@
+/* 
+   Extreme Element Reset CSS 
+   This file uses !important with extreme specificity 
+   for the practice-item and delights-input-container
+*/
+
+/* Global reset for target elements */
+[style*="padding"] {
+  padding: none;
+}
+
+/* TARGET MIN-WIDTH SPECIFICALLY */
+[style*="min-width: 44px"],
+button[style*="min-width: 44px"],
+div[style*="min-width: 44px"],
+.filter-chip[style*="min-width"],
+#practices-filter-chips-container button[style*="min-width"],
+#learn-filter-chips-container button[style*="min-width"] {
+  min-width: auto !important;
+  width: auto !important;
+}
+
+/* PRACTICE ITEM STYLES */
+.practice-item[style] {
+  padding: 10px !important;
+  gap: 4px !important;
+}
+
+html body .practice-item[style],
+#root .practice-item[style],
+div.practice-item[style],
+.left-section .practice-item[style] {
+  padding: 10px !important;
+  gap: 4px !important;
+}
+
+.practice-item > * {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.practice-item[style] > * {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* DELIGHTS INPUT CONTAINER STYLES */
+#delights-input-container[style] {
+  padding: 14px 20px !important;
+  gap: 8px !important;
+}
+
+html body #delights-input-container[style],
+#root #delights-input-container[style],
+div#delights-input-container[style],
+.input-bar#delights-input-container[style] {
+  padding: 14px 20px !important;
+  gap: 8px !important;
+}
+
+#delights-input-container > * {
+  gap: 8px !important;
+}

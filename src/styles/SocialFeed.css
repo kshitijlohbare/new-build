@@ -9,6 +9,15 @@
   --border-radius: 25px;
 }
 
+/* Input card style to replace post-input-container */
+.input-card {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--bg-color, white);
+  border-radius: 10px;
+  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50);
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -258,6 +267,13 @@ header {
   gap: 10px;
   display: inline-flex;
   width: 100%;
+}
+
+.post-input-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
 }
 
 /* Responsive adjustments */

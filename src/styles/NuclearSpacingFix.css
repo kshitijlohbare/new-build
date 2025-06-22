@@ -23,7 +23,7 @@ body .daily-practice-todo-list,
   width: 100% !important;
   padding: 20px 10px !important;
   margin: 0 !important;
-  background-color: #F5F5F5 !important;
+  background-color: #FAF8EC !important;
   overflow: hidden !important;
   border-radius: 20px !important;
   box-sizing: border-box !important;
@@ -51,7 +51,8 @@ div.input-bar#delights-input-container,
 .mobile-home-container .input-bar#delights-input-container,
 div.mobile-home-container div.input-bar#delights-input-container {
   /* Core box model properties */
-  padding: 0 16px !important;
+  padding: 14px 20px !important; /* Increased vertical padding for better spacing */
+  gap: 8px !important; /* Increased gap for better element spacing */
   background-color: #FFD400 !important;
   border: 2px solid white !important;
   box-sizing: border-box !important;

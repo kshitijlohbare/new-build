@@ -604,6 +604,7 @@ const TherapistListing_New = () => {
           </div>
         )}
       </div>
+      <div className="page-bottom-spacer" />
     </div>
   );
 };

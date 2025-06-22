@@ -18,7 +18,7 @@ const WellbeingTipsSection = () => {
     >
       {/* Daily Tip by Huberman */}
       <div 
-        className="tip-card relative rounded-[20px] bg-[#F5F5F5]"
+        className="tip-card relative rounded-[20px] bg-[#FAF8EC]"
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -79,7 +79,7 @@ const WellbeingTipsSection = () => {
       
       {/* Today's Quote by Naval */}
       <div 
-        className="quote-card relative rounded-[20px] bg-[#F5F5F5]"
+        className="quote-card relative rounded-[20px] bg-[#FAF8EC]"
         style={{
           display: 'flex',
           flexDirection: 'column',

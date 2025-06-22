@@ -7,7 +7,7 @@ type CommunityTopNavBarProps = {
 
 const CommunityTopNavBar: React.FC<CommunityTopNavBarProps> = ({ activeView, onViewChange }) => {
   return (
-    <div className="w-full h-[52px] bg-[#F5F5F5] border border-white rounded-[100px] flex flex-row items-center justify-between px-2 relative">
+    <div className="w-full h-[52px] bg-[#FAF8EC] border border-white rounded-[100px] flex flex-row items-center justify-between px-2 relative">
       {/* News Feed Icon - Pen/Notes (Left side) */}
       <div 
         className={`flex items-center justify-center cursor-pointer ${activeView === 'newsfeed' ? 'z-10' : ''}`}

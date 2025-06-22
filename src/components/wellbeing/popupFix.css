@@ -82,25 +82,15 @@ button,
   padding-left: 0 !important;
 }
 
-/* Fix for touch devices */
-@media (pointer: coarse) {
-  button, 
-  [role="button"],
-  .cursor-pointer {
-    min-height: 44px !important;
-    min-width: 44px !important;
-    padding: 8px !important;
-  }
+/* Touch device fixes removed */
+.step-navigation button {
+  min-height: 48px !important;
+  min-width: 48px !important;
+}
   
-  .step-navigation button {
-    min-height: 48px !important;
-    min-width: 48px !important;
-  }
-  
-  /* Ensure header buttons are easy to tap on mobile */
-  .bg-gradient-to-r.from-\[\#04C4D5\].to-\[\#148BAF\] button {
-    min-width: 88px !important;
-  }
+/* Ensure header buttons are easy to tap on mobile */
+.bg-gradient-to-r.from-\[\#04C4D5\].to-\[\#148BAF\] button {
+  min-width: 88px !important;
 }
 
 /* Add required animations that might be missing */

@@ -1,0 +1,37 @@
+/* Component-specific focus timer fixes */
+
+/* Focus Timer Header */
+header[data-testid="focus-timer-header-bar"] {
+  background: none !important;
+  background-color: transparent !important;
+}
+
+/* Play/Pause Button */
+button[data-testid="play-pause-button"] {
+  padding: 0 !important;
+}
+
+/* Stop Button */
+button[data-testid="stop-button"] {
+  padding: 0 !important;
+}
+
+/* Music Drawer */
+div[data-testid="music-drawer"] {
+  background: #fff !important;
+  display: flex !important;
+  width: auto !important;
+  height: auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Music Drawer Buttons */
+div[data-testid="music-drawer"] button {
+  background: none !important;
+  border-radius: 6px !important;
+}
+
+div[data-testid="music-drawer"] button:hover {
+  background: #FAF8EC !important;
+}

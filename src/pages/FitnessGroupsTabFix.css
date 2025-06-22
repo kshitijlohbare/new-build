@@ -1,33 +1,40 @@
 /* Additional fixes for fitness groups tabs to ensure text fits and shadows are visible */
 .fitnessgroups-topnav {
-  padding: 20px 5px 15px 5px !important;
-  margin: 0 -5px !important;
-  overflow: visible !important;
-  background: transparent !important;
+  padding: 20px 5px 15px 5px;
+  margin: 0 -5px;
+  overflow: visible;
+  background: transparent;
 }
 
 .fitnessgroups-tab {
-  padding: 0 22px !important;
-  height: 36px !important;
-  overflow: visible !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  white-space: nowrap !important;
-  line-height: 1 !important;
-  font-size: 16px !important;
+  padding: 0 22px;
+  height: 36px;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  line-height: 1;
+  font-size: 16px;
 }
 
 /* Allow shadow to be visible */
 .fitnessgroups-tab.active {
-  z-index: 5 !important;
-  box-shadow: 0 3px 10px rgba(73, 218, 234, 0.4) !important;
+  z-index: 5;
+  box-shadow: 0 3px 10px rgba(73, 218, 234, 0.4);
 }
 
 /* Make the text fit properly */
 .fitnessgroups-tab span {
-  display: inline-block !important;
-  line-height: 1 !important;
-  padding: 0 !important;
-  margin: 0 !important;
+  display: inline-block;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+}
+
+/* Remove !important from all rules to allow new class-based styles to apply */
+@media (max-width: 500px) {
+  .fitnessgroups-section {
+    padding: 0 2vw 30px 2vw;
+  }
 }

@@ -24,7 +24,7 @@ export default function Community() {
   const [activeView, setActiveView] = useState<'groups' | 'messages'>('messages');
 
   return (
-    <div className="w-full" style={{ backgroundColor: '#FFFFFF' }}>
+    <div className="w-full bg-white">
       <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
       
       {activeView === 'groups' ? <FitnessGroups /> : <GroupMessages />}

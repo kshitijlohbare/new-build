@@ -7,14 +7,6 @@ import './styles/GlobalTypographyFix.css'; // Ensure typography fix is always ap
 import './styles/EssentialSpacingFix.css'; // Simple, lightweight spacing fix
 import './styles/homeHeader.css'; // Ensure home header has the correct background color
 import './styles/sidebar.css'; // Add blur effect to sidebar
-import loadDebugStyles from './utils/conditionalDebugStyles.ts'; // Import the conditional loader
-
-// Only load debug styles when explicitly requested via URL parameter
-// This ensures better performance by default
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has('debug') || urlParams.has('debugStyles')) {
-  loadDebugStyles();
-}
 
 // Simple favicon injector (acts as a fallback if public/favicon.ico is missing or not picked up)
 const injectFavicon = () => {

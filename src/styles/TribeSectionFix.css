@@ -1,0 +1,105 @@
+/* Emergency override for tribe section render issues */
+.tribe-section {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+  z-index: 1 !important;
+  overflow: visible !important;
+}
+
+.tribe-content {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  align-items: center !important;
+  position: relative !important;
+  z-index: 1 !important;
+  overflow: visible !important;
+}
+
+.tribe-cards-container {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  align-items: center !important;
+  position: relative !important;
+  z-index: 1 !important;
+  overflow: visible !important;
+}
+
+.Frame13, .fitness-group-card {
+  display: flex !important;
+  flex-direction: column !important;
+  width: calc(100% - 20px) !important;
+  max-width: 360px !important;
+  margin-bottom: 15px !important;
+  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5) !important;
+  position: relative !important;
+  z-index: 1 !important;
+  overflow: visible !important;
+  background: rgba(83, 252, 255, 0.1) !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+}
+
+/* Removed input-bar-container styling in favor of floating input bar */
+
+/* Fix any Frame135 issues */
+.Frame135, .group-content {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100% !important;
+  position: relative !important;
+  z-index: 1 !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+/* Fix any Frame5 issues */
+.Frame5, .group-category {
+  display: flex !important;
+  flex-direction: row !important;
+  background: #F5F5F5 !important;
+  border-radius: 8px !important;
+  padding: 4px 8px !important;
+  position: relative !important;
+  z-index: 1 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+/* Fix any join button issues */
+.join-button, .leave-button {
+  cursor: pointer !important;
+  padding: 5px 10px !important;
+  border-radius: 4px !important;
+  background: var(--primary, #148BAF) !important;
+  color: white !important;
+  border: none !important;
+  font-family: 'Happy Monkey', cursive !important;
+  font-size: 12px !important;
+  z-index: 10 !important;
+}
+
+/* Make sure all tribe elements have proper z-index */
+.fitnessgroups-section {
+  position: relative !important;
+  z-index: 1 !important;
+  overflow: visible !important;
+}
+
+/* Make sure nothing gets hidden under other elements */
+.fitnessgroups-topnav {
+  position: relative !important;
+  z-index: 10 !important;
+}

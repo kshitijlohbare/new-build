@@ -3,6 +3,8 @@ import MobileViewport from "@/components/ui/MobileViewport";
 import { KeyboardAwareInput } from "@/components/ui/KeyboardAwareInput";
 import "@/styles/mobileHome.css";
 import "@/styles/mobileHomeBackgroundFix.css"; // Import the background fix CSS
+import "@/styles/ConsistentPadding.css"; // Import updated padding styles
+import "@/styles/ConsistentSpacing.css"; // Import consistent spacing styles
 import MobileWellbeingTipsSection from "../components/wellbeing/MobileWellbeingTipsSection";
 import MobileDailyPractices from "../components/wellbeing/MobileDailyPractices";
 import MobileBookSessionSection from "../components/wellbeing/MobileBookSessionSection";
@@ -478,6 +480,9 @@ const MobileHome = () => {
         <MobileBookSessionSection />
       </section>
       
+      {/* Add bottom spacer to prevent content from being hidden behind the input bar */}
+      <div className="page-bottom-spacer" />
+      
       {/* Floating bottom input for delights */}
       {showInputBar && (
         <div 
@@ -485,23 +490,6 @@ const MobileHome = () => {
           id="delights-input-container"
           data-testid="delights-input-container"
           aria-label="Enter a new delight"
-          style={{ 
-            padding: '16px', 
-            margin: '12px 0',
-            gap: '8px',
-            backgroundColor: '#FFD400', 
-            border: '2px solid white', 
-            boxSizing: 'border-box',
-            position: 'fixed',
-            bottom: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 'calc(100% - 40px)',
-            maxWidth: '500px',
-            borderRadius: '50px',
-            zIndex: 1000
-          }}
-          data-fixed-spacing="true"
           onTouchStart={handleInputBarTouchStart}
           onTouchMove={handleInputBarTouchMove}
           onTouchEnd={handleInputBarTouchEnd}
@@ -534,6 +522,7 @@ const MobileHome = () => {
               </div>
             </div>
           )}
+          
           {/* Swipe indicator with a more noticeable hint */}
           <div 
             className="swipe-indicator" 
@@ -541,38 +530,29 @@ const MobileHome = () => {
             data-testid="swipe-indicator"
             aria-hidden="true"
           ></div>
-          <p 
-            className="text-[9px] text-white text-opacity-80 text-center mb-1 font-medium leading-none" 
-            id="swipe-hint-text"
-            data-testid="swipe-hint-text"
-            aria-hidden="true"
-          >
-            swipe down to dismiss
-          </p>
+          
           <form 
             onSubmit={handleSubmitDelight} 
-            className="flex items-center justify-between w-full" 
             id="delight-submit-form"
             data-testid="delight-submit-form"
           >
-            <div className="flex-grow mr-3">
-              <KeyboardAwareInput
-                type="text"
-                id="delight-input-field"
-                data-testid="delight-input-field"
-                value={newDelight}
-                onChange={(e) => setNewDelight(e.target.value)}
-                placeholder="what delighted you today?"
-                className="w-full bg-transparent outline-none text-white placeholder-white placeholder-opacity-90 pl-1 caret-white text-sm"
-              />
-            </div>
-            <div className="flex items-center gap-3 flex-shrink-0">
+            <KeyboardAwareInput
+              type="text"
+              id="delight-input-field"
+              data-testid="delight-input-field"
+              value={newDelight}
+              onChange={(e) => setNewDelight(e.target.value)}
+              placeholder="what delighted you today?"
+              className="delight-input"
+            />
+            
+            <div className="input-buttons">
               <button 
                 type="button" 
                 id="emoji-toggle-button"
                 data-testid="emoji-toggle-button"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)} 
-                className="emoji-button flex-shrink-0"
+                className="emoji-button"
                 aria-label="Open emoji picker"
               >
                 <img 
@@ -584,6 +564,7 @@ const MobileHome = () => {
                   data-testid="emoji-button-icon"
                 />
               </button>
+              
               <button 
                 type="submit" 
                 id="delight-post-button"
@@ -605,14 +586,24 @@ const MobileHome = () => {
           id="add-delight-floating-button"
           data-testid="add-delight-floating-button"
           onClick={showInputBarAgain}
-          className="add-delight-floating-button"
+          className="add-delight-floating-button post-button"
           aria-label="Add new delight"
         >
-          <span 
+          <svg 
             className="plus-icon"
             id="plus-icon"
             data-testid="plus-icon"
-          >+</span>
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path 
+              d="M12 4C12.5523 4 13 4.44772 13 5V11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H13V19C13 19.5523 12.5523 20 12 20C11.4477 20 11 19.5523 11 19V13H5C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11H11V5C11 4.44772 11.4477 4 12 4Z" 
+              fill="white"
+            />
+          </svg>
         </button>
       )}
         </div>

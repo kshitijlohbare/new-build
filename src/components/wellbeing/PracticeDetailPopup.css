@@ -143,10 +143,4 @@ button {
   pointer-events: auto !important;
 }
 
-/* Ensure buttons have proper touch targets */
-@media (pointer: coarse) {
-  button {
-    min-height: 44px !important;
-    min-width: 44px !important;
-  }
-}
+/* Touch targets requirement removed */

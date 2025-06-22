@@ -1,6 +1,6 @@
 /* 
    Consistent Spacing CSS
-   Ensures elements display consistently between browse mode and inspect mode
+   Ensures pixel-perfect, consistent spacing and padding across the website
 */
 
 /* Global spacing consistency fixes */
@@ -9,7 +9,7 @@
   box-sizing: border-box !important;
 }
 
-/* Fix for input bar on homepage */
+/* ===== Input Bar Refinement ===== */
 .input-bar {
   position: fixed !important;
   bottom: 20px !important;
@@ -18,6 +18,10 @@
   width: calc(100% - 40px) !important;
   max-width: 500px !important;
   display: flex !important;
+  /* Enforce exact spacing as per design */
+  padding: 10px 20px !important;
+  margin: 12px 0 !important;
+  gap: 4px !important;
   flex-direction: column !important;
   align-items: center !important;
 }

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Style Test Page</title>
+  <link rel="stylesheet" href="/urgent-style-fix.css">
+  <link rel="stylesheet" href="/extreme-reset.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    
+    h1, h2 {
+      margin-bottom: 20px;
+    }
+    
+    .test-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Style Test Page</h1>
+  
+  <div class="test-section">
+    <h2>Practice Item Test</h2>
+    <div class="practice-item">
+      <div class="practice-name">
+        <div class="practice-name-container">
+          <div class="practice-text">Practice Name</div>
+        </div>
+      </div>
+      <div class="streak-badge">Streak</div>
+    </div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Filter Chip Test</h2>
+    <div id="practices-filter-chips-container">
+      <button class="filter-chip" style="min-width: 44px !important;">Filter 1</button>
+      <button class="filter-chip">Filter 2</button>
+    </div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Delights Input Container Test</h2>
+    <div class="input-bar" id="delights-input-container">
+      <input type="text" placeholder="Enter a delight">
+      <button>Submit</button>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded - checking styles');
+      
+      // Check practice item styles
+      const practiceItem = document.querySelector('.practice-item');
+      console.log('Practice Item styles:', window.getComputedStyle(practiceItem));
+      
+      // Check delights container styles
+      const delightsContainer = document.getElementById('delights-input-container');
+      console.log('Delights Container styles:', window.getComputedStyle(delightsContainer));
+    });
+  </script>
+</body>
+</html>

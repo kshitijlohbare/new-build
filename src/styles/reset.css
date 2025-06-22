@@ -1,0 +1,49 @@
+/* 
+   CSS Reset for consistent rendering
+   This file provides additional overrides to ensure consistency
+   between inspect and browse modes
+*/
+
+/* Specific button reset for filter chips to prevent browser default styling */
+button.filter-chip {
+  /* Button reset */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  font: inherit !important;
+  background: none !important;
+  cursor: pointer !important;
+  
+  /* Size constraints */
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  
+  /* Text properties */
+  text-transform: lowercase !important;
+  white-space: nowrap !important;
+  
+  /* Prevent Safari from adding its own styling */
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Target the button after it's been styled by the framework */
+#practices-filter-chips-container button[class*="filter-chip"] {
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+}
+
+/* Target the specific child div containing text */
+#practices-filter-chips-container button[class*="filter-chip"] > div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 16px !important;
+  min-height: 16px !important;
+  max-height: 16px !important;
+  line-height: 16px !important;
+  font-size: 12px !important;
+}

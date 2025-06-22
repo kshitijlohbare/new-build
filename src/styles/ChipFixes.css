@@ -29,29 +29,48 @@
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-  height: 36px !important;
-  padding: 0 16px !important; /* Further increased horizontal padding */
-  border-radius: 20px !important;
-  white-space: nowrap !important;
-  min-width: fit-content !important; /* Ensures the chip fits the text */
+  height: auto !important;
+  min-height: auto !important; /* Removed fixed min-height requirement */
+  min-width: auto !important; /* Override the 44px min-width */
   width: auto !important;
+  padding: 10px !important; /* Matching the padding from the design */
+  border-radius: 4px !important; /* Square with slight rounding */
+  white-space: nowrap !important;
   transition: all 0.2s ease;
   box-sizing: border-box !important;
+  gap: 10px !important; /* Gap as specified in the design */
+  /* Override any browser or extension injected styles */
+  touch-action: manipulation !important;
+  /* Establish a stacking context to prevent interference */
+  isolation: isolate !important;
+  /* Override any possible user-agent styling */
+  margin: 0 !important;
+  line-height: 16px !important;
 }
 
-#practices-filter-chips-container button span,
-#learn-filter-chips-container button span {
+#practices-filter-chips-container button div,
+#learn-filter-chips-container button div {
   display: flex !important;
+  flex-direction: column !important; /* Using div instead of span to match design */
   align-items: center !important;
   justify-content: center !important;
   font-size: 12px !important;
   line-height: 16px !important;
   white-space: nowrap !important;
   overflow: visible !important;
+  font-family: 'Happy Monkey', cursive !important;
+  font-weight: 400 !important;
+  text-transform: lowercase !important;
+  word-wrap: break-word !important;
 }
 
 /* Very specific overrides to ensure text fits in chips */
-.filter-chip {
+.filter-chip,
+button.filter-chip,
+#practices-filter-chips-container button.filter-chip,
+#learn-filter-chips-container button.filter-chip,
+#practices-filter-chips-container > button,
+#learn-filter-chips-container > button {
   width: auto !important;
   min-width: fit-content !important;
   max-width: none !important;
@@ -60,9 +79,23 @@
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   box-sizing: border-box !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  
+  /* Force height across all browser modes */
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  
+  /* Reset browser defaults */
+  text-transform: none;
+  border-width: 0;
+  border-style: none;
+  border-color: transparent;
 }
 
-.filter-chip span {
+.filter-chip div {
   width: auto !important;
   overflow: visible !important;
   white-space: nowrap !important;
@@ -70,10 +103,17 @@
 }
 
 /* Override any potential padding issues */
-#practices-filter-chips-container button span,
-#learn-filter-chips-container button span,
-.filter-chip span {
+#practices-filter-chips-container button div,
+#learn-filter-chips-container button div,
+.filter-chip div {
   padding: 0 !important;
   margin: 0 !important;
   width: auto !important;
+  color: #148BAF !important;
+  font-family: 'Happy Monkey', cursive !important;
+  height: 16px !important;
+  line-height: 16px !important;
+  font-size: 12px !important;
+  min-height: 16px !important;
+  max-height: 16px !important;
 }

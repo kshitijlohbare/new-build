@@ -1,0 +1,69 @@
+/**
+ * URGENT STYLE FIX
+ * This CSS file overrides all other styles for specific elements
+ */
+
+/* ===== PRACTICE ITEM FIXES ===== */
+.practice-item,
+div.practice-item,
+[class*="practice-item"],
+.left-section .practice-item,
+.practices-list .practice-item,
+.daily-practice-todo-list .practice-item,
+#root .practice-item,
+html body .practice-item {
+  /* Container padding */
+  padding: 10px !important;
+  gap: 4px !important;
+  box-sizing: border-box !important;
+  
+  /* Force flex layout */
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Remove padding/margin from direct children */
+.practice-item > *,
+.practice-item > div,
+div.practice-item > div,
+.practice-item > div > div,
+.practice-item .practice-name,
+.practice-item .practice-name-container,
+.practice-item .practice-text,
+.practice-item .streak-badge,
+.practice-item .points-indicator,
+.practice-item .practice-icon-container {
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* ===== DELIGHTS INPUT CONTAINER FIXES ===== */
+#delights-input-container,
+div#delights-input-container,
+.input-bar#delights-input-container,
+[id="delights-input-container"],
+html body #delights-input-container,
+#root #delights-input-container {
+  /* Box model - Updated padding for better vertical spacing */
+  padding: 14px 20px !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+  
+  /* Keep other important styles */
+  background-color: #FFD400 !important;
+  border: 2px solid white !important;
+  border-radius: 50px !important;
+  
+  /* Layout */
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Apply to nested elements */
+#delights-input-container > *,
+#delights-input-container > div {
+  gap: 4px !important;
+}

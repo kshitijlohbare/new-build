@@ -254,7 +254,7 @@ export default function FitnessGroups() {
       <div className="mx-auto w-full max-w-md flex flex-col items-center">
         {/* Top Search Bar/Nav */}
         <div className="w-full px-5 pt-5 pb-2.5 flex flex-row justify-center items-center">
-          <div className="w-full h-[52px] bg-[#F5F5F5] border border-white rounded-[100px] flex flex-row items-center px-5 gap-5">
+          <div className="w-full h-[52px] bg-[#FAF8EC] border border-white rounded-[100px] flex flex-row items-center px-5 gap-5">
             {/* Write Icon */}
             <div className="w-12 h-12 flex items-center justify-center">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -381,7 +381,7 @@ export default function FitnessGroups() {
           ) : (
             <div className="flex flex-col space-y-3 w-full max-w-md mx-auto">
               {filteredGroups.map(group => (
-                <div key={group.id} className={`w-full rounded-lg overflow-hidden ${group.isJoined ? 'bg-[#F5F5F5]' : 'bg-white'} box-border p-2.5 border border-[#04C4D5] drop-shadow-[1px_2px_4px_rgba(73,218,234,0.5)]`}>
+                <div key={group.id} className={`w-full rounded-lg overflow-hidden ${group.isJoined ? 'bg-[#FAF8EC]' : 'bg-white'} box-border p-2.5 border border-[#04C4D5] drop-shadow-[1px_2px_4px_rgba(73,218,234,0.5)]`}>
                   {/* Group Header with Activity Badge */}
                   <div className="w-full h-[26px] relative mb-2.5">
                     {/* Activity Badge */}

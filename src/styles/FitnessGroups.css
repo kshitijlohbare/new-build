@@ -234,6 +234,107 @@ header {
   color: #999;
 }
 
+/* Input bar container styles */
+.input-bar-container {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  box-shadow: var(--shadow);
+  width: 100%;
+}
+
+.search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+.input-bar {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Happy Monkey', cursive;
+  font-size: 14px;
+  color: var(--primary);
+  padding: 4px 0;
+}
+
+.input-bar::placeholder {
+  color: var(--primary);
+  opacity: 0.7;
+  text-transform: lowercase;
+}
+
+/* Post input container specific styles have been removed */
+
+.post-input-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.post-input {
+  width: 100%;
+  min-height: 60px;
+  border: none;
+  resize: none;
+  background-color: rgba(83, 252, 255, 0.05);
+  border-radius: 6px;
+  padding: 8px;
+  font-family: 'Happy Monkey', cursive;
+  font-size: 14px;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.post-input:focus {
+  outline: 1px solid rgba(4, 196, 213, 0.3);
+}
+
+.post-button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: 'Happy Monkey', cursive;
+  font-size: 14px;
+  cursor: pointer;
+  float: right;
+  text-transform: lowercase;
+}
+
+.post-button:hover {
+  background-color: rgba(20, 139, 175, 0.9);
+}
+
+/* Feels Section */
+.feels-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.social-feed-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 /* Group Filter Pills */
 .filters-container {
   width: 100%;
@@ -482,4 +583,293 @@ header {
   text-align: center;
   padding: 40px 0;
   width: 100%;
+}
+
+/* Tribe Card (Frame4) and subcomponents */
+.Frame4, .Frame13 {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 10px !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: 360px !important;
+  min-height: 170.7px !important;
+  background: var(--cards-bg, rgba(83, 252, 255, 0.1)) !important;
+  box-shadow: var(--shadow, 1px 2px 4px rgba(73, 218, 234, 0.5)) !important;
+  border-radius: 8px !important;
+  align-self: stretch !important;
+  cursor: pointer !important;
+  margin: 0 auto 15px auto !important;
+  position: relative !important;
+}
+
+.Frame {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+  width: 340px;
+  height: 18px;
+  align-self: stretch;
+}
+
+.Frame132 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  width: 340px;
+  height: 18px;
+  flex: 1 1 0;
+  align-self: stretch;
+}
+
+.MorningRunningGroup {
+  width: 340px;
+  height: 18px;
+  font-family: 'Righteous', cursive;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--primary, #148BAF);
+  border: 1px solid #FFFFFF;
+  flex: 1 1 0;
+}
+
+.Frame135 {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: 340px !important;
+  min-height: 52.7px !important;
+  align-self: stretch !important;
+  position: relative !important;
+}
+
+.Frame5 {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 4px 8px !important;
+  gap: 4px !important;
+  width: auto !important;
+  min-height: auto !important;
+  background: #F5F5F5 !important;
+  border-radius: 8px !important;
+  flex-shrink: 0 !important;
+  overflow: hidden !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.Yoga {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  color: var(--Primary, #148BAF);
+  font-size: 12px;
+  font-family: 'Happy Monkey', cursive;
+  font-weight: 400;
+  text-transform: lowercase;
+  line-height: 16px;
+  word-wrap: break-word;
+  text-transform: lowercase;
+  color: var(--primary, #148BAF);
+}
+
+.StartYourDayRightWithOurEnergeticMorningRunningGroupAllPacesWelcomeEverySundayMorningTheRunStarts {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: 'Happy Monkey', cursive;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--DARKBGColor, black);
+  text-transform: lowercase;
+  align-items: flex-start;
+  margin-left: 8px;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+.Frame131 {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+  width: 340px;
+  height: 24px;
+  align-self: stretch;
+}
+
+.Frame7, .Frame9 {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 8px;
+  gap: 4px;
+  min-width: 85px;
+  height: 24px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  flex: 1 1 0;
+}
+
+.Members, .KalyaniNagar {
+  font-family: 'Happy Monkey', cursive;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--primary, #148BAF);
+  text-align: center;
+  text-transform: lowercase;
+  display: flex;
+  align-items: center;
+}
+
+.Frame6 {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 8px;
+  gap: 4px;
+  width: 340px;
+  height: 26px;
+  background: #FFFFFF;
+  border: 1px solid #04C4D5;
+  box-shadow: var(--shadow, 1px 2px 4px rgba(73, 218, 234, 0.5));
+  border-radius: 8px;
+  align-self: stretch;
+}
+
+.Join {
+  font-family: 'Righteous', cursive;
+  font-size: 16px;
+  line-height: 18px;
+  color: var(--primary, #148BAF);
+  text-align: center;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tribe-join-btn {
+  background: none;
+  border: none;
+  color: var(--primary, #148BAF);
+  font-family: 'Righteous', cursive;
+  font-size: 16px;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0;
+}
+
+.leave-button {
+  background-color: transparent;
+  color: #888;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-family: 'Happy Monkey', cursive;
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 8px;
+  text-transform: lowercase;
+}
+
+.leave-button:hover {
+  background-color: #f8f8f8;
+  color: #d32f2f;
+  border-color: #d32f2f;
+}
+
+.IMAMember {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 340px;
+  height: 37px;
+  background-color: #F5F5F5;
+  border-radius: 8px;
+  color: var(--primary, #148BAF);
+  font-family: 'Happy Monkey', cursive;
+  font-weight: 400;
+  font-size: 14px;
+  text-transform: lowercase;
+}
+
+/* Tribe Section Container */
+.tribe-section {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  padding: 0 0 20px 0 !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* Input bar specific styles for tribe section */
+.tribe-section .input-bar-container {
+  margin-bottom: 15px !important;
+  width: 100% !important;
+  max-width: 360px !important;
+}
+
+/* Stack the tribe cards correctly */
+.tribe-section .Frame13 {
+  margin-bottom: 15px !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Tribe section content wrapper */
+.tribe-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Tribe cards container */
+.tribe-cards-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Debug outline for tribe section */
+.fitnessgroups-root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Ensure tribe cards render properly */
+.tribe-section,
+.tribe-content,
+.tribe-cards-container,
+.tribe-section .Frame13 {
+  border: none !important;
+  outline: none !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }

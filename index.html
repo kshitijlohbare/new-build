@@ -1,6 +1,10 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script src="/min-width-fix.js"></script>
+    <script src="/immediate-style-fix.js"></script>
+    <link rel="stylesheet" href="/critical-focus-timer-fixes.css">
+    <link rel="stylesheet" href="/tribe-section-critical-fix.css">
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,6 +22,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Happy+Monkey&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="/urgent-style-fix.css">
+    <link rel="stylesheet" href="/extreme-reset.css">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,26 +43,16 @@
       window.SUPABASE_URL = 'https://svnczxevigicuskppyfz.supabase.co';
       window.SUPABASE_ANON_KEY = 'sb_publishable_SwYftYe96k-CZCD6UFLOrg_tFWUI55b';
     </script>
-  </head>
+  <link rel="stylesheet" href="/src/styles/FocusTimer.css">
+<link rel="stylesheet" href="/src/styles/FocusTimerFix.css">
+<link rel="stylesheet" href="/src/styles/FocusTimerHeaderFix.css">
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script src="/pre-emptive-fix.js" defer></script>
     <script type="module" src="/fix-embed-frames.js"></script>
-    
-    <script src="/spacing-diagnostic.js" defer></script>
-    <!-- SIMPLIFIED SPACING FIX - Only load essential scripts -->
-    <script src="/direct-dom-fix.js" defer></script>
     <script src="/performance-optimization.js" defer></script>
-    
-    <!-- Enable these scripts only when debugging spacing issues -->
-    <!-- 
-    <script src="/spacing-inspector.js" defer></script>
-    <script src="/force-clone-fix.js" defer></script>
-    <script src="/extreme-fix.js" defer></script>
-    <script src="/inspect-mode-fix.js" defer></script>
-    <script src="/continuous-spacing-enforcer.js" defer></script>
-    -->
+    <script type="module" src="/src/utils/tribe-section-debug.js" defer></script>
     
     <!-- Simple one-time fix script -->
     <script>
@@ -73,14 +69,12 @@
           }
           
           if (delightsInput) {
-            delightsInput.style.padding = '16px';
-            delightsInput.style.margin = '12px 0';
-            delightsInput.style.gap = '8px';
+            delightsInput.style.padding = '10px 20px';
+            delightsInput.style.gap = '4px';
           }
         }, 500);
       });
     </script>
-    <script src="/brute-force-fix.js" defer></script>
     
     <script>
       // Global inline fix
@@ -94,7 +88,7 @@
             el.style.setProperty('gap', '10px', 'important');
             el.style.setProperty('box-sizing', 'border-box', 'important');
             el.style.setProperty('width', '100%', 'important');
-            el.style.setProperty('background', '#F5F5F5', 'important');
+            el.style.setProperty('background', '#FAF8EC', 'important');
             el.style.setProperty('border-radius', '20px', 'important');
             el.style.setProperty('display', 'flex', 'important');
             el.style.setProperty('flex-direction', 'column', 'important');
@@ -132,5 +126,6 @@
         window.applyInlineFixes = applyInlineFixes;
       });
     </script>
+    <script src="/force-styles.js"></script>
   </body>
 </html>

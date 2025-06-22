@@ -54,7 +54,7 @@ const EnhancedNavBar: React.FC<CommunityTopNavBarProps> = ({ activeView, onViewC
   }, [activeView]);
 
   return (
-    <div className="w-full h-[52px] bg-[#F5F5F5] border border-white rounded-[100px] flex items-center justify-between px-1 relative overflow-hidden">
+    <div className="w-full h-[52px] bg-[#FAF8EC] border border-white rounded-[100px] flex items-center justify-between px-1 relative overflow-hidden">
       {/* Background highlight pill that moves based on active state */}
       <motion.div
         animate={{ left: pillStyle.left, width: pillStyle.width }}

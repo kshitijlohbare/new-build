@@ -1,0 +1,66 @@
+/* Critical Focus Timer Fixes 
+   This CSS applies high-specificity fixes for the focus timer
+   to ensure they override any other styles
+*/
+
+/* Fix for the focus timer header - remove background */
+[data-testid="focus-timer-header-bar"],
+.header,
+.focus-timer-header,
+div[class*="focus-timer-header"],
+div[class*="timer-header"] {
+  background: none !important;
+  background-color: transparent !important;
+}
+
+/* Fix for all control buttons - remove padding */
+[data-testid="play-pause-button"],
+[data-testid="stop-button"],
+.control-button,
+.reset-button,
+div[class*="control-button"],
+div[class*="reset-button"],
+button[class*="control-button"],
+button[class*="reset-button"] {
+  padding: 0 !important;
+}
+
+/* Fix for the music drawer - make it hug content */
+[data-testid="music-drawer"],
+.music-drawer,
+div[class*="music-drawer"] {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  background: #fff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+  padding: 8px 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 90vw !important;
+  z-index: 1000 !important;
+}
+
+/* Target buttons inside music drawer */
+[data-testid="music-drawer"] button,
+.music-drawer button,
+div[class*="music-drawer"] button {
+  background: none !important;
+  border: none !important;
+  padding: 6px 16px !important;
+  margin: 0 !important;
+  font-size: 16px !important;
+  width: 100% !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  border-radius: 6px !important;
+  transition: background 0.2s !important;
+}
+
+/* Hover state for music drawer buttons */
+[data-testid="music-drawer"] button:hover,
+.music-drawer button:hover,
+div[class*="music-drawer"] button:hover {
+  background: #FAF8EC !important;
+}

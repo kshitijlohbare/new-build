@@ -4,6 +4,9 @@ import PauseIconPath from '../assets/icons/Pause.svg';
 import StopIconPath from '../assets/icons/stop.svg';
 import '@/styles/FocusTimerFix.css';
 import '@/styles/FocusTimer.css'; // Import our new centering styles
+import '@/styles/FocusTimerHeaderFix.css'; // Import header fix
+import '@/styles/FocusTimerComponentFixes.css'; // Import component-specific fixes
+import { useForceStyles } from '../hooks/useForceStyles';
 
 // Music options array with SVG icons that match the reference image
 const musicOptions = [
@@ -72,6 +75,9 @@ const focusPresets = [
 ];
 
 const FocusTimer = () => {
+  // Use the force styles hook to ensure our styles are applied
+  useForceStyles();
+  
   const [selectedPreset, setSelectedPreset] = useState<number | null>(0); // Default to first preset
   const [workTime, setWorkTime] = useState(25); // Default to first preset work time
   const [breakTime, setBreakTime] = useState(5); // Default to first preset break time
@@ -223,8 +229,18 @@ const FocusTimer = () => {
     <div data-testid="focus-timer-page" className="min-h-screen pb-28">
       {/* Main Container */}
       <div data-testid="focus-timer-container" className="container mx-auto">
-        {/* Header Bar */}
-        <header data-testid="focus-timer-header-bar">
+        {/* Header Bar - Completely unstyled to avoid background */}
+        <header 
+          data-testid="focus-timer-header-bar" 
+          className="bg-transparent"
+          style={{ 
+            background: 'none !important', 
+            backgroundColor: 'transparent !important',
+            // Make sure these styles are applied with !important
+            '--override-background': 'none !important',
+            '--override-background-color': 'transparent !important',
+          } as React.CSSProperties}
+        >
           <p className="font-size-[#16px] font-['Happy_Monkey'] text-[#04C4D5] mt-2">get things done!</p>
         </header>
 
@@ -437,7 +453,7 @@ const FocusTimer = () => {
         </section>
 
         {/* Focus Presets Section - Desktop Design Exactly as Per CSS */}
-        <section data-testid="focus-presets-section" className="w-[360px] h-[225px] bg-[#F5F5F5] rounded-[20px] mx-auto relative hidden md:block">
+        <section data-testid="focus-presets-section" className="w-[360px] h-[225px] bg-[#FAF8EC] rounded-[20px] mx-auto relative hidden md:block">
           {/* Focus Presets Container */}
           <div className="relative w-full h-full">
             {/* First Preset - Top Left */}
@@ -538,7 +554,7 @@ const FocusTimer = () => {
         </section>
         
         {/* Mobile Focus Presets Section - Responsive Design for Small Screens */}
-        <section data-testid="focus-presets-section-mobile" className="w-[95%] bg-[#F5F5F5] rounded-[20px] mx-auto block md:hidden py-3 px-3">
+        <section data-testid="focus-presets-section-mobile" className="w-[95%] bg-[#FAF8EC] rounded-[20px] mx-auto block md:hidden py-3 px-5">
           <div className="grid grid-cols-2 gap-3">
             {/* First Preset - Mobile */}
             <button
@@ -643,12 +659,15 @@ const FocusTimer = () => {
           <div 
             data-testid="player-controls-center-panel" 
             className="absolute left-1/2 bottom-[20px] transform -translate-x-1/2 flex justify-center items-center gap-[20px] py-1.5 px-5 bg-[#FCDF4D] rounded-full border-2 border-white shadow-2xl pointer-events-auto"
+            style={{ boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)" }}
           >
             {/* Play/Pause Button */}
             <button 
               data-testid="play-pause-button"
               onClick={() => setIsRunning(!isRunning)}
               aria-label={isRunning ? "Pause timer" : "Start timer"}
+              className="control-button p-0"
+              style={{ padding: 0 }}
             >
               {isRunning ? (
                 <img src={PauseIconPath} alt="Pause" className="w-11 h-11" />
@@ -659,6 +678,8 @@ const FocusTimer = () => {
             {/* Stop Button */}
             <button 
               data-testid="stop-button" 
+              className="control-button reset-button p-0"
+              style={{ padding: 0 }}
               onClick={() => {
                 setIsRunning(false);
                 setCurrentCycle(1);
@@ -692,14 +713,26 @@ const FocusTimer = () => {
             {musicDrawerOpen && (
               <div 
                 data-testid="music-drawer"
-                className="absolute w-[314px] h-[52px] py-1 px-3 bg-[#148BAF] border border-white shadow-lg rounded-3xl flex flex-row items-center justify-center gap-2"
+                className="absolute py-1 px-3 border border-white shadow-lg rounded-3xl flex flex-row items-center justify-center gap-2"
                 style={{ 
+                  background: '#fff !important',
+                  backgroundColor: '#fff !important',
                   boxShadow: "1px 2px 4px rgba(73, 218, 234, 0.5)",
                   zIndex: 60,
                   transform: "rotate(-90deg)",
                   bottom: "130px",
                   right: "-130px",
-                }}
+                  width: 'auto !important',
+                  height: 'auto !important',
+                  display: 'flex !important',
+                  alignItems: 'center !important',
+                  justifyContent: 'center !important',
+                  // Double protection with CSS variables
+                  '--override-background': '#fff !important',
+                  '--override-display': 'flex !important',
+                  '--override-align': 'center !important',
+                  '--override-justify': 'center !important',
+                } as React.CSSProperties}
               >
                 {musicOptions.map((option) => (
                   <button

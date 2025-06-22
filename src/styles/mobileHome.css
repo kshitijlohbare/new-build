@@ -47,20 +47,22 @@ nav.app-navbar * {
 /* Input bar styling */
 .input-bar {
   position: fixed;
-  bottom: 20px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 40px);
+  width: calc(100% - 32px);
   max-width: 500px;
-  background-color: transparent; /* Removed background color */
-  z-index: 100;
-  padding: 8px 5px;
-  padding-top: 12px;
-  border-radius: 200px;
-  box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #FFD400;
+  border: 2px solid white;
+  border-radius: 50px;
+  z-index: 1000;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 2px;
 }
 
 .swipe-indicator {
@@ -80,23 +82,29 @@ nav.app-navbar * {
   justify-content: space-between;
 }
 
-/* Floating button */
-.add-delight-floating-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: #15A9D6;
+.input-bar .delight-input {
+  width: 100%;
+  background-color: transparent;
+  outline: none;
   color: white;
+  caret-color: white;
+  text-align: left;
+  font-size: 15px;
+  padding: 4px 0 4px 4px;
+  margin: 0;
+}
+
+.input-bar .delight-input::placeholder {
+  color: white;
+  opacity: 0.9;
+}
+
+.input-bar .input-buttons {
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  z-index: 99;
-  border: none;
-  font-size: 24px;
+  gap: 4px;
+  flex-shrink: 0;
+  height: 100%;
 }
 
 /* Ensure all section children expand to full width */
@@ -495,7 +503,8 @@ nav.app-navbar * {
   width: calc(100% - 40px);
   max-width: 500px;
   background-color: transparent; /* Removed background color */
-  padding: 10px 20px;
+  padding: 10px 20px; /* 10px vertical, 20px horizontal as requested */
+  gap: 4px; /* 4px gap between elements as requested */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -542,13 +551,32 @@ nav.app-navbar * {
 }
 
 .emoji-button {
-  padding: 0%;
+  padding: 0 !important;
+  margin: 0 !important;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
   border: none;
   cursor: pointer;
+  height: 28px;
+  width: 28px;
+  flex-shrink: 0;
+}
+
+/* Specific styles for emoji toggle button */
+#emoji-toggle-button {
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#emoji-toggle-button img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 .post-button {
@@ -560,11 +588,11 @@ nav.app-navbar * {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  padding: 8px 10px;
-  gap: 4px;
+  padding: 4px 8px;
+  gap: 2px;
   
-  width: 48px;
-  height: 32px;
+  width: 42px;
+  height: 28px;
   
   background: #FFFFFF;
   border: 1px solid #FFFFFF;
@@ -572,9 +600,7 @@ nav.app-navbar * {
   
   /* Inside auto layout */
   flex: none;
-  order: 2;
-  align-self: stretch;
-  flex-grow: 0;
+  flex-shrink: 0;
   cursor: pointer;
 }
 
@@ -747,7 +773,7 @@ nav.app-navbar * {
 .daily-practice-todo-list {
   width: 100%;
   padding: 20px 10px;
-  background: #F5F5F5;
+  background: #FAF8EC;
   overflow: hidden;
   border-radius: 20px;
   flex-direction: column;
@@ -794,6 +820,7 @@ nav.app-navbar * {
   display: flex;
   width: 100%;
   transition: all 0.3s ease;
+  gap: 4px; /* Added 4px gap as requested */
 }
 
 .practice-card-alt {
@@ -803,6 +830,12 @@ nav.app-navbar * {
 .practice-item:hover {
   border-color: #04C4D5;
   box-shadow: 0px 4px 8px rgba(73, 218, 234, 0.4);
+}
+
+/* Remove padding and margin from elements within practice-item */
+.practice-item > * {
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .practice-name {
@@ -943,7 +976,7 @@ nav.app-navbar * {
   gap: 15px;
   width: 100%;
   padding: 30px 20px;
-  background: #F5F5F5;
+  background: #FAF8EC;
   border-radius: 20px;
   text-align: center;
 }
@@ -974,7 +1007,7 @@ nav.app-navbar * {
   align-items: center;
   width: 100%;
   padding: 20px;
-  background: #F5F5F5;
+  background: #FAF8EC;
   border-radius: 20px;
   color: var(--Primary, #148BAF);
   font-family: 'Happy Monkey', cursive;
@@ -1034,4 +1067,56 @@ nav.app-navbar * {
   .wellness-section-title {
     font-size: 18px;
   }
+}
+
+#delight-submit-form {
+  height: 32px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  min-height: 0 !important;
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 8px !important;
+}
+
+#delights-input-container {
+  margin: 0 !important;
+}
+
+/* Ensure no margin on post button */
+#delight-post-button,
+.post-button,
+.input-buttons .post-button {
+  margin-top: 0 !important;
+  margin: 0 !important;
+}
+
+#daily-practices-section,
+#wellbeing-tips-section,
+#book-session-section {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+#delight-input-field {
+  padding: 0 !important;
+  height: 28px !important;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Specifically target input-buttons within delight-submit-form */
+#delight-submit-form .input-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }

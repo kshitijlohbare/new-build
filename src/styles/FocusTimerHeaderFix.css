@@ -1,0 +1,16 @@
+/* Focus Timer Header background removal */
+[data-testid="focus-timer-header-bar"] {
+  background: none !important;
+}
+
+.header {
+  background: none !important;
+}
+
+/* This fixes the header padding and alignment issues */
+.focus-timer-header {
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 30px;
+  background: none !important;
+}

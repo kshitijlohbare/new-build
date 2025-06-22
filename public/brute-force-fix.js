@@ -24,7 +24,7 @@ const ENFORCED_STYLES = {
     'gap': '10px',
     'box-sizing': 'border-box',
     'width': '100%',
-    'background-color': '#F5F5F5',
+    'background-color': '#FAF8EC',
     'border-radius': '20px',
     'display': 'flex',
     'flex-direction': 'column',

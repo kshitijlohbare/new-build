@@ -761,7 +761,7 @@ export function Home() {
                 className={`box-border flex flex-col justify-center items-center p-1 sm:p-[6px] gap-1 sm:gap-[4px] 
                   ${expandedCards[term.term] 
                     ? 'h-auto sm:h-[180px] bg-white/80 backdrop-blur-xl card-expanded' 
-                    : 'h-auto sm:h-[86px] bg-[#F5F5F5]/80 backdrop-blur-xl card-collapsed'} 
+                    : 'h-auto sm:h-[86px] bg-[#FAF8EC]/80 backdrop-blur-xl card-collapsed'} 
                   border border-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[10px] card-hover cursor-pointer 
                   ${index === 0 ? 'animate-slide-down' : ''} transition-all duration-300`}
                 onClick={(event) => handleTermSelect(term, event)}
@@ -822,7 +822,7 @@ export function Home() {
                     {/* Expand/Collapse Button */}
                     <div 
                       className={`flex flex-col justify-center items-center p-1 sm:p-[2px_6px] gap-[2px] min-w-[36px] h-[22px] 
-                        ${expandedCards[term.term] ? 'bg-white' : 'bg-[#F5F5F5]'} shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[8px]`}
+                        ${expandedCards[term.term] ? 'bg-white' : 'bg-[#FAF8EC]'} shadow-[1px_2px_4px_rgba(73,218,234,0.5)] rounded-[8px]`}
                       onClick={(e) => toggleCardExpansion(term.term, e)}
                       id={`expand-button-${term.term.toLowerCase().replace(/\s+/g, '-')}`}
                       role="button"

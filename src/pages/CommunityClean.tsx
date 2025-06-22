@@ -21,7 +21,7 @@ const animationStyles = `
 
 export default function Community() {
   return (
-    <div className="w-full" style={{ backgroundColor: '#FFFFFF' }}>
+    <div className="w-full bg-white">
       <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
       <FitnessGroups />
     </div>

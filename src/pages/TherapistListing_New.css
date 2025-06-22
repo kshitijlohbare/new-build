@@ -1211,4 +1211,32 @@
   }
 }
 
+/* Remove unnecessary margin/padding from all direct children of major containers */
+.Main > *,
+.Frame124 > *,
+.Frame125 > *,
+.Frame17 > *,
+.therapist-card > * {
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Enforce spacing at parent level only */
+.Main,
+.Frame124,
+.Frame125,
+.Frame17,
+.therapist-card {
+  gap: 12px !important;
+}
+
+/* Utility: Add a bottom spacer to prevent content being hidden by input bar */
+.page-bottom-spacer {
+  width: 100%;
+  height: 70px; /* Adjust to match input bar height */
+  pointer-events: none;
+  background: transparent;
+}
+
 /* Existing CSS below */

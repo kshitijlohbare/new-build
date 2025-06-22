@@ -27,17 +27,34 @@
   word-wrap: break-word;
 }
 .TherapistCards {
-  align-self: stretch;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 10px;
-  display: inline-flex;
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  gap: 16px;
+  padding-bottom: 8px;
   width: 100%;
+  /* Hide scrollbar for webkit browsers */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) #faf8ec;
+}
+.TherapistCards::-webkit-scrollbar {
+  height: 8px;
+  background: #faf8ec;
+}
+.TherapistCards::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+/* Ensure each card has a min/max width for horizontal scroll */
+.TherapistCards > div {
+  min-width: 260px;
+  max-width: 340px;
+  flex: 0 0 auto;
 }
 .Banner {
   align-self: stretch;
   padding: 10px;
-  background: linear-gradient(180deg, #49DAEA 0%, rgba(196, 254, 255, 0.2) 100%);
+  /* Gradient background removed for UI consistency */
   box-shadow: 1px 2px 4px rgba(73, 217, 234, 0.5);
   border-radius: 10px;
   flex-direction: column;

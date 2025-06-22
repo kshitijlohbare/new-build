@@ -25,7 +25,7 @@ const ENFORCED_STYLES = {
     'gap': '10px',
     'box-sizing': 'border-box',
     'width': '100%',
-    'background': '#F5F5F5',
+    'background': '#FAF8EC',
     'border-radius': '20px',
     'display': 'flex',
     'flex-direction': 'column',
@@ -69,7 +69,7 @@ function fixHomepageSpacing() {
         gap: 10px !important;
         box-sizing: border-box !important;
         width: 100% !important;
-        background: #F5F5F5 !important;
+        background: #FAF8EC !important;
         border-radius: 20px !important;
         display: flex !important;
         flex-direction: column !important;

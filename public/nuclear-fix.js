@@ -54,7 +54,7 @@ function fixDailyPracticeList() {
   Object.assign(fixedElement.style, {
     width: '100%',
     padding: '20px 10px',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FAF8EC',
     borderRadius: '20px',
     display: 'flex',
     flexDirection: 'column',

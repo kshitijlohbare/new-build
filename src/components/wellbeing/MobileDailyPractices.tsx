@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { usePractices } from "../../context/PracticeContext";
 import "../../../src/styles/mobileHome.css";
+import "../../../src/styles/PracticeItemFixes.css"; // Import fixes for practice items
 
 const MobileDailyPractices = () => {
   // Consume context
@@ -96,7 +97,7 @@ const MobileDailyPractices = () => {
             gap: '8px', 
             boxSizing: 'border-box',
             width: '100%',
-            background: '#F5F5F5',
+            background: '#FAF8EC',
             borderRadius: '20px',
             display: 'flex',
             flexDirection: 'column',
@@ -119,9 +120,18 @@ const MobileDailyPractices = () => {
                 <div 
                   key={practice.id} 
                   className={`practice-item ${index % 2 === 0 ? '' : 'practice-card-alt'}`}
+                  style={{
+                    padding: '10px',
+                    gap: '4px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    boxSizing: 'border-box'
+                  }}
                 >
                   {/* Practice name */}
-                  <div className="practice-name">
+                  <div className="practice-name" style={{ padding: 0, margin: 0 }}>
                     <div className="practice-name-container">
                       <div className="points-indicator" style={{position: 'static', transform: 'none'}}>
                         <div className="practice-icon-container">

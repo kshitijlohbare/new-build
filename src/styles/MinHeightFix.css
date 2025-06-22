@@ -1,0 +1,36 @@
+/* 
+   Min-height and Min-width Browsing Mode Fix
+   This file specifically targets the 44px min-height and min-width that was observed
+   in browsing mode but not in inspect mode
+*/
+
+/* Universal button height fix */
+button,
+button[type],
+button.filter-chip,
+#practices-filter-chips-container button,
+#learn-filter-chips-container button,
+.filter-chip {
+  /* Override Mobile Safari's 44px minimum clickable element size */
+  min-height: auto !important; /* Removed 44px min-height requirement */
+  height: auto !important; /* Allow natural height */
+  padding: 10px !important; /* Ensure consistent padding */
+  
+  /* Also override min-width */
+  min-width: auto !important; /* Override the 44px min-width */
+  width: auto !important;
+}
+
+/* Safari-specific fix */
+_::-webkit-full-page-media, _:future, :root button.filter-chip {
+  min-height: 36px !important;
+  height: 36px !important;
+  max-height: 36px !important;
+}
+
+/* Prevent automatic zoom on input focus */
+@media screen and (max-width: 768px) {
+  input, select, textarea, button {
+    font-size: 16px !important; /* Prevents iOS zoom */
+  }
+}

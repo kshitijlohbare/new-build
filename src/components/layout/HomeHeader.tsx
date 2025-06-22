@@ -48,7 +48,7 @@ const HomeHeader: React.FC = () => {
       <div 
         id="header-logo-container"
         data-testid="header-logo-container" 
-        className="flex flex-row items-center flex-grow"
+        className="flex flex-row items-center flex-grow p-0"
       >
         <Link to="/" aria-label="Go to homepage">
           <img 

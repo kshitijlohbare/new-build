@@ -5,9 +5,12 @@ import AddPracticeDialog from "@/components/wellbeing/AddPracticeDialog";
 import SimplePracticePopup from '@/components/wellbeing/SimplePracticePopup';
 import ClickablePortal from '@/components/common/ClickablePortal';
 import '@/components/wellbeing/popupFix.css';
+import '@/styles/reset.css'; // Import reset CSS first to establish baseline
 import '@/styles/ChipFixes.css';
+import '@/styles/MinHeightFix.css'; // Import specific fix for min-height issue
 import '@/styles/PracticeCardFixes.css';
 import '@/styles/HappyMonkeyFont.css'; // Import Happy Monkey font for title
+import '@/styles/overrideInjectedStyles.css'; // Import overrides for injected styles
 
 // Import icons
 import QuotesIcon from "../assets/icons/quotes.svg";
@@ -357,17 +360,42 @@ const Practices = () => {
 
   return (
     <div className="min-h-screen flex flex-col p-[20px] bg-transparent relative pointer-events-none" id="practices-page" data-testid="practices-page-container">
-      {/* Background embed frame */}
-      <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0 pointer-events-auto" id="practices-background-container">
-        <iframe 
-          src='https://my.spline.design/glassmorphlandingpage-dTRlb7D9jEqp40V25exFI0oj/' 
-          frameBorder='0' 
-          width='100%' 
-          height='100vh' 
-          className="fixed"
-          title="Background 3D animation" 
-          style={{ minHeight: '100vh' }}
-        ></iframe>
+      {/* Critical inline style for filter chips */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        /* Critical CSS for filter chips */
+        #practices-filter-chips-container button,
+        .filter-chip {
+          height: 36px !important;
+          min-height: 36px !important;
+          max-height: 36px !important;
+          min-width: auto !important; /* Override the 44px min-width */
+          width: auto !important;
+          box-sizing: border-box !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          padding: 10px !important;
+          border-radius: 4px !important;
+          white-space: nowrap !important;
+          touch-action: manipulation !important;
+        }
+        
+        .filter-chip div {
+          font-family: 'Happy Monkey', cursive !important;
+          font-size: 12px !important;
+          line-height: 16px !important;
+          height: 16px !important;
+          min-height: 16px !important;
+          max-height: 16px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+      ` }} />
+      
+      {/* Background container - embed frame removed to reduce server load */}
+      <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0 pointer-events-auto p-0 bg-gradient-to-b from-[#e9fbfd] to-white" id="practices-background-container">
+        {/* iframe removed to reduce server load */}
       </div>
       
       {/* Title and Filters Container */}
@@ -388,25 +416,43 @@ const Practices = () => {
               className={`filter-chip box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] w-auto ${
                 activeTab === category.id as ActiveTabType 
                   ? 'bg-[#FCDF4D] border border-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)]' 
-                  : `border ${category.id === 'all' ? 'border-white' : 'border-[#04C4D5]'}`
-              } rounded-[20px] whitespace-nowrap px-4`} 
+                  : 'bg-[rgba(83,252,255,0.10)] outline outline-1 outline-[#148BAF] outline-offset-[-1px]'
+              } rounded-[4px] whitespace-nowrap px-4`} 
               data-testid={`filter-chip-${category.id}`}
-              onClick={() => setActiveTab(category.id as ActiveTabType)}>
-              <span className={`font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center text-center lowercase ${
+              onClick={() => setActiveTab(category.id as ActiveTabType)}
+              style={{ 
+                height: '36px',
+                minHeight: '36px',
+                maxHeight: '36px',
+                minWidth: 'auto',
+                width: 'auto',
+                boxSizing: 'border-box',
+                padding: '10px',
+                touchAction: 'manipulation',
+                appearance: 'none',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none'
+              }}>
+              <div className={`font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase ${
                 activeTab === category.id as ActiveTabType ? 'text-black' : 'text-[#148BAF]'
               }`}>
                 {category.label} {category.count > 0 && category.id !== 'all' ? `(${category.count})` : ''}
-              </span>
+              </div>
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Spline Embed Frame */}
+      <div style={{ width: '100%', height: '320px', maxWidth: 900, margin: '0 auto 24px auto', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 8px rgba(73,218,234,0.08)' }}>
+        <iframe src='https://my.spline.design/zerogravityphysicslandingpage-45017afdfc0f8e2b6973e1063215893a/' frameBorder='0' width='100%' height='100%' style={{ minHeight: 320, border: 'none', borderRadius: 16 }} allowFullScreen></iframe>
       </div>
 
       {/* Practices Grid - Main content showing practice cards */}
       <div className="grid grid-cols-2 gap-2 justify-items-center justify-center relative z-10 pointer-events-auto" id="practices-grid" data-testid="practices-grid-container">
         {filteredPractices.map((practice) => (
           <div key={practice.id} 
-               className={`flex flex-col justify-start items-stretch p-[10px] gap-[10px] w-full h-[220px] ${practice.isDaily ? 'bg-[#F5F5F5]/80':'bg-[#EDFEFF]/80'} backdrop-blur-xl shadow-[1px_2px 4px rgba(73,218,234,0.5)] rounded-[8px]`}
+               className={`flex flex-col justify-start items-stretch p-[10px] gap-[10px] w-full h-[220px] ${practice.isDaily ? 'bg-[#FAF8EC]/80':'bg-[#EDFEFF]/80'} backdrop-blur-xl shadow-[1px_2px 4px rgba(73,218,234,0.5)] rounded-[8px]`}
                data-testid={`practice-card-${practice.id}`}
                onClick={() => handlePracticeNameClick(practice.id)}
                style={{ 

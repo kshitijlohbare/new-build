@@ -1,0 +1,51 @@
+/**
+ * PracticeItemFixes.css
+ * 
+ * This file provides consistent spacing for practice items
+ * - Keeps padding only on the container
+ * - Removes padding and margin from child elements
+ * - Sets consistent gap of 4px
+ */
+
+/* Basic practice-item styling */
+.practice-item {
+  padding: 10px !important;
+  gap: 4px !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+/* Remove padding and margin from direct children */
+.practice-item > * {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Ensure all levels of child elements have consistent spacing */
+.practice-item * {
+  box-sizing: border-box !important;
+}
+
+/* Target specific elements inside practice items */
+.practice-name,
+.practice-name-container,
+.practice-icon-container,
+.practice-text,
+.streak-badge {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Ultra-specific selectors for practice item */
+.practices-list .practice-item,
+.left-section .practice-item,
+div.left-section div.practice-item,
+.daily-practice-todo-list .practice-item {
+  padding: 10px !important;
+  gap: 4px !important;
+  box-sizing: border-box !important;
+  align-self: stretch !important;
+}

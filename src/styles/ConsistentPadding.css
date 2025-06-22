@@ -14,7 +14,7 @@ main,
 [id$="-page"],
 [id$="-container"],
 [class*="container"] {
-  padding: inherit !important;
+  padding: 0px !important;
   box-sizing: border-box !important;
 }
 
@@ -109,7 +109,8 @@ form,
 
 /* Enforce consistent padding and border for delights-input-container */
 #delights-input-container {
-  padding: 0 16px !important; /* Adjust as needed for visual match */
+  padding: 14px 20px !important; /* 14px vertical padding for more space, 20px horizontal */
+  gap: 8px !important; /* Increased gap for better element spacing */
   background-color: #FFD400 !important;
   border: 2px solid white !important;
   box-sizing: border-box !important;
@@ -132,7 +133,8 @@ form,
 #delights-input-container:not([style='']),
 #delights-input-container[style*="padding"],
 #delights-input-container[style*="gap"] {
-  padding: 0 16px !important;
+  padding: 14px 20px !important; /* 14px vertical padding for more space, 20px horizontal */
+  gap: 8px !important; /* Increased gap for better element spacing */
   background-color: #FFD400 !important;
   border: 2px solid white !important;
   box-sizing: border-box !important;

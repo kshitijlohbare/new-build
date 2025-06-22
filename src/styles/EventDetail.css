@@ -1,0 +1,244 @@
+/* EventDetail.css */
+
+.event-detail-container {
+  padding: 20px;
+  background-color: var(--BGColor, white);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(73, 217, 234, 0.2);
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: 'Happy Monkey', sans-serif;
+}
+
+.event-detail-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--Primary, #148BAF);
+  font-family: 'Happy Monkey', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 20px;
+  transition: background-color 0.2s;
+}
+
+.back-button:hover {
+  background-color: rgba(20, 139, 175, 0.1);
+}
+
+.event-detail-image {
+  width: 100%;
+  height: 200px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.event-detail-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.event-image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: #e0f7fa;
+}
+
+.event-detail-content {
+  padding: 0 10px;
+}
+
+.event-title {
+  font-family: 'Righteous', cursive;
+  color: var(--Primary, #148BAF);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  font-size: 24px;
+}
+
+.event-group {
+  font-family: 'Happy Monkey', sans-serif;
+  color: #5a5a5a;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.event-detail-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.event-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.event-info-item svg {
+  margin-top: 3px;
+}
+
+.info-label {
+  font-size: 12px;
+  color: #707070;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #333;
+}
+
+.event-description {
+  margin-bottom: 25px;
+}
+
+.event-description h2 {
+  font-family: 'Righteous', cursive;
+  color: var(--Primary, #148BAF);
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.event-description p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.event-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.join-button, .leave-button {
+  padding: 10px 30px;
+  border-radius: 25px;
+  font-family: 'Happy Monkey', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.join-button {
+  background-color: var(--Primary, #148BAF);
+  color: white;
+}
+
+.join-button:hover {
+  background-color: #0f7a9c;
+}
+
+.leave-button {
+  background-color: #f0f0f0;
+  color: #707070;
+}
+
+.leave-button:hover {
+  background-color: #e0e0e0;
+}
+
+/* Discussion section */
+.discussion-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.message-input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-family: 'Happy Monkey', sans-serif;
+  resize: none;
+  min-height: 60px;
+}
+
+.post-button {
+  align-self: flex-end;
+  padding: 10px 20px;
+  background-color: var(--Primary, #148BAF);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Happy Monkey', sans-serif;
+}
+
+.post-button:hover {
+  background-color: #0f7a9c;
+}
+
+.discussion-posts {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.discussion-post {
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #fafafa;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.post-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+}
+
+.post-author {
+  font-weight: bold;
+  color: var(--Primary, #148BAF);
+  font-size: 14px;
+}
+
+.post-content {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.post-footer {
+  font-size: 12px;
+  color: #909090;
+}
+
+.no-posts-message {
+  text-align: center;
+  color: #909090;
+  padding: 20px 0;
+}

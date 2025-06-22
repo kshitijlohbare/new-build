@@ -30,9 +30,9 @@ const Sidebar = ({ onNavigate }: SidebarProps) => {
   
   const navItems = [
     { name: "home", path: "/", selectedIcon: "/src/assets/icons/Home_selected.svg", nonSelectedIcon: "/src/assets/icons/Home_nonselected.svg" },
+    { name: "fitness groups", path: "/fitness-groups", selectedIcon: "/src/assets/icons/Learn_selected.svg", nonSelectedIcon: "/src/assets/icons/Learn_nonselected.svg" },
     { name: "wellbeing practices", path: "/practices", selectedIcon: "/src/assets/icons/Practice_selected.svg", nonSelectedIcon: "/src/assets/icons/Practice_nonselected.svg" },
     { name: "focus timer", path: "/focus-timer", selectedIcon: "/src/assets/icons/Focus_selected.svg", nonSelectedIcon: "/src/assets/icons/Focus_nonselected.svg" },
-    { name: "fitness groups", path: "/fitness-groups", selectedIcon: "/src/assets/icons/Learn_selected.svg", nonSelectedIcon: "/src/assets/icons/Learn_nonselected.svg" },
     { name: "learn", path: "/learn", selectedIcon: "/src/assets/icons/Learn_selected.svg", nonSelectedIcon: "/src/assets/icons/Learn_nonselected.svg" },
     { name: "therapy sessions", path: "/therapist-listing", selectedIcon: "/src/assets/icons/Therapist_selected.svg", nonSelectedIcon: "/src/assets/icons/Therapist_nonselected.svg" },
     { name: "my profile", path: "/profile", selectedIcon: "/src/assets/icons/Profile black.svg", nonSelectedIcon: "/src/assets/icons/Profile.svg" },

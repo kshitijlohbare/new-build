@@ -1,0 +1,75 @@
+/* 
+   Override injected styles from browser extensions or user agent stylesheets
+   This file targets very specific overrides that might be causing 
+   differences between inspect mode and browsing mode
+*/
+
+/* Universal overrides for filter chips */
+#practices-filter-chips-container button,
+#learn-filter-chips-container button,
+.filter-chip {
+  /* Reset ALL height related properties */
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important; 
+  line-height: normal !important;
+  
+  /* Reset ALL width related properties */
+  min-width: auto !important; /* Override the 44px min-width */
+  max-width: none !important;
+  width: auto !important;
+
+  /* Reset ALL box model properties */
+  box-sizing: border-box !important;
+  padding: 10px !important;
+  margin: 0 !important;
+  border-radius: 4px !important;
+  
+  /* Reset ALL typography properties */
+  font-size: 12px !important;
+  text-transform: lowercase !important;
+
+  /* Ensure proper stacking context */
+  z-index: auto !important;
+  isolation: isolate !important;
+
+  /* Prevent tap delay and other mobile behaviors */
+  touch-action: manipulation !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/* Target Safari-specific rendering issues */
+@supports (-webkit-touch-callout: none) {
+  #practices-filter-chips-container button,
+  #learn-filter-chips-container button,
+  .filter-chip {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+  }
+}
+
+/* Target Chrome-specific rendering issues */
+@supports (-webkit-appearance: none) and (not (-moz-appearance: none)) {
+  #practices-filter-chips-container button,
+  #learn-filter-chips-container button,
+  .filter-chip {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+  }
+}
+
+/* Target Firefox-specific rendering issues */
+@supports (-moz-appearance: none) {
+  #practices-filter-chips-container button,
+  #learn-filter-chips-container button,
+  .filter-chip {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+  }
+}

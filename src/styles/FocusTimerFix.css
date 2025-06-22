@@ -6,4 +6,28 @@
   justify-content: center;
   padding: 10px 0;
   width: 100%;
+  background: none !important;
+}
+
+/* Apply control button fixes */
+.control-button, 
+[data-testid="play-pause-button"],
+[data-testid="stop-button"],
+.reset-button {
+  padding: 0 !important;
+}
+
+/* Music drawer styling */
+.music-drawer,
+[data-testid="music-drawer"] {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 8px 0;
+  width: auto;
+  min-width: 0;
+  max-width: 90vw;
 }

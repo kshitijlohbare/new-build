@@ -1,10 +1,18 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import SocialFeed from './SocialFeed';
+import FitnessGroupDetail from './FitnessGroupDetail';
+import EventDetail, { Event } from './EventDetail';
+import Frame11 from '@/components/social/Frame11';
 import '@/pages/FitnessGroups.css';
 import '@/pages/FitnessGroupsTabFix.css';
+import '@/styles/FitnessGroupDetail.css';
+import '@/styles/TribeSectionFix.css';
+import '@/styles/EventDetail.css';
 import NewsFeedIcon from '@/assets/icons/News feed-Black.svg';
 import CommunityIcon from '@/assets/icons/Community -black.svg';
 import EventsIcon from '@/assets/icons/events.svg';
+import FitnessGroupCard from '@/components/fitness/FitnessGroupCard';
+import { FitnessGroup } from '@/helpers/fitnessGroupUtils';
 
 const TABS = [
   { key: 'feels', label: 'share your feels', icon: NewsFeedIcon },
@@ -12,8 +20,101 @@ const TABS = [
   { key: 'events', label: 'friendly events', icon: EventsIcon }
 ];
 
+// Dummy data for demonstration (replace with real data source)
+const GROUPS: FitnessGroup[] = [
+  {
+    id: 1,
+    name: 'Morning Running Group',
+    category: 'Running',
+    description: 'Start your day right with our energetic morning running group. All paces welcome. Every Sunday morning the run starts.',
+    memberCount: 88,
+    location: 'Kalyani Nagar',
+    creator_id: 'demo',
+    created_at: '',
+  },
+  {
+    id: 2,
+    name: 'Yoga Tribe',
+    category: 'Yoga',
+    description: 'Find your zen and flexibility with our yoga tribe. Classes every Saturday.',
+    memberCount: 54,
+    location: 'Koregaon Park',
+    creator_id: 'demo',
+    created_at: '',
+  },
+  {
+    id: 3,
+    name: 'Cycling Enthusiasts',
+    category: 'Cycling',
+    description: 'Join our cycling group for weekend rides and fitness challenges.',
+    memberCount: 120,
+    location: 'Viman Nagar',
+    creator_id: 'demo',
+    created_at: '',
+  },
+];
+
+// Sample event data for demonstration
+const EVENTS: Event[] = [
+  {
+    id: 1,
+    title: 'Morning Run at Kalyani Nagar',
+    date: '12 Jan 2025',
+    time: '7:00 AM',
+    location: 'Kalyani Nagar Park Entrance',
+    description: 'Join us for an energetic morning run. All paces welcome! We\'ll meet by the park entrance near the big map sign.',
+    organizer: 'Morning Running Group',
+    attendees: 15,
+    groupName: 'Morning Running Group',
+  },
+  {
+    id: 2,
+    title: 'Weekend Yoga Session',
+    date: '14 Jan 2025',
+    time: '8:30 AM',
+    location: 'Koregaon Park Lawn',
+    description: 'Relax and rejuvenate with our weekend yoga session. Suitable for all skill levels. Please bring your own mat.',
+    organizer: 'Yoga Tribe',
+    attendees: 25,
+    groupName: 'Yoga Tribe',
+  },
+  {
+    id: 3,
+    title: 'Cycling Expedition',
+    date: '15 Jan 2025',
+    time: '6:30 AM',
+    location: 'Viman Nagar Meeting Point',
+    description: 'A 20km cycling expedition around the city outskirts. Helmet required. Water will be provided at checkpoints.',
+    organizer: 'Cycling Enthusiasts',
+    attendees: 12,
+    groupName: 'Cycling Enthusiasts',
+  },
+  {
+    id: 4,
+    title: 'Fitness Challenge Day',
+    date: '18 Jan 2025',
+    time: '9:00 AM',
+    location: 'Aundh Sports Complex',
+    description: 'Test your limits with various fitness challenges and compete for fun prizes. Activities include sprints, push-ups, and endurance tests.',
+    organizer: 'Morning Running Group',
+    attendees: 30,
+    groupName: 'Morning Running Group',
+  }
+];
+
 export default function FitnessGroups() {
   const [activeTab, setActiveTab] = useState('feels');
+  const [joinedGroups, setJoinedGroups] = useState<string[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<FitnessGroup | null>(null);
+  const [searchText, setSearchText] = useState('');
+  // Using _searchType for potential future functionality
+  const [_searchType, setSearchType] = useState<'groups' | 'events'>('groups');
+  // Using only the state value of showInputBar
+  const [showInputBar] = useState(true);
+  const [postContent, setPostContent] = useState('');
+  const [selectedTribe, setSelectedTribe] = useState<string>('all');
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [joinedEvents, setJoinedEvents] = useState<number[]>([]);
   const swipeRef = useRef<HTMLDivElement>(null);
   let touchStartX = 0;
 
@@ -30,14 +131,112 @@ export default function FitnessGroups() {
     }
   };
 
+  const handleJoin = (group: FitnessGroup) => {
+    setJoinedGroups(prev => [...prev, group.name]);
+  };
+  
+  const handleLeave = (group: FitnessGroup) => {
+    setJoinedGroups(prev => prev.filter(name => name !== group.name));
+  };
+  
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+  
+  const handleGroupSelect = (group: FitnessGroup) => {
+    setSelectedGroup(group);
+    // Scroll to top when selecting a group
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+  
+  const handleBackToGroups = () => {
+    setSelectedGroup(null);
+    // Scroll to top when returning to groups list
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  // Handler for event selection
+  const handleEventSelect = (event: Event) => {
+    setSelectedEvent(event);
+    // Scroll to top when selecting an event
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+  
+  const handleBackToEvents = () => {
+    setSelectedEvent(null);
+    // Scroll to top when returning to events list
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  const handleJoinEvent = (event: Event) => {
+    setJoinedEvents(prev => [...prev, event.id]);
+  };
+  
+  const handleLeaveEvent = (event: Event) => {
+    setJoinedEvents(prev => prev.filter(id => id !== event.id));
+  };
+
+  // Filter groups based on search text
+  const filteredGroups = useMemo(() => {
+    if (!searchText) return GROUPS;
+    
+    return GROUPS.filter(group => 
+      group.name.toLowerCase().includes(searchText.toLowerCase()) || 
+      group.description.toLowerCase().includes(searchText.toLowerCase()) ||
+      group.category.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }, [GROUPS, searchText]);
+
+  // Filter events based on search text
+  const filteredEvents = useMemo(() => {
+    if (!searchText) return EVENTS;
+    
+    return EVENTS.filter(event => 
+      event.title.toLowerCase().includes(searchText.toLowerCase()) || 
+      event.description.toLowerCase().includes(searchText.toLowerCase()) ||
+      event.location.toLowerCase().includes(searchText.toLowerCase()) ||
+      event.groupName.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }, [searchText]);
+
+  // Update search type based on active tab
+  useEffect(() => {
+    setSearchType(activeTab === 'events' ? 'events' : 'groups');
+  }, [activeTab]);
+
   // --- Section Renderers ---
   const renderEvents = () => (
     <div className="events-section">
-      {[1,2,3,4].map(i => (
-        <div className="event-card" key={i} style={{
+      {selectedEvent ? (
+        <EventDetail
+          event={selectedEvent}
+          isJoined={joinedEvents.includes(selectedEvent.id)}
+          onJoin={handleJoinEvent}
+          onLeave={handleLeaveEvent}
+          onBack={handleBackToEvents}
+        />
+      ) : (
+        filteredEvents.map(event => (
+          <div 
+            className="event-card" 
+            key={event.id} 
+            onClick={() => handleEventSelect(event)}
+            style={{
           alignSelf: 'stretch',
           padding: '10px',
-          background: 'var(--CARDSNEW, rgba(83, 252, 255, 0.10))',
+          background: '#FAF8EC',
           boxShadow: '1px 2px 4px rgba(73, 217.90, 234, 0.50)',
           overflow: 'hidden',
           borderRadius: '8px',
@@ -61,7 +260,7 @@ export default function FitnessGroups() {
               paddingRight: '8px',
               paddingTop: '4px',
               paddingBottom: '4px',
-              background: '#F5F5F5',
+              background: '#FAF8EC',
               overflow: 'hidden',
               borderRadius: '8px',
               flexDirection: 'column',
@@ -221,62 +420,100 @@ export default function FitnessGroups() {
                 textTransform: 'lowercase',
                 lineHeight: '16px',
                 wordWrap: 'break-word'
-              }}>88 members</div>
+              }}>{event.attendees} attendees</div>
             </div>
           </div>
         </div>
-      ))}
+        ))
+      )}
     </div>
   );
 
   const renderTribe = () => (
     <div className="tribe-section">
-      {[1,2,3].map((i, idx) => (
-        <div className="tribe-card" key={i}>
-          <div className="tribe-title-container">
-            <div className="tribe-title">morning running group</div>
-          </div>
-          <div className="tribe-content-row">
-            <div className="tribe-activity-badge">
-              <div className="activity-icon">
-                <svg width="30" height="25" viewBox="0 0 30 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1.13438 24.7008H28.8656C29.1126 24.7008 29.3129 24.5005 29.3129 24.2536C29.3129 24.0066 29.1126 23.8063 28.8656 23.8063H26.1069C26.2211 23.6624 26.3237 23.5076 26.4026 23.3367C26.9472 22.1598 26.4345 20.7656 25.2564 20.2223L19.8665 17.7339V14.1972C19.9338 14.3872 19.9718 14.3444 23.2478 16.8332C24.0406 17.4313 25.1976 17.3036 25.8246 16.4725C26.4236 15.6783 26.2745 14.5323 25.4922 13.9177L22.3764 11.4707L21.3826 9.56162C20.455 7.77908 19.558 6.40559 17.353 6.31565C18.1103 5.6574 18.5919 4.69084 18.5919 3.61183C18.5919 2.45642 18.0504 1.40566 17.1385 0.736405C17.1385 0.829107 17.1495 0.648286 17.1385 0.736405C15.7959 -0.258412 14.2125 -0.232599 12.8596 0.736866C11.5066 1.70633 11.4062 2.45782 11.4062 3.61182C11.4062 4.68573 11.8836 5.64819 12.6348 6.3062C10.4579 6.34671 9.57463 7.60809 8.57584 9.38213L7.09453 12.0136L4.55736 13.925C3.75076 14.5326 3.58986 15.677 4.19825 16.4834C4.81922 17.3069 5.96567 17.4365 6.75557 16.8423L9.99791 14.3992C10.049 14.3605 10.0913 14.3113 10.1217 14.255L10.1311 14.2381V17.735L4.74349 20.222C3.57232 20.7626 3.04954 22.1512 3.59886 23.3393C3.67736 23.5092 3.77922 23.663 3.89274 23.806H1.13473C0.887773 23.806 0.6875 24.0063 0.6875 24.2533C0.6875 24.5005 0.887773 24.7007 1.13473 24.7007L1.13438 24.7008ZM15 22.1701L20.8452 23.8064L9.15458 23.8061L15 22.1701ZM12.3006 3.61203C12.3006 2.66469 12.7812 1.80705 13.5901 1.31569C14.4235 0.798187 15.523 0.79269 16.3648 1.29348C16.3799 1.30241 16.3962 1.30859 16.411 1.31798C17.2162 1.8071 17.6969 2.66469 17.6969 3.61227C17.6969 5.09727 16.4866 6.30507 14.9986 6.30507C13.5108 6.30484 12.3006 5.0968 12.3006 3.61203ZM9.38166 13.7435L6.21713 16.1282C5.81681 16.4299 5.21254 16.3424 4.91248 15.9453C4.76233 15.7464 4.69893 15.5011 4.73372 15.2545C4.76828 15.008 4.89691 14.7897 5.09558 14.64L7.70734 12.6723C7.75678 12.6352 7.79775 12.5883 7.82819 12.5345L9.35573 9.82159C10.3596 8.0377 11.0208 7.19746 12.7455 7.19746L17.129 7.20181C18.8669 7.20364 19.5723 8.02077 20.589 9.97494C22.0848 12.8087 20.8866 11.3807 24.9396 14.6215C25.3415 14.9371 25.4182 15.5258 25.1104 15.9339C24.8057 16.3374 24.1926 16.4253 23.7867 16.1193L20.6383 13.7435L19.8667 12.3228V10.8342C19.8667 10.5872 19.6664 10.3869 19.4195 10.3869C19.1725 10.3869 18.9722 10.5872 18.9722 10.8342V17.4582H11.0257C11.0198 14.1543 11.0344 14.1346 11.0038 10.8342C11.0038 10.5872 10.8035 10.3869 10.5565 10.3869C10.3096 10.3869 10.1093 10.5872 10.1093 10.8342V12.4025L9.38166 13.7435ZM4.40945 22.9614C4.07276 22.2345 4.38816 21.3721 5.11808 21.0347L10.923 18.3552H19.0769L24.8815 21.0347C25.6084 21.3707 25.9286 22.2304 25.589 22.9644C25.2573 23.6817 24.3992 24.012 23.6641 23.6728L15.9906 21.5195L16.8512 20.8773L20.8988 21.8575C21.1341 21.9157 21.3797 21.7715 21.4387 21.5282C21.4971 21.2881 21.3495 21.0464 21.1094 20.9883L16.9961 19.9922C16.9945 19.9917 16.9929 19.9924 16.9913 19.9919C16.8355 19.7358 16.5306 19.3787 15.9639 19.1476C14.6272 18.6031 12.6069 19.062 9.9592 20.5134C9.74245 20.6321 9.66302 20.9041 9.78182 21.1206C9.9006 21.3371 10.1725 21.4163 10.389 21.2979C13.3439 19.6784 14.8504 19.6786 15.5931 19.9629C15.8467 20.0602 16.0122 20.1936 16.1168 20.3092L14.7888 21.3005L6.40227 23.6483L6.33544 23.6728C5.61011 24.0079 4.74767 23.6927 4.40964 22.9614L4.40945 22.9614Z" fill="var(--Primary, #148BAF)"/>
-                </svg>
-              </div>
-              <div className="meta-text">88 members</div>
-            </div>
-            <div className="tribe-meta tribe-meta-loc">
-              <div className="location-icon">
-                <svg width="12" height="17" viewBox="0 0 12 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M5.8492 1.78897C9.5561 1.78897 10.877 4.19408 10.877 6.44466C10.877 6.48697 10.8757 6.52915 10.8744 6.57146L10.8738 6.58706C10.8733 6.61166 10.8733 6.63626 10.8744 6.66086C10.875 6.67577 10.8759 6.69038 10.877 6.70655C10.8931 8.20129 10.133 10.2505 8.78928 12.3335C7.6472 14.1035 6.64933 15.5327 6.04427 15.5429C5.44401 15.553 4.42507 14.1788 3.28883 12.4866C2.48186 11.285 1.12915 8.93583 1.12262 6.68582C1.12349 6.66881 1.1245 6.65194 1.12508 6.63493C1.12566 6.61511 1.12581 6.59529 1.12523 6.57547L1.1245 6.54553C1.12378 6.51193 1.12262 6.47847 1.12262 6.44501C1.12262 5.04503 1.58318 1.78896 5.84927 1.78896M5.84927 0.701172C1.42193 0.701172 0 3.74999 0 6.44476C0 6.49663 0.00174075 6.54879 0.0030463 6.60108C0.002321 6.624 0 6.64635 0 6.66968C0 11.2372 4.82469 16.7012 6.05835 16.7012C7.29226 16.7012 12.0643 10.8449 11.9993 6.66968C11.9989 6.65211 11.9969 6.6351 11.9962 6.61753C11.9979 6.56003 11.9998 6.5024 11.9998 6.4449C11.9996 3.67934 10.276 0.701312 5.84933 0.701312L5.84927 0.701172Z" fill="var(--Primary, #148BAF)"/>
-                </svg>
-              </div>
-              <div className="location-text">kalyani nagar</div>
-            </div>
-          </div>
-          <div className="tribe-join-button">
-            {idx === 1 ? (
-              <div className="join-text">I'M A MEMBER</div>
-            ) : (
-              <div className="join-text">join</div>
-            )}
+      {selectedGroup ? (
+        <FitnessGroupDetail
+          group={selectedGroup}
+          isJoined={joinedGroups.includes(selectedGroup.name)}
+          onJoin={handleJoin}
+          onLeave={handleLeave}
+          onBack={handleBackToGroups}
+        />
+      ) : (
+        <div className="tribe-content">
+          <div className="tribe-cards-container">
+            {filteredGroups.map((group) => (
+              <FitnessGroupCard
+                key={group.id}
+                group={group}
+                isJoined={joinedGroups.includes(group.name)}
+                onJoin={handleJoin}
+                onLeave={handleLeave}
+                onClick={() => handleGroupSelect(group)}
+              />
+            ))}
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 
+  const handlePostSubmit = () => {
+    if (postContent.trim() === '') {
+      return;
+    }
+    
+    // In a real app, this would send the post to your backend
+    alert(`Posted to ${selectedTribe === 'all' ? 'all tribes' : selectedTribe}: ${postContent}`);
+    setPostContent('');
+  };
+
+  const handleTribeSelect = (tribe: string) => {
+    setSelectedTribe(tribe);
+  };
+
   const renderFeels = () => (
     <div className="feels-section">
-      <SocialFeed />
+      {/* Tribe filter chips */}
+      <div className="tribe-filter-chips-container" id="tribe-filter-chips-container">
+        <button 
+          className={`filter-chip ${selectedTribe === 'all' ? 'active' : ''}`}
+          onClick={() => handleTribeSelect('all')}
+        >
+          <div>all</div>
+        </button>
+        {GROUPS.map((group) => (
+          <button 
+            key={group.id}
+            className={`filter-chip ${selectedTribe === group.name ? 'active' : ''}`}
+            onClick={() => handleTribeSelect(group.name)}
+          >
+            <div>{group.name.toLowerCase()}</div>
+          </button>
+        ))}
+      </div>
+      <div className="social-feed-container">
+        {/* Custom Frame11 implementation */}
+        <Frame11 
+          username="fitness enthusiast"
+          group={selectedTribe !== 'all' ? selectedTribe : "morning running group"}
+          content="i've found my wellness tribe and it feels amazing"
+          avatarColor="#FCDF4D"
+        />
+        
+        {/* Rest of the social feed */}
+        <SocialFeed />
+      </div>
     </div>
   );
+
+  // Group details are now rendered directly inside renderTribe
 
   return (
     <div className="fitnessgroups-root" ref={swipeRef} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       <div className="fitnessgroups-topnav">
         {TABS.map(tab => (
-          <button
+          <div
             key={tab.key}
             className={`fitnessgroups-tab ${activeTab === tab.key ? 'active' : ''}`}
             onClick={() => setActiveTab(tab.key)}
@@ -287,7 +524,7 @@ export default function FitnessGroups() {
               className="tab-icon"
             />
             {activeTab === tab.key && <span>{tab.label}</span>}
-          </button>
+          </div>
         ))}
       </div>
       <div className="fitnessgroups-section">
@@ -295,6 +532,50 @@ export default function FitnessGroups() {
         {activeTab === 'tribe' && renderTribe()}
         {activeTab === 'feels' && renderFeels()}
       </div>
+      
+      {/* Floating input bar - Search or Post based on active tab */}
+      {showInputBar && (
+        <div 
+          className={`floating-input-bar ${activeTab === 'feels' ? 'post-input-bar' : ''}`}
+          id="search-input-container"
+          data-testid="search-input-container"
+          aria-label={activeTab === 'feels' ? "Post a message" : "Search"}
+        >
+          {activeTab !== 'feels' ? (
+            <>
+              <div className="search-icon">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16.5 16.5L12.875 12.875M14.8333 8.16667C14.8333 11.8486 11.8486 14.8333 8.16667 14.8333C4.48477 14.8333 1.5 11.8486 1.5 8.16667C1.5 4.48477 4.48477 1.5 8.16667 1.5C11.8486 1.5 14.8333 4.48477 14.8333 8.16667Z" stroke="#148BAF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <input 
+                type="text" 
+                className="search-input"
+                placeholder={activeTab === 'events' ? "search for events..." : "search for fitness groups..."}
+                value={searchText}
+                onChange={handleSearch}
+              />
+            </>
+          ) : (
+            <>
+              <input 
+                type="text" 
+                className="post-input"
+                placeholder={`post to ${selectedTribe === 'all' ? 'all tribes' : selectedTribe}...`}
+                value={postContent}
+                onChange={(e) => setPostContent(e.target.value)}
+              />
+              <button 
+                className="post-button"
+                onClick={handlePostSubmit}
+                disabled={!postContent.trim()}
+              >
+                post
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

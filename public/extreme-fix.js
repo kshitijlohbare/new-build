@@ -60,7 +60,7 @@ function fixDailyPracticesList() {
     <div class="daily-practice-todo-list" data-extreme-fixed="true" style="
       width: 100% !important;
       padding: 20px 10px !important;
-      background: #F5F5F5 !important;
+      background: #FAF8EC !important;
       overflow: hidden !important;
       border-radius: 20px !important;
       display: flex !important;

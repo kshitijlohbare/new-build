@@ -5,8 +5,8 @@
 
 (function() {
   function fixEmbedFrames() {
-    // Find all embed iframes in the Practices and Learn pages
-    const embeds = document.querySelectorAll('#practices-background-container iframe, [src*="spline.design"] iframe');
+    // Find all embed iframes in the Learn pages (Practices page iframe removed to reduce server load)
+    const embeds = document.querySelectorAll('[src*="spline.design"] iframe');
     
     embeds.forEach(iframe => {
       // Make sure iframe container has pointer-events-auto
