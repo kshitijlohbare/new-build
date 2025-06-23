@@ -29,21 +29,18 @@
 .TherapistCards {
   display: flex;
   flex-direction: row;
-  overflow-x: auto;
+  flex-wrap: wrap;
   gap: 16px;
   padding-bottom: 8px;
   width: 100%;
-  /* Hide scrollbar for webkit browsers */
-  scrollbar-width: thin;
-  scrollbar-color: var(--primary) #faf8ec;
+  overflow-x: visible;
+  justify-content: center;
 }
-.TherapistCards::-webkit-scrollbar {
-  height: 8px;
-  background: #faf8ec;
-}
-.TherapistCards::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 4px;
+.TherapistCards > div {
+  min-width: 220px;
+  max-width: 340px;
+  flex: 1 1 260px;
+  box-sizing: border-box;
 }
 /* Ensure each card has a min/max width for horizontal scroll */
 .TherapistCards > div {
@@ -239,4 +236,11 @@
   text-transform: lowercase;
   line-height: 16px;
   word-wrap: break-word;
+}
+@media (max-width: 600px) {
+  .TherapistCards > div {
+    min-width: 90vw;
+    max-width: 98vw;
+    flex: 1 1 90vw;
+  }
 }

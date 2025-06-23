@@ -32,10 +32,14 @@ const FitnessGroupCard: React.FC<FitnessGroupCardProps> = ({
           e.currentTarget.style.transform = 'translateY(0)';
           e.currentTarget.style.boxShadow = '1px 2px 4px rgba(73, 217.90, 234, 0.5)';
         }
-      }}>
-      <div className="Frame group-header">
-        <div className="Frame132 group-name">
-          <div className="MorningRunningGroup">
+      }}
+      data-name={`fitness-group-${group.id}`}
+      aria-label={`Fitness group: ${group.name}`}
+      data-testid={`fitness-group-card-${group.id}`}
+    >
+      <div className="Frame group-header" data-name="group-header">
+        <div className="Frame132 group-name" data-name="group-name-container">
+          <div className="MorningRunningGroup group-title" data-name={`group-name-${group.id}`}>
             {group.name}
           </div>
         </div>
@@ -56,7 +60,10 @@ const FitnessGroupCard: React.FC<FitnessGroupCardProps> = ({
           </div>
           <div className="Yoga">{group.category}</div>
         </div>
-        <div className="StartYourDayRightWithOurEnergeticMorningRunningGroupAllPacesWelcomeEverySundayMorningTheRunStarts">
+        <div 
+          className="group-description" 
+          data-name={`group-description-${group.id}`}
+        >
           {group.description}
         </div>
       </div>
@@ -74,7 +81,13 @@ const FitnessGroupCard: React.FC<FitnessGroupCardProps> = ({
               <path fillRule="evenodd" clipRule="evenodd" d="M7.50008 16.4022C11.4698 16.4022 14.6869 14.8643 14.6869 12.966C14.6869 11.5681 12.9412 9.51708 10.4358 8.53226C9.65225 9.50101 8.62545 10.186 7.50005 10.186C6.37486 10.186 5.34793 9.50101 4.5638 8.53226C2.05901 9.51714 0.312988 11.5683 0.312988 12.966C0.312988 14.8642 3.53039 16.4022 7.50014 16.4022H7.50008ZM1.35808 12.1908C1.52655 11.8548 1.78357 11.4957 2.10115 11.1523C2.70306 10.5014 3.48634 9.9346 4.34606 9.52251C4.7036 9.88897 5.0858 10.193 5.48738 10.43C6.13667 10.8132 6.81379 11.0073 7.50005 11.0073C8.61243 11.0073 9.71444 10.4846 10.6535 9.52238C11.5133 9.93451 12.2969 10.5014 12.8988 11.1523C13.2162 11.4957 13.4732 11.8547 13.6418 12.1908C13.8273 12.5608 13.8664 12.8166 13.8664 12.966C13.8664 13.2234 13.7458 13.4901 13.5079 13.7591C13.2233 14.0808 12.7809 14.3905 12.2285 14.6545C11.6294 14.9409 10.9251 15.1672 10.1354 15.3269C9.3027 15.4952 8.41608 15.5806 7.50008 15.5806C6.58418 15.5806 5.69756 15.4952 4.86481 15.3269C4.07495 15.1672 3.37069 14.941 2.77151 14.6545C2.21908 14.3904 1.77659 14.0808 1.49188 13.7591C1.25407 13.4901 1.13349 13.2233 1.13349 12.966C1.13349 12.8166 1.17245 12.5608 1.35816 12.1908H1.35808ZM7.49976 9.05259C9.6371 9.05259 11.3698 6.20329 11.3698 4.13962C11.3698 2.07574 9.6371 0.402344 7.49976 0.402344C5.36254 0.402344 3.62973 2.07535 3.62973 4.13962C3.62973 6.20389 5.36241 9.05259 7.49976 9.05259ZM4.44766 4.13962C4.44766 3.36676 4.76102 2.63855 5.33005 2.08901C5.90789 1.53102 6.6784 1.22361 7.49976 1.22361C8.32112 1.22361 9.09176 1.53101 9.66959 2.08914C10.2386 2.63884 10.5521 3.36702 10.5521 4.13962C10.5521 4.55311 10.463 5.02513 10.2946 5.50449C10.1219 5.99588 9.87293 6.47422 9.57431 6.88784C9.2705 7.30876 8.92105 7.65349 8.56364 7.8845C8.20773 8.11462 7.84982 8.23123 7.49975 8.23123C7.14968 8.23123 6.79177 8.11462 6.43598 7.88462C6.07858 7.65351 5.72911 7.30901 5.42531 6.88809C5.12684 6.4745 4.87774 5.99613 4.70504 5.50474C4.53658 5.02539 4.44763 4.55324 4.44763 4.13966L4.44766 4.13962Z" fill="var(--Primary, #148BAF)"/>
             </svg>
           </div>
-          <div className="Members category-name">{group.memberCount} members</div>
+          <div 
+            className="Members members-count" 
+            data-name={`members-count-${group.id}`}
+            aria-label={`${group.memberCount} members`}
+          >
+            {group.memberCount} members
+          </div>
         </div>
         <div className="Frame9 group-location">
           <div className="Vector location-icon">
@@ -83,15 +96,23 @@ const FitnessGroupCard: React.FC<FitnessGroupCardProps> = ({
               <path d="M5.8492 1.49014C9.5561 1.49014 10.877 3.89525 10.877 6.14583C10.877 6.18814 10.8757 6.23032 10.8744 6.27263L10.8738 6.28823C10.8733 6.31283 10.8733 6.33744 10.8744 6.36204C10.875 6.37694 10.8759 6.39156 10.877 6.40772C10.8931 7.90246 10.133 9.95165 8.78928 12.0347C7.6472 13.8047 6.64933 15.2339 6.04427 15.2441C5.44401 15.2542 4.42507 13.8799 3.28883 12.1878C2.48186 10.9861 1.12915 8.637 1.12262 6.38699C1.12349 6.36998 1.1245 6.35311 1.12508 6.3361C1.12566 6.31628 1.12581 6.29646 1.12523 6.27664L1.1245 6.2467C1.12378 6.2131 1.12262 6.17964 1.12262 6.14619C1.12262 4.7462 1.58318 1.49013 5.84927 1.49013M5.84927 0.402344C1.42193 0.402344 0 3.45116 0 6.14593C0 6.19781 0.00174075 6.24996 0.0030463 6.30226C0.002321 6.32517 0 6.34752 0 6.37086C0 10.9384 4.82469 16.4023 6.05835 16.4023C7.29226 16.4023 12.0643 10.5461 11.9993 6.37086C11.9989 6.35328 11.9969 6.33627 11.9962 6.3187C11.9979 6.26121 11.9998 6.20357 11.9998 6.14607C11.9996 3.38051 10.276 0.402484 5.84933 0.402484L5.84927 0.402344Z" fill="var(--Primary, #148BAF)"/>
             </svg>
           </div>
-          <div className="KalyaniNagar location-text">{group.location}</div>
+          <div 
+            className="KalyaniNagar location-text" 
+            data-name={`location-text-${group.id}`}
+            aria-label={`Location: ${group.location}`}
+          >
+            {group.location}
+          </div>
         </div>
       </div>
       <div className="Frame6 group-action">
         {isJoined ? (
-          <div className="IMAMember member-status">
+          <div className="IMAMember member-status" data-name="member-status">
             I'm a member
             <button 
               className="leave-button" 
+              data-name={`leave-button-${group.id}`}
+              aria-label={`Leave ${group.name}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onLeave(group);
@@ -101,9 +122,11 @@ const FitnessGroupCard: React.FC<FitnessGroupCardProps> = ({
             </button>
           </div>
         ) : (
-          <div className="Join join-container">
+          <div className="Join join-container" data-name="join-container">
             <button 
               className="join-button" 
+              data-name={`join-button-${group.id}`}
+              aria-label={`Join ${group.name}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onJoin(group);

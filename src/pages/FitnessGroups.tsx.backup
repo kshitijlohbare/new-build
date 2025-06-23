@@ -1,19 +1,17 @@
-import React, { useState, useRef, useMemo, useEffect } from "react";
-import SocialFeed from './SocialFeed';
-import FitnessGroupDetail from './FitnessGroupDetail';
-import EventDetail, { Event } from './EventDetail';
-import Frame11 from '@/components/social/Frame11';
-import '@/pages/FitnessGroups.css';
-import '@/pages/FitnessGroupsTabFix.css';
-import '@/styles/FitnessGroupDetail.css';
-import '@/styles/TribeSectionFix.css';
-import '@/styles/EventDetail.css';
-import '@/styles/FeelsSectionResponsive.css';
-import '@/styles/FeelsSectionImproved.css';
-import NewsFeedIcon from '@/assets/icons/News feed.svg';
-import CommunityIcon from '@/assets/icons/Community -black.svg';
-import EventsIcon from '@/assets/icons/events.svg';
-import FitnessGroupCard from '@/components/fitness/FitnessGroupCard';
+import { useState, useEffect } from "react";
+import { Plus, Search } from 'lucide-react';
+import { useToast } from '@/hooks/useToast';
+import { useAuth } from "@/context/AuthContext";
+import { 
+  FitnessGroup, 
+  getFitnessGroups, 
+  getUserGroups, 
+  joinFitnessGroup, 
+  leaveFitnessGroup,
+  createFitnessGroup
+} from "@/helpers/fitnessGroupUtils";
+import FitnessGroupCard from "@/components/fitness/FitnessGroupCard";
+import "@/styles/FitnessGroups.css";
 import { FitnessGroup } from '@/helpers/fitnessGroupUtils';
 
 const TABS = [
@@ -248,10 +246,9 @@ export default function FitnessGroups() {
               gap: '10px',
               display: 'inline-flex'
             }}
-            data-name={`event-card-${event.id}`}
+            name={`event-card-${event.id}`}
             data-testid={`event-card-${event.id}`}
-            aria-label={`Event: ${event.title}`}
-          >
+            aria-label={`Event: ${event.title}`}>
           <div className="event-header" style={{
             alignSelf: 'stretch',
             justifyContent: 'center',
@@ -478,11 +475,12 @@ export default function FitnessGroups() {
   };
 
   const renderFeels = () => (
-    <div className="feels-section feels-section-centered">
+    <div className="feels-section">
       {/* Tribe filter chips */}
       <div 
         className="tribe-filter-chips-container" 
         id="tribe-filter-chips-container"
+        name="tribe-filter-chips-container"
       >
         <button 
           className={`filter-chip ${selectedTribe === 'all' ? 'active' : ''}`}
@@ -514,8 +512,9 @@ export default function FitnessGroups() {
           content="i've found my wellness tribe and it feels amazing"
           avatarColor="#FCDF4D"
         />
-        {/* SocialFeed now receives selectedTribe for filtering */}
-        <SocialFeed selectedTribe={selectedTribe} />
+        
+        {/* Rest of the social feed */}
+        <SocialFeed />
       </div>
     </div>
   );
@@ -553,11 +552,11 @@ export default function FitnessGroups() {
           id="search-input-container"
           data-testid="search-input-container"
           aria-label={activeTab === 'feels' ? "Post a message" : "Search"}
-          data-name="floating-input-container"
+          name="floating-input-container"
         >
           {activeTab !== 'feels' ? (
             <>
-              <div className="search-icon" data-name="search-icon">
+              <div className="search-icon" name="search-icon">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M16.5 16.5L12.875 12.875M14.8333 8.16667C14.8333 11.8486 11.8486 14.8333 8.16667 14.8333C4.48477 14.8333 1.5 11.8486 1.5 8.16667C1.5 4.48477 4.48477 1.5 8.16667 1.5C11.8486 1.5 14.8333 4.48477 14.8333 8.16667Z" stroke="#148BAF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -568,7 +567,7 @@ export default function FitnessGroups() {
                 placeholder={activeTab === 'events' ? "search for events..." : "search for fitness groups..."}
                 value={searchText}
                 onChange={handleSearch}
-                id={`search-input-${activeTab}`}
+                name={`search-input-${activeTab}`}
                 aria-label={activeTab === 'events' ? "Search events" : "Search fitness groups"}
               />
             </>
@@ -580,33 +579,15 @@ export default function FitnessGroups() {
                 placeholder={`post to ${selectedTribe === 'all' ? 'all tribes' : selectedTribe}...`}
                 value={postContent}
                 onChange={(e) => setPostContent(e.target.value)}
-                id="post-input-feels"
+                name="post-input-feels"
                 aria-label={`Post to ${selectedTribe === 'all' ? 'all tribes' : selectedTribe}`}
               />
-              <div className="caktus-feels-compose-attachments" style={{display: 'inline-flex', gap: '8px', marginLeft: '8px'}}>
-                <button className="caktus-feels-attachment-btn" aria-label="Add image">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6.66667 14.1667L10.8333 9.16667L13.3333 12.5L16.6667 8.33333" stroke="#148BAF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M15.8333 3.33333H4.16667C3.24619 3.33333 2.5 4.07952 2.5 5V15C2.5 15.9205 3.24619 16.6667 4.16667 16.6667H15.8333C16.7538 16.6667 17.5 15.9205 17.5 15V5C17.5 4.07952 16.7538 3.33333 15.8333 3.33333Z" stroke="#148BAF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="7.5" cy="7.5" r="1.25" fill="#148BAF"/>
-                  </svg>
-                </button>
-                <button className="caktus-feels-attachment-btn" aria-label="Add emoji">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z" stroke="#148BAF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M7.5 9.16667C7.96024 9.16667 8.33333 8.79357 8.33333 8.33333C8.33333 7.8731 7.96024 7.5 7.5 7.5C7.03976 7.5 6.66667 7.8731 6.66667 8.33333C6.66667 8.79357 7.03976 9.16667 7.5 9.16667Z" fill="#148BAF"/>
-                    <path d="M12.5 9.16667C12.9602 9.16667 13.3333 8.79357 13.3333 8.33333C13.3333 7.8731 12.9602 7.5 12.5 7.5C12.0398 7.5 11.6667 7.8731 11.6667 8.33333C11.6667 8.79357 12.0398 9.16667 12.5 9.16667Z" fill="#148BAF"/>
-                    <path d="M12.5 12.5C12.5 12.5 11.6667 14.1667 10 14.1667C8.33333 14.1667 7.5 12.5 7.5 12.5" stroke="#148BAF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              </div>
               <button 
                 className="post-button"
                 onClick={handlePostSubmit}
                 disabled={!postContent.trim()}
-                id="post-submit-button"
+                name="post-submit-button"
                 aria-label="Submit post"
-                style={{marginLeft: '8px'}}
               >
                 post
               </button>

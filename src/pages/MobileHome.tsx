@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import MobileViewport from "@/components/ui/MobileViewport";
-import { KeyboardAwareInput } from "@/components/ui/KeyboardAwareInput";
 import "@/styles/mobileHome.css";
 import "@/styles/mobileHomeBackgroundFix.css"; // Import the background fix CSS
 import "@/styles/ConsistentPadding.css"; // Import updated padding styles
@@ -9,11 +8,11 @@ import MobileWellbeingTipsSection from "../components/wellbeing/MobileWellbeingT
 import MobileDailyPractices from "../components/wellbeing/MobileDailyPractices";
 import MobileBookSessionSection from "../components/wellbeing/MobileBookSessionSection";
 import HomeHeader from "@/components/layout/HomeHeader";
-import emojiButtonIcon from "../assets/emoji button.svg";
+// Removed unused import: emojiButtonIcon
 import GlobalSidebar from "@/components/layout/GlobalSidebar";
+import InputBar from "@/components/home/InputBar";
 
 const MobileHome = () => {
-  const [newDelight, setNewDelight] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showInputBar, setShowInputBar] = useState(true); // New state to track input bar visibility
   const [hasScrolled, setHasScrolled] = useState(false); // Track if user has scrolled
@@ -31,8 +30,9 @@ const MobileHome = () => {
   
   const emojis = ['😊', '😍', '🥰', '😂', '🤩', '😎', '🔥', '💪', '🌟', '❤️', '👏', '🙌'];
   
-  const handleEmojiSelect = (emoji: string) => {
-    setNewDelight(prev => prev + emoji);
+  const handleEmojiSelect = () => {
+    // We now handle emoji selection in the InputBar component
+    // Just close the emoji picker
     setShowEmojiPicker(false);
   };
   
@@ -250,11 +250,9 @@ const MobileHome = () => {
     };
   }, [activeIndex]);
   
-  const handleSubmitDelight = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newDelight.trim()) {
-      setUserDelights(prev => [newDelight.trim(), ...prev]); // Add new delight to the beginning of the array
-      setNewDelight("");
+  const handleSubmitDelight = (text: string) => {
+    if (text.trim()) {
+      setUserDelights(prev => [text.trim(), ...prev]); // Add new delight to the beginning of the array
       setShowEmojiPicker(false);
       
       // Scroll to the newly added delight (no need to scroll as it's now the first item)
@@ -486,10 +484,7 @@ const MobileHome = () => {
       {/* Floating bottom input for delights */}
       {showInputBar && (
         <div 
-          className="input-bar" 
-          id="delights-input-container"
-          data-testid="delights-input-container"
-          aria-label="Enter a new delight"
+          className="input-bar-container" 
           onTouchStart={handleInputBarTouchStart}
           onTouchMove={handleInputBarTouchMove}
           onTouchEnd={handleInputBarTouchEnd}
@@ -512,7 +507,7 @@ const MobileHome = () => {
                     type="button"
                     id={`emoji-btn-${index}`}
                     data-testid={`emoji-btn-${index}`}
-                    onClick={() => handleEmojiSelect(emoji)}
+                    onClick={() => handleEmojiSelect()}
                     className="text-xl p-1.5 hover:bg-gray-100 rounded-lg transition-colors emoji-select-btn"
                     aria-label={`Insert emoji ${emoji}`}
                   >
@@ -531,52 +526,11 @@ const MobileHome = () => {
             aria-hidden="true"
           ></div>
           
-          <form 
-            onSubmit={handleSubmitDelight} 
-            id="delight-submit-form"
-            data-testid="delight-submit-form"
-          >
-            <KeyboardAwareInput
-              type="text"
-              id="delight-input-field"
-              data-testid="delight-input-field"
-              value={newDelight}
-              onChange={(e) => setNewDelight(e.target.value)}
-              placeholder="what delighted you today?"
-              className="delight-input"
-            />
-            
-            <div className="input-buttons">
-              <button 
-                type="button" 
-                id="emoji-toggle-button"
-                data-testid="emoji-toggle-button"
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)} 
-                className="emoji-button"
-                aria-label="Open emoji picker"
-              >
-                <img 
-                  src={emojiButtonIcon} 
-                  alt="Emoji" 
-                  width="24" 
-                  height="24" 
-                  id="emoji-button-icon"
-                  data-testid="emoji-button-icon"
-                />
-              </button>
-              
-              <button 
-                type="submit" 
-                id="delight-post-button"
-                data-testid="delight-post-button"
-                disabled={!newDelight.trim()}
-                className="post-button"
-                aria-label="Post your delight"
-              >
-                post
-              </button>
-            </div>
-          </form>
+          <InputBar 
+            placeholder="what delighted you today?"
+            onSubmit={handleSubmitDelight}
+            onEmojiClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          />
         </div>
       )}
       

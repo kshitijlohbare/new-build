@@ -517,6 +517,20 @@ nav.app-navbar * {
   font-size: 14px;
 }
 
+/* Styling for the new InputBar component container */
+.input-bar-container {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 400px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 /* Set delights-input-container background to #FFD400 with white border */
 #delights-input-container {
   background-color: #FFD400 !important;

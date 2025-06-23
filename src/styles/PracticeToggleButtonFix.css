@@ -1,0 +1,27 @@
+/*
+  Remove all padding from practice-toggle-button
+  Uses high specificity selectors to override any existing rules
+*/
+
+html body .practice-toggle-button,
+.practice-toggle-button[style],
+button.practice-toggle-button,
+.action-buttons .practice-toggle-button,
+div .practice-toggle-button,
+[class*="practice-toggle-button"] {
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure that any child elements don't have extra padding or margin either */
+.practice-toggle-button > * {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Make sure SVG inside button is displayed without extra space */
+.practice-toggle-button svg {
+  display: block !important;
+  /* removed vertical-align since it doesn't apply to block elements */
+}

@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Happy+Monkey&family=Righteous&family=Luckiest+Guy&display=swap');
+@import './styles/FilterChipBorders.css';
 
 /* tailwind directives */
 @tailwind base;
@@ -745,6 +746,11 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Responsive timer display that takes full width of circular-timer-section */
 .timer-display-responsive {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100% !important; /* Full width of parent container */
   height: 100% !important; /* Full height of parent container */
   aspect-ratio: 1/1; /* Ensure circle is perfectly round */
@@ -1020,20 +1026,24 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Make circular-timer-section height equal to width */
 [data-testid="circular-timer-section"] {
-  aspect-ratio: 1/1; /* This will make height equal to width */
+  position: relative;
+  aspect-ratio: 1/1; /* This ensures a perfect circle */
   display: flex;
   align-items: center;
   justify-content: center;
   width: min(calc(100vw - 2rem), 600px) !important; /* Use min to respect max-width */
-  height: auto !important; /* Let aspect-ratio control height */
+  height: 0 !important; /* Height will be determined by padding-bottom */
+  padding-bottom: min(calc(100vw - 2rem), 600px) !important; /* Makes height equal to width */
   max-width: 600px; /* Maximum size limit */
   margin: 0 auto; /* Center horizontally */
+  overflow: hidden; /* Ensure no overflow */
 }
 
 /* Adjust for various screen sizes */
 @media (max-width: 480px) {
   [data-testid="circular-timer-section"] {
     width: min(calc(100vw - 1rem), 450px) !important; /* Slightly more width on mobile */
+    padding-bottom: min(calc(100vw - 1rem), 450px) !important; /* Makes height equal to width */
     max-width: 450px;
   }
 }
@@ -1041,6 +1051,7 @@ h1, h2, h3, h4, h5, h6 {
 @media (min-width: 768px) {
   [data-testid="circular-timer-section"] {
     width: min(75vw, 600px) !important; /* Slightly less width on larger screens */
+    padding-bottom: min(75vw, 600px) !important; /* Makes height equal to width */
   }
 }
 
@@ -1064,12 +1075,13 @@ h1, h2, h3, h4, h5, h6 {
 
 [data-testid="circular-timer-section"] {
   flex: 1;
-  /* Removed margin-bottom */
   /* Ensure consistent circular shape */
   aspect-ratio: 1/1 !important;
   /* Improved centering */
   margin-left: auto !important;
   margin-right: auto !important;
+  position: relative !important;
+  height: 0 !important;
 }
 
 /* Ensure proper spacing in flex layout */
@@ -1229,4 +1241,36 @@ section,
 #practices-background-container {
   padding: 0 !important;
   background: linear-gradient(180deg, #e9fbfd 0%, #ffffff 100%) !important;
+}
+
+/* Additional centering for timer content */
+[data-testid="timer-circle"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure timer controls are positioned properly */
+.timer-controls {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+/* Debugging aid: adds a thin border to visualize the circular container */
+[data-testid="circular-timer-section"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px dotted rgba(20, 139, 175, 0.2);
+  border-radius: 50%;
+  pointer-events: none;
 }

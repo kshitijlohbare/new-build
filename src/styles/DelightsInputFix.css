@@ -1,0 +1,66 @@
+/*
+  Stable styles for delights-input-container
+  This CSS ensures consistent styling without JavaScript flickering
+*/
+
+/* High specificity selector to override inline styles */
+html body #delights-input-container,
+#root #delights-input-container,
+#delights-input-container,
+div#delights-input-container,
+.input-bar#delights-input-container {
+  width: 100% !important;
+  max-width: 380px !important;
+  padding: 10px !important;
+  background-color: #FFD400 !important;
+  box-shadow: 1px 2px 4px rgba(73, 217.90, 234, 0.50) !important;
+  border-radius: 100px !important;
+  outline: 1px solid white !important;
+  outline-offset: -1px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+  border: 2px solid white !important;
+  transition: none !important; /* Disable transitions to prevent flickering */
+}
+
+/* Ensure form inside container has correct styling */
+#delights-input-container form {
+  display: flex !important;
+  width: 100% !important;
+  align-items: center !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+/* Style input inside container */
+#delights-input-container input {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: var(--Secondary-button, #F7FFFF) !important;
+  font-size: 12px !important;
+  font-family: Happy Monkey !important;
+  font-weight: 400 !important;
+  text-transform: lowercase !important;
+  line-height: 16px !important;
+  width: 100% !important;
+}
+
+/* Style post button */
+#delights-input-container button[type="submit"] {
+  align-self: stretch !important;
+  padding: 8px 10px !important;
+  background: var(--BGColor, white) !important;
+  border-radius: 50px !important;
+  outline: 1px var(--BGColor, white) solid !important;
+  outline-offset: -1px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 4px !important;
+  display: flex !important;
+  border: none !important;
+  cursor: pointer !important;
+}

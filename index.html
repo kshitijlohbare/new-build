@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <script src="/min-width-fix.js"></script>
-    <script src="/immediate-style-fix.js"></script>
+    <!-- Removed immediate-style-fix.js script that was causing flickering -->
     <link rel="stylesheet" href="/critical-focus-timer-fixes.css">
     <link rel="stylesheet" href="/tribe-section-critical-fix.css">
     <meta charset="UTF-8" />
@@ -46,6 +46,9 @@
   <link rel="stylesheet" href="/src/styles/FocusTimer.css">
 <link rel="stylesheet" href="/src/styles/FocusTimerFix.css">
 <link rel="stylesheet" href="/src/styles/FocusTimerHeaderFix.css">
+<link rel="stylesheet" href="/src/styles/DelightsInputFix.css">
+<link rel="stylesheet" href="/src/styles/PracticeToggleButtonFix.css">
+<link rel="stylesheet" href="/src/styles/FeelsSectionImproved.css">
 </head>
   <body>
     <div id="root"></div>
@@ -54,78 +57,10 @@
     <script src="/performance-optimization.js" defer></script>
     <script type="module" src="/src/utils/tribe-section-debug.js" defer></script>
     
-    <!-- Simple one-time fix script -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // Run once after a short delay to catch React hydration
-        setTimeout(function() {
-          const dailyPractice = document.querySelector('.daily-practice-todo-list');
-          const delightsInput = document.querySelector('#delights-input-container');
-          
-          if (dailyPractice) {
-            dailyPractice.style.padding = '16px';
-            dailyPractice.style.margin = '12px 0';
-            dailyPractice.style.gap = '8px';
-          }
-          
-          if (delightsInput) {
-            delightsInput.style.padding = '10px 20px';
-            delightsInput.style.gap = '4px';
-          }
-        }, 500);
-      });
-    </script>
-    
-    <script>
-      // Global inline fix
-      document.addEventListener('DOMContentLoaded', function() {
-        function applyInlineFixes() {
-          // Target the daily practice list
-          const dailyPracticeList = document.querySelectorAll('.daily-practice-todo-list');
-          dailyPracticeList.forEach(el => {
-            // Apply all critical styles with !important flag
-            el.style.setProperty('padding', '20px 10px', 'important');
-            el.style.setProperty('gap', '10px', 'important');
-            el.style.setProperty('box-sizing', 'border-box', 'important');
-            el.style.setProperty('width', '100%', 'important');
-            el.style.setProperty('background', '#FAF8EC', 'important');
-            el.style.setProperty('border-radius', '20px', 'important');
-            el.style.setProperty('display', 'flex', 'important');
-            el.style.setProperty('flex-direction', 'column', 'important');
-          });
-          
-          // Target the delights input container
-          const delightsContainer = document.getElementById('delights-input-container');
-          if (delightsContainer) {
-            // Apply all critical styles with !important flag
-            delightsContainer.style.setProperty('padding', '0 16px', 'important');
-            delightsContainer.style.setProperty('background-color', '#FFD400', 'important');
-            delightsContainer.style.setProperty('border', '2px solid white', 'important');
-            delightsContainer.style.setProperty('box-sizing', 'border-box', 'important');
-          }
-        }
-        
-        // Run fixes multiple times
-        setTimeout(applyInlineFixes, 500);
-        setTimeout(applyInlineFixes, 1500);
-        setTimeout(applyInlineFixes, 3000);
-        
-        // Run on scroll and resize events
-        window.addEventListener('scroll', applyInlineFixes);
-        window.addEventListener('resize', applyInlineFixes);
-        
-        // Run every second for 30 seconds
-        let fixCount = 0;
-        const intervalId = setInterval(() => {
-          applyInlineFixes();
-          fixCount++;
-          if (fixCount > 30) clearInterval(intervalId);
-        }, 1000);
-        
-        // Store function globally
-        window.applyInlineFixes = applyInlineFixes;
-      });
-    </script>
-    <script src="/force-styles.js"></script>
+    <!-- 
+      Removed inline scripts manipulating delights-input-container to fix flickering issues.
+      Styles are now handled via CSS only through the styled-components in InputBar.tsx
+      and FilterChipBorders.css
+    -->
   </body>
 </html>

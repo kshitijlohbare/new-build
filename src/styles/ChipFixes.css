@@ -88,11 +88,8 @@ button.filter-chip,
   min-height: 36px !important;
   max-height: 36px !important;
   
-  /* Reset browser defaults */
+  /* Reset browser defaults but preserve border for visibility */
   text-transform: none;
-  border-width: 0;
-  border-style: none;
-  border-color: transparent;
 }
 
 .filter-chip div {

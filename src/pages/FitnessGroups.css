@@ -1325,7 +1325,7 @@ header {
   justify-content: center;
   padding: 5px 15px;
   background-color: white;
-  border: 1px solid rgba(20, 139, 175, 0.5);
+  border: 1.5px solid #148BAF !important; /* Increased border width and opacity for visibility */
   border-radius: 20px;
   min-width: 60px;
   height: 36px;
@@ -1335,6 +1335,7 @@ header {
   font-size: 14px;
   color: #148BAF;
   transition: all 0.2s ease;
+  box-shadow: 0 0 3px rgba(20, 139, 175, 0.2) !important; /* Added subtle shadow for depth */
 }
 
 .filter-chip div {
@@ -1343,9 +1344,10 @@ header {
 }
 
 .filter-chip.active {
-  background-color: rgba(20, 139, 175, 0.1);
-  border-color: #148BAF;
-  box-shadow: 0 0 4px rgba(20, 139, 175, 0.3);
+  background-color: rgba(20, 139, 175, 0.15);
+  border-color: #148BAF !important;
+  border-width: 2px !important;
+  box-shadow: 0 0 6px rgba(20, 139, 175, 0.35) !important;
 }
 
 .filter-chip:hover {
