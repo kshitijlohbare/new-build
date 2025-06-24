@@ -1,0 +1,133 @@
+/*
+ * FilterChipsOverflow.css
+ * Ensures filter chips scroll properly horizontally and are fully interactive
+ */
+
+/* Container for filter chips - ensure horizontal scrolling */
+#practices-filter-chips-container {
+  display: flex;
+  flex-direction: row;
+  padding: 0 4px;
+  width: calc(100% + 40px); /* Full width plus margins */
+  margin: 0 -20px;
+  height: 42px; /* Increased height to ensure visibility */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  z-index: 20;
+  gap: 8px;
+  position: relative;
+  padding-bottom: 4px; /* Prevent cutting off shadows */
+  align-items: center; /* Center chips vertically */
+  justify-content: flex-start; /* Start alignment */
+  flex-wrap: nowrap; /* Ensure no wrapping */
+}
+
+/* Hide scrollbar for Chrome/Safari/Opera */
+#practices-filter-chips-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ensure each filter chip has consistent styling and is fully interactive */
+.filter-chip {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 14px; /* Wider padding for better text display */
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  white-space: nowrap;
+  border-radius: 4px;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out; /* Smoother transitions */
+  flex-shrink: 0; /* Prevent shrinking */
+  position: relative; /* For absolute positioning of effects */
+  transform: translateZ(0); /* Force GPU acceleration */
+  will-change: transform, box-shadow; /* Optimization hint */
+}
+
+/* Active filter style */
+.filter-chip-active {
+  background-color: #FCDF4D !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0px 2px 4px rgba(73, 218, 234, 0.4) !important;
+  transform: translateY(-1px);
+}
+
+/* Inactive filter style */
+.filter-chip-inactive {
+  background-color: rgba(83, 252, 255, 0.1) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Filter chip hover states - no borders */
+.filter-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(73, 218, 234, 0.4);
+  background-color: rgba(83, 252, 255, 0.15) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Filter chip active (pressed) state - no borders */
+.filter-chip:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(73, 218, 234, 0.2);
+  border: none !important;
+  outline: none !important;
+}
+
+/* Text styles for filter chips */
+.filter-chip-text {
+  font-family: 'Happy Monkey', cursive;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Text colors for active and inactive states */
+.filter-chip-text-active {
+  color: black !important;
+}
+
+.filter-chip-text-inactive {
+  color: #148BAF !important;
+}
+
+/* Count badges */
+.filter-chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  margin-left: 4px;
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* Badge styles for active and inactive states */
+.filter-chip-count-active {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: black;
+}
+
+.filter-chip-count-inactive {
+  background-color: rgba(20, 139, 175, 0.2);
+  color: #148BAF;
+}

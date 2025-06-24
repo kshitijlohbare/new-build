@@ -1,0 +1,50 @@
+/* Ensure all filter chips are properly clickable and styled - with no borders */
+.filter-chip,
+button.filter-chip,
+#practices-filter-chips-container button,
+#learn-filter-chips-container button,
+#tribe-filter-chips-container button.filter-chip,
+[class*="filter-chip"] {
+  cursor: pointer !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Target all child elements of filter chips to ensure no borders */
+.filter-chip *,
+button.filter-chip *,
+#practices-filter-chips-container button *,
+#learn-filter-chips-container button *,
+#tribe-filter-chips-container button.filter-chip *,
+[class*="filter-chip"] * {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Add subtle visual indication on hover - without borders */
+.filter-chip:hover,
+button.filter-chip:hover,
+[class*="filter-chip"]:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 6px rgba(20, 139, 175, 0.3) !important;
+  background-color: rgba(83, 252, 255, 0.15) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Make text properly visible */
+.filter-chip-text {
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Fix padding issues */
+#practices-filter-chips-container {
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}

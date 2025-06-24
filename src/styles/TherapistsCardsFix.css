@@ -1,0 +1,88 @@
+/* 
+ * TherapistsCardsFix.css
+ * High-specificity overrides to ensure therapist cards have no margin or excess padding
+ * Added June 2025 to remove unwanted margins in therapist cards on homepage
+ */
+
+/* !important in-page fix - force no margin on therapist cards */
+.TherapistCards, .TherapistCards > div, .Card1, .therapist-card {
+  margin: 0 !important;
+}
+
+/* General TherapistCards container reset - highest specificity */
+html body .TherapySection .TherapistCards,
+html body .MobileBookSessionSection .TherapistCards,
+html body .therapist-listing-container .TherapistCards {
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Card items - direct children */
+html body .TherapySection .TherapistCards > div,
+html body .MobileBookSessionSection .TherapistCards > div,
+html body .therapist-listing-container .TherapistCards > div,
+html body .TherapistCards > .Card1 {
+  margin: 0 !important;
+  padding: 6px !important;
+  box-sizing: border-box !important;
+}
+
+/* Internal content spacing */
+html body .TherapySection .TherapistCards > div > div,
+html body .MobileBookSessionSection .TherapistCards > div > div {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  box-sizing: border-box !important;
+}
+
+/* Card1 specific styling - used in MobileBookSessionSection */
+html body .TherapistCards > .Card1,
+html body .Card1 {
+  margin: 0 !important;
+  padding: 6px !important;
+  box-sizing: border-box !important;
+}
+
+/* Mobile-specific fixes */
+@media screen and (max-width: 768px) {
+  html body .TherapistCards,
+  html body .TherapySection .TherapistCards,
+  html body .MobileBookSessionSection .TherapistCards {
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+  
+  html body .TherapistCards > div,
+  html body .TherapySection .TherapistCards > div,
+  html body .MobileBookSessionSection .TherapistCards > div {
+    margin: 0 !important;
+    padding: 4px !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Card internal content */
+  html body .TherapistCards > div > div {
+    padding: 4px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Override any margin or padding on .Banner inside therapist cards */
+html body .TherapistCards .Banner,
+html body .TherapySection .Banner,
+html body .MobileBookSessionSection .Banner {
+  margin: 0 !important;
+  padding: 8px !important;
+  box-sizing: border-box !important;
+}
+
+/* These will target any possible class that might be applied to therapist cards */
+html body [class*="therapist-card"],
+html body [class*="TherapistCard"],
+html body .Card1 {
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}

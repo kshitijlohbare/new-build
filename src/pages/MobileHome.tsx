@@ -4,6 +4,8 @@ import "@/styles/mobileHome.css";
 import "@/styles/mobileHomeBackgroundFix.css"; // Import the background fix CSS
 import "@/styles/ConsistentPadding.css"; // Import updated padding styles
 import "@/styles/ConsistentSpacing.css"; // Import consistent spacing styles
+import "@/styles/MobileTherapistsSection.css"; // Import horizontal scroll for therapist cards
+import "@/styles/TherapistsCardsFix.css"; // Import fixes for therapist card margins
 import MobileWellbeingTipsSection from "../components/wellbeing/MobileWellbeingTipsSection";
 import MobileDailyPractices from "../components/wellbeing/MobileDailyPractices";
 import MobileBookSessionSection from "../components/wellbeing/MobileBookSessionSection";

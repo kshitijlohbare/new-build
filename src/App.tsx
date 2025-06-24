@@ -45,6 +45,7 @@ import TestPage from "./pages/TestPage"; // Import TestPage for debugging
 import LandingPage from "./pages/LandingPage"; // Import the new LandingPage
 import FlashScreen from "./pages/FlashScreen";
 import './App.css';
+import './styles/TherapistsCardsFix.css'; // Import therapist cards margin fix
 import React from "react"; // Make sure React is imported
 
 // Simple Favicon component directly in App.tsx to avoid import errors

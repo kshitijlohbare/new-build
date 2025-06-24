@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./TherapistListing_New.css";
+import "../styles/TherapistsCardsFix.css";
 import Vector from "../components/Vector";
 import BackgroundEmbed from "../components/BackgroundEmbed";
 import { supabase } from "../lib/browser-safe-supabase";

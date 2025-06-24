@@ -11,12 +11,13 @@ import '@/styles/MinHeightFix.css'; // Import specific fix for min-height issue
 import '@/styles/PracticeCardFixes.css';
 import '@/styles/HappyMonkeyFont.css'; // Import Happy Monkey font for title
 import '@/styles/overrideInjectedStyles.css'; // Import overrides for injected styles
+import '@/styles/FilterChipsOverflow.css'; // Import specialized styles for filter chips
 
 // Import icons
 import QuotesIcon from "../assets/icons/quotes.svg";
 
-// Define a type for the active tab state for better type safety
-type ActiveTabType = 'all' | 'meditation' | 'physical' | 'journal' | 'huberman' | 'naval' | 'neuroscience' | 'popular' | 'daily' | 'quick';
+// Define a type for the active tab state that allows any string (for dynamic categories)
+type ActiveTabType = string;
 
 const Practices = () => {
   const { practices, isLoading, addPractice } = usePractices(); // Removed userProgress
@@ -198,7 +199,8 @@ const Practices = () => {
   }, [practices]);
   
   // Add debug output to help diagnose issues
-  console.log(`Found ${practices.length} total practices:`);
+  console.log(`Found ${practices.length} total practices with ${filterCategories.length} filter categories`);
+  console.log(`Current active tab: ${activeTab}`);
   
   // Practice count tracking is currently disabled
   // These were used in previous versions of the UI but are kept for future reference
@@ -238,38 +240,90 @@ const Practices = () => {
   // Filter practices based on active tab and search query
   const filteredPractices = practices
     .filter(practice => {
-      // Filter by tab
+      // Return all practices for the "all" tab
+      if (activeTab === 'all') return true;
+
+      // Common predefined filter categories
       switch (activeTab) {
         case 'meditation':
-          return practice.icon === 'sparkles' || practice.icon === 'meditation' || practice.icon === 'breathing' ||
-                 practice.name.toLowerCase().includes('meditation') || practice.name.toLowerCase().includes('mindfulness') ||
-                 practice.name.toLowerCase().includes('breathe') || practice.name.toLowerCase().includes('breathing');
+          return (
+            practice.icon === 'sparkles' || 
+            practice.icon === 'meditation' || 
+            practice.icon === 'breathing' ||
+            practice.name.toLowerCase().includes('meditation') || 
+            practice.name.toLowerCase().includes('mindfulness') ||
+            practice.name.toLowerCase().includes('breathe') || 
+            practice.name.toLowerCase().includes('breathing') ||
+            (practice.tags && practice.tags.some(tag => 
+              tag.toLowerCase().includes('meditation') || 
+              tag.toLowerCase().includes('mindful') || 
+              tag.toLowerCase().includes('breath')
+            ))
+          );
         case 'physical':
-          return practice.icon === 'shower' || practice.icon === 'yoga' ||
-                 practice.name.toLowerCase().includes('exercise') || practice.name.toLowerCase().includes('stretching') ||
-                 practice.name.toLowerCase().includes('shower') || practice.name.toLowerCase().includes('cold') ||
-                 practice.name.toLowerCase().includes('yoga');
+          return (
+            practice.icon === 'shower' || 
+            practice.icon === 'yoga' ||
+            practice.name.toLowerCase().includes('exercise') || 
+            practice.name.toLowerCase().includes('stretching') ||
+            practice.name.toLowerCase().includes('shower') || 
+            practice.name.toLowerCase().includes('cold') ||
+            practice.name.toLowerCase().includes('yoga') ||
+            (practice.tags && practice.tags.some(tag => 
+              tag.toLowerCase().includes('physical') || 
+              tag.toLowerCase().includes('exercise') || 
+              tag.toLowerCase().includes('yoga') || 
+              tag.toLowerCase().includes('cold')
+            ))
+          );
         case 'journal':
-          return practice.icon === 'moleskine' || practice.icon === 'journal' ||
-                 practice.name.toLowerCase().includes('journal') || practice.name.toLowerCase().includes('write') || 
-                 practice.name.toLowerCase().includes('gratitude');
+          return (
+            practice.icon === 'moleskine' || 
+            practice.icon === 'journal' ||
+            practice.name.toLowerCase().includes('journal') || 
+            practice.name.toLowerCase().includes('write') || 
+            practice.name.toLowerCase().includes('gratitude') ||
+            (practice.tags && practice.tags.some(tag => 
+              tag.toLowerCase().includes('journal') || 
+              tag.toLowerCase().includes('writing') || 
+              tag.toLowerCase().includes('gratitude')
+            ))
+          );
         case 'huberman':
-          return practice.source?.toLowerCase().includes('huberman') || 
-                 practice.source?.toLowerCase().includes('andrew');
+          return (
+            (practice.source?.toLowerCase().includes('huberman') || 
+            practice.source?.toLowerCase().includes('andrew')) ||
+            (practice.tags && practice.tags.some(tag => 
+              tag.toLowerCase().includes('huberman') || 
+              tag.toLowerCase().includes('andrew huberman')
+            ))
+          );
         case 'naval':
-          return practice.source?.toLowerCase().includes('naval') || 
-                 practice.source?.toLowerCase().includes('ravikant');
+          return (
+            (practice.source?.toLowerCase().includes('naval') || 
+            practice.source?.toLowerCase().includes('ravikant')) ||
+            (practice.tags && practice.tags.some(tag => 
+              tag.toLowerCase().includes('naval') || 
+              tag.toLowerCase().includes('ravikant') || 
+              tag.toLowerCase().includes('naval ravikant')
+            ))
+          );
         case 'neuroscience':
-          return practice.source?.toLowerCase().includes('neuroscience') || 
-                 practice.source?.toLowerCase().includes('stress reduction') ||
-                 (practice.tags && practice.tags.some(tag => 
-                   tag.toLowerCase() === 'neuroscience' || 
-                   tag.toLowerCase() === 'stress' || 
-                   tag.toLowerCase() === 'anxiety' || 
-                   tag.toLowerCase() === 'focus'
-                 )) || 
-                 practice.name.toLowerCase().includes('breathing') || 
-                 practice.name.toLowerCase().includes('mindfulness');
+          return (
+            practice.source?.toLowerCase().includes('neuroscience') || 
+            practice.source?.toLowerCase().includes('stress reduction') ||
+            practice.name.toLowerCase().includes('breathing') || 
+            practice.name.toLowerCase().includes('mindfulness') ||
+            practice.name.toLowerCase().includes('neuroscience') || 
+            practice.name.toLowerCase().includes('stress') ||
+            (practice.tags && practice.tags.some(tag => 
+              tag.toLowerCase().includes('neuroscience') || 
+              tag.toLowerCase().includes('stress') || 
+              tag.toLowerCase().includes('anxiety') || 
+              tag.toLowerCase().includes('focus') ||
+              tag.toLowerCase().includes('brain')
+            ))
+          );
         case 'popular':
           // Practices with higher points (indicating popularity)
           return Boolean(practice.points && practice.points >= 5);
@@ -279,10 +333,30 @@ const Practices = () => {
         case 'quick':
           // Practices that take less time
           return practice.duration && practice.duration <= 5;
-        case 'all':
-        default:
-          return true;
       }
+
+      // Dynamic tag-based filtering for any other category
+      const activeCategoryLower = activeTab.toLowerCase();
+      
+      // Check if the active category matches any practice attributes
+      return (
+        // Check source
+        (practice.source && practice.source.toLowerCase().includes(activeCategoryLower)) ||
+        
+        // Check name
+        practice.name.toLowerCase().includes(activeCategoryLower) ||
+        
+        // Check description
+        practice.description.toLowerCase().includes(activeCategoryLower) ||
+        
+        // Check tags 
+        (practice.tags && practice.tags.some(tag => 
+          tag.toLowerCase().includes(activeCategoryLower)
+        )) ||
+        
+        // Check icon (exact match)
+        practice.icon?.toLowerCase() === activeCategoryLower
+      );
     })
     .filter(practice => {
       // Filter by search
@@ -362,7 +436,7 @@ const Practices = () => {
     <div className="min-h-screen flex flex-col p-[20px] bg-transparent relative pointer-events-none" id="practices-page" data-testid="practices-page-container">
       {/* Critical inline style for filter chips */}
       <style dangerouslySetInnerHTML={{ __html: `
-        /* Critical CSS for filter chips */
+        /* Critical CSS for filter chips - no borders */
         #practices-filter-chips-container button,
         .filter-chip {
           height: 36px !important;
@@ -378,6 +452,8 @@ const Practices = () => {
           border-radius: 4px !important;
           white-space: nowrap !important;
           touch-action: manipulation !important;
+          border: none !important;
+          outline: none !important;
         }
         
         .filter-chip div {
@@ -390,6 +466,8 @@ const Practices = () => {
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
+          border: none !important;
+          outline: none !important;
         }
       ` }} />
       
@@ -408,44 +486,36 @@ const Practices = () => {
         </div>
 
         {/* Filter Chips - Horizontal scrolling categories */}
-        <div className="flex flex-row items-start p-0 pl-[4px] pr-[4px] w-screen -mx-[20px] h-[36px] overflow-x-auto scrollbar-hide z-20 gap-2" 
-             id="practices-filter-chips-container" data-testid="filter-chips-container">
+        <div id="practices-filter-chips-container" data-testid="filter-chips-container">
           {filterCategories.map((category) => (
             <button 
               key={category.id}
-              className={`filter-chip box-border flex flex-row justify-center items-center p-[10px] gap-[10px] h-[36px] w-auto ${
+              className={`filter-chip ${
                 activeTab === category.id as ActiveTabType 
-                  ? 'bg-[#FCDF4D] border border-white shadow-[1px_2px_4px_rgba(73,218,234,0.5)]' 
-                  : 'bg-[rgba(83,252,255,0.10)] outline outline-1 outline-[#148BAF] outline-offset-[-1px]'
-              } rounded-[4px] whitespace-nowrap px-4`} 
+                  ? 'filter-chip-active' 
+                  : 'filter-chip-inactive'
+              } rounded-[4px] px-4`} 
               data-testid={`filter-chip-${category.id}`}
-              onClick={() => setActiveTab(category.id as ActiveTabType)}
-              style={{ 
-                height: '36px',
-                minHeight: '36px',
-                maxHeight: '36px',
-                minWidth: 'auto',
-                width: 'auto',
-                boxSizing: 'border-box',
-                padding: '10px',
-                touchAction: 'manipulation',
-                appearance: 'none',
-                WebkitAppearance: 'none',
-                MozAppearance: 'none'
-              }}>
-              <div className={`font-['Happy_Monkey'] font-normal text-[12px] leading-[16px] flex items-center justify-center text-center lowercase ${
-                activeTab === category.id as ActiveTabType ? 'text-black' : 'text-[#148BAF]'
+              data-category={category.id}
+              aria-pressed={activeTab === category.id}
+              onClick={() => setActiveTab(category.id)}>
+              <div className={`filter-chip-text ${
+                activeTab === category.id ? 'filter-chip-text-active' : 'filter-chip-text-inactive'
               }`}>
-                {category.label} {category.count > 0 && category.id !== 'all' ? `(${category.count})` : ''}
+                {category.label}
+                {category.count > 0 && category.id !== 'all' && (
+                  <span className={`filter-chip-count ${
+                    activeTab === category.id
+                      ? 'filter-chip-count-active'
+                      : 'filter-chip-count-inactive'
+                  }`}>
+                    {category.count}
+                  </span>
+                )}
               </div>
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Spline Embed Frame */}
-      <div style={{ width: '100%', height: '320px', maxWidth: 900, margin: '0 auto 24px auto', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 8px rgba(73,218,234,0.08)' }}>
-        <iframe src='https://my.spline.design/zerogravityphysicslandingpage-45017afdfc0f8e2b6973e1063215893a/' frameBorder='0' width='100%' height='100%' style={{ minHeight: 320, border: 'none', borderRadius: 16 }} allowFullScreen></iframe>
       </div>
 
       {/* Practices Grid - Main content showing practice cards */}

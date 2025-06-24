@@ -28,149 +28,123 @@
 .Frame126 {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  justify-content: center;
+  align-items: center;
   padding: 0px;
   gap: 10px;
   width: 100%;
+  margin-bottom: 20px;
+  background: var(--bg-color);
+  overflow: visible; /* Make sure dropdowns can extend outside */
+}
+
+.FindSomeoneWhoHelpsYouUnderstandYourself {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 15px;
+  font-family: 'Happy Monkey', cursive;
+  font-style: normal;
+  font-weight: 400;
+  font-size: clamp(16px, 3vw, 20px);
+  line-height: 1.2;
+  text-align: center;
+  text-transform: lowercase;
+  color: var(--text-color);
 }
 
 .Frame124 {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  padding: 0px;
-  gap: 10px;
+  flex-wrap: nowrap; /* Prevent wrapping */
+  justify-content: flex-start; /* Align to the start */
+  padding: 0px 15px;
+  gap: 25px; /* Increased spacing between filter chips */
   width: 100%;
+  margin-bottom: 15px; /* More space below the filter container */
+  position: relative;
+  z-index: 1001; /* Ensure filters always appear over other content */
+  overflow-x: auto; /* Add horizontal scrolling if needed */
+  scrollbar-width: thin; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+  white-space: nowrap;
+  justify-content: center; /* Center filters when there's room */
+  -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+  scroll-behavior: smooth; /* Smooth scrolling */
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0; /* Remove padding */
 }
 
-.Frame125 {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0px;
-  gap: 10px;
+/* Hide scrollbar for Chrome, Safari and Opera */
+.Frame124::-webkit-scrollbar {
+  height: 4px;
+}
+
+.Frame124::-webkit-scrollbar-thumb {
+  background-color: rgba(20, 139, 175, 0.3);
+  border-radius: 4px;
+}
+
+.Frame124::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .InputBar {
   box-sizing: border-box;
-  cursor: pointer;
   display: flex;
   flex-direction: row;
+  justify-content: center;
   align-items: center;
-  padding: 8px 10px;
-  gap: 10px;
-  height: 32px;
-  background: #EEFFFF;
-  border: 1px solid rgba(4, 196, 213, 0.17);
-  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
-  border-radius: 8px;
-  position: relative; /* Added for popup positioning */
-  transition: all 0.2s ease-in-out;
+  padding: 10px 24px; /* Increased horizontal padding */
+  gap: 15px; /* Increased gap between icon and text inside InputBar */
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  height: 38px; /* Slightly taller for better readability */
+  background: var(--bg-color);
+  margin-bottom: 8px; /* More space below */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0; /* Prevent shrinking */
+  white-space: nowrap; /* Prevent text wrapping */
+  min-width: fit-content; /* Ensure it fits content */
+  margin-right: 8px; /* Extra margin between filter chips */
+}
+
+.InputBar:hover {
+  background: rgba(20, 139, 175, 0.05);
+  box-shadow: 0 2px 4px rgba(73, 218, 234, 0.2);
 }
 
 .InputBar.active {
-  background: #E1FCFF;
-  border-color: rgba(4, 196, 213, 0.3);
+  background: rgba(20, 139, 175, 0.1);
+  box-shadow: 0 2px 4px rgba(73, 218, 234, 0.3);
 }
 
-.InputBar.active-popup {
-  background: #E1FCFF;
-  border-color: rgba(4, 196, 213, 0.3);
-  box-shadow: 0px 0px 0px 3px rgba(4, 196, 213, 0.15);
-}
-
-/* Popup styles */
-.filter-popup {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 8px;
-  background: #FFFFFF;
-  border: 1px solid rgba(4, 196, 213, 0.2);
-  box-shadow: 0px 4px 12px rgba(73, 218, 234, 0.15);
-  border-radius: 8px;
-  width: max-content;
-  min-width: 100%;
-  padding: 8px;
-  z-index: 100;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.price-popup {
-  width: 240px;
-}
-
-/* Filter option */
-.filter-option {
-  padding: 8px 12px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.15s ease;
-}
-
-.filter-option:hover {
-  background-color: rgba(4, 196, 213, 0.1);
-}
-
-.filter-option.selected {
-  background-color: rgba(4, 196, 213, 0.15);
-  font-weight: bold;
-}
-
-/* Price slider styles */
-.price-slider-container {
-  padding: 16px;
-  width: 100%;
-}
-
-.slider-container {
-  position: relative;
-  width: 100%;
-  height: 6px;
-  background-color: #E1E1E1;
-  border-radius: 3px;
-  margin: 24px 0;
-}
-
-.slider-track {
-  position: absolute;
-  height: 100%;
-  background-color: #04C4D5;
-  border-radius: 3px;
-}
-
-.slider-thumb {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  background-color: #FFFFFF;
-  border: 2px solid #04C4D5;
-  border-radius: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.price-display {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  font-family: 'Happy Monkey', cursive;
-  color: #333;
-  font-size: 14px;
-}
-
-.Specialisation,
-.InLocationFilter,
-.Languages {
+.SelectCenter, .Approach, .Specialisation, .Languages, .Price {
   font-family: 'Happy Monkey', cursive;
   font-style: normal;
   font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
-  color: #616161;
+  font-size: 14px; /* Increased font size for better readability */
+  line-height: 18px; /* Increased line height */
+  display: flex;
+  align-items: center;
+  text-align: center;
+  text-transform: lowercase;
+  color: var(--primary);
+  letter-spacing: 0.2px; /* Slight letter spacing for better legibility */
+}
+
+.Frame125 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 10px;
+  width: 100%;
+  flex-grow: 1;
+  overflow: hidden;
 }
 
 .Frame17 {
@@ -183,6 +157,8 @@
   padding: 10px 5px 20px;
   grid-auto-rows: minmax(277px, auto);
   justify-content: center;
+  margin: 0 auto;
+  max-width: 800px; /* Limit width on larger screens for better readability */
 }
 
 /* Change from absolute positioning to grid for responsive layout */
@@ -216,6 +192,14 @@
   }
 }
 
+/* Ensure consistent padding inside therapist card */
+.therapist-card {
+  padding: 8px;
+  box-sizing: border-box;
+  cursor: pointer; /* Show cursor pointer to indicate card is clickable */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effect */
+}
+
 .therapist-card > div {
   margin: 0;
   padding: 4px;
@@ -236,32 +220,81 @@
   height: 24px;
   
   background: #EEFFFF;
-  border-radius: 4px;
+  border-radius: 8px;
   
   /* Inside auto layout */
   flex: none;
-  order: 5;
+  order: 3;
   align-self: stretch;
-  flex-grow: 0;
+  flex-grow: 1;
+  
+  /* Include these properties from the CSS provided */
+  box-sizing: border-box;
 }
 
-.Frame50 {
+[class^="Frame6"], [class*=" Frame6"] {
+  box-sizing: border-box;
+  
+  /* Auto layout */
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 4px 8px;
   gap: 4px;
+  
   width: 100%;
-  height: 24px;
-  background-color: #EEFFFF;
-  border-radius: 4px;
+  height: 26px;
+  
+  background: #148BAF;
+  border: 1px solid #04C4D5;
+  /* drop */
+  box-shadow: 1px 2px 4px rgba(73, 218, 234, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  
+  /* Inside auto layout */
+  flex: none;
+  order: 6;
+  align-self: stretch;
+  flex-grow: 0;
+  transition: all 0.2s ease-in-out;
+}
+
+[class^="Frame6"]:hover, [class*=" Frame6"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 1px 4px 8px rgba(73, 218, 234, 0.6);
+}
+
+.BookNow {
+  width: 100%;
+  height: 18px;
+  
+  /* body */
+  font-family: 'Righteous', cursive;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 18px;
+  /* identical to box height, or 112% */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-transform: uppercase;
+  
+  color: #FFFFFF;
+  
+  /* Inside auto layout */
+  flex: 1;
+  order: 0;
 }
 
 .AndrewSchulz {
   width: 100%;
-  height: 20px;
+  height: 18px;
   
-  /* H4 */
+  /* body */
   font-family: 'Righteous', cursive;
   font-style: normal;
   font-weight: 400;
@@ -291,55 +324,14 @@
   font-size: 12px;
   line-height: 16px;
   /* identical to box height, or 133% */
+  text-transform: lowercase;
   text-align: center;
   
-  color: #000000;
+  color: #148BAF;
   
   /* Inside auto layout */
   flex: none;
   order: 2;
-  align-self: stretch;
-  flex-grow: 0;
-}
-
-.DepressionAnxietyEmotional {
-  width: 100%;
-  
-  /* BODY SMALL */
-  font-family: 'Happy Monkey', cursive;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
-  /* or 133% */
-  text-align: center;
-  
-  color: #000000;
-  
-  /* Inside auto layout */
-  flex: none;
-  order: 3;
-  align-self: stretch;
-  flex-grow: 0;
-}
-
-.EnglishHindiMarathi {
-  width: 100%;
-  
-  /* BODY SMALL */
-  font-family: 'Happy Monkey', cursive;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
-  /* or 133% */
-  text-align: center;
-  
-  color: #000000;
-  
-  /* Inside auto layout */
-  flex: none;
-  order: 4;
   align-self: stretch;
   flex-grow: 0;
 }
@@ -362,84 +354,255 @@
   background-position: center;
 }
 
-/* Price Component */
-.Frame68 {
+.Frame72, .Frame73 {
+  /* Auto layout */
   display: flex;
   flex-direction: row;
-  justify-content: center;
   align-items: center;
   padding: 0px;
-  gap: 10px;
+  gap: 2px;
   
   width: 100%;
-  height: 24px;
+  height: 16px;
   
   /* Inside auto layout */
   flex: none;
-  order: 6;
   align-self: stretch;
-  flex-grow: 0;
-}
-
-.session {
-  width: 100%;
-  height: 18px;
-  
-  font-family: 'Happy Monkey', cursive;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 13px;
-  line-height: 18px;
-  /* identical to box height, or 138% */
-  text-align: center;
-  
-  color: #000000;
-  
-  /* Inside auto layout */
-  flex: none;
-  order: 0;
   flex-grow: 1;
 }
 
-/* Button Styles */
-.Button {
+/* Improved styling for Frame72 (expertise row) */
+.Frame72 {
+  /* Auto layout */
   display: flex;
   flex-direction: row;
-  justify-content: center;
   align-items: center;
-  padding: 8px 12px;
-  gap: 10px;
+  padding: 0px;
+  gap: 2px;
   
-  width: 117px;
-  height: 37px;
+  width: 155px;
+  height: 16px;
   
-  background: linear-gradient(274.42deg, #148BAF 0%, #04C4D5 124.45%);
-  border-radius: 8px;
+  background: rgba(83, 252, 255, 0.1); /* Light teal background color */
+  border-radius: 4px;
+  padding: 4px 2px;
+  order: 4;
   
   /* Inside auto layout */
   flex: none;
-  order: 7;
+  align-self: stretch;
   flex-grow: 0;
+  position: relative; /* Add position for z-index */
+  z-index: 2; /* Higher z-index than text but lower than gradient overlay */
+}
+
+.Frame73 {
+  /* Auto layout */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  gap: 2px;
   
-  /* Button text */
-  font-family: 'Righteous', cursive;
+  width: 155px;
+  height: 16px;
+  order: 5;
+  background: rgba(83, 252, 255, 0.1); /* Light teal background color */
+  border-radius: 4px;
+  padding: 4px 2px;
+  
+  /* Inside auto layout */
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+  position: relative; /* Add position for z-index */
+  z-index: 2; /* Higher z-index than text but lower than gradient overlay */
+}
+
+.Frame72 svg, .Frame73 svg {
+  margin-right: 4px;
+  flex-shrink: 0;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+  position: relative;
+  z-index: 2; /* Ensure icons appear above the text but on the same level as the background */
+  width: auto;
+  min-width: 15px;
+}
+
+.DepressionAnxietyEmotional, .EnglishHindiMarathi, .\39 00Session {
+  font-family: 'Happy Monkey', cursive;
   font-style: normal;
   font-weight: 400;
-  font-size: 16px;
-  line-height: 20px;
-  text-align: center;
-  color: #FFFFFF;
-  border: none;
+  font-size: 12px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  text-transform: lowercase;
+  color: #000000;
+}
+
+.DepressionAnxietyEmotional {
+  width: calc(100% - 20px); /* Account for the icon width and spacing */
+  height: 16px;
+  
+  /* BODY SMALL */
+  font-family: 'Happy Monkey';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  /* identical to box height, or 133% */
+  display: flex;
+  align-items: center;
+  text-transform: lowercase;
+  
+  color: #000000;
+  
+  flex-grow: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  
+  /* Ticker effect on overflow */
+  position: relative;
+  z-index: 1; /* Lower z-index than the background */
+  
+  /* Inside auto layout */
+  flex: 1;
+  order: 1;
+}
+
+/* Ticker animation for DepressionAnxietyEmotional when text overflows */
+.DepressionAnxietyEmotional.ticker {
+  animation: ticker-scroll 8s linear infinite;
+  animation-play-state: paused;
   cursor: pointer;
-  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1; /* Keep text below the background */
 }
 
-.Button:hover {
-  background: linear-gradient(274.42deg, #04C4D5 0%, #148BAF 124.45%);
-  box-shadow: 0px 2px 8px rgba(4, 196, 213, 0.25);
+.DepressionAnxietyEmotional.ticker:hover {
+  animation-play-state: running;
+}
+
+.DepressionAnxietyEmotional.ticker::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 15px;
+  background: linear-gradient(to right, transparent, rgba(83, 252, 255, 0.3)); /* Slightly stronger gradient for better visibility */
+  pointer-events: none;
+  z-index: 3; /* Higher z-index than the background */
+}
+
+.EnglishHindiMarathi {
+  width: calc(100% - 20px); /* Account for the icon width and spacing */
+  height: 16px;
+  
+  /* BODY SMALL */
+  font-family: 'Happy Monkey';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  /* identical to box height, or 133% */
+  display: flex;
+  align-items: center;
+  text-transform: lowercase;
+  
+  color: #000000;
+  overflow: hidden;
+  white-space: nowrap;
+  
+  /* Ticker effect on overflow */
+  position: relative;
+  z-index: 1; /* Lower z-index than the background */
+  
+  /* Inside auto layout */
+  flex: 1;
+  order: 1;
+}
+
+/* Ticker animation for EnglishHindiMarathi when text overflows */
+.EnglishHindiMarathi.ticker {
+  animation: ticker-scroll 8s linear infinite;
+  animation-play-state: paused;
+  cursor: pointer;
+  position: relative;
+  z-index: 1; /* Keep text below the background */
+}
+
+.EnglishHindiMarathi.ticker:hover {
+  animation-play-state: running;
+}
+
+.EnglishHindiMarathi.ticker::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 15px;
+  background: linear-gradient(to right, transparent, rgba(83, 252, 255, 0.3)); /* Slightly stronger gradient for better visibility */
+  pointer-events: none;
+  z-index: 3; /* Higher z-index than the background */
+  pointer-events: none;
+}
+
+.\39 00Session {
+  width: calc(100% - 30px); /* Account for the Vector icons */
+  height: 16px;
+  text-align: center;
+  
+  /* Inside auto layout */
+  flex: 1;
+  order: 2;
+}
+
+.Vector {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  margin-right: 8px;
+  width: auto;
+  min-width: 30px;
+}
+
+/* Add the ticker animation keyframes */
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(0);
+  }
+  85% {
+    transform: translateX(calc(-100% + 50%));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Media queries for responsiveness */
+/* Add a hover effect for therapist cards */
+.therapist-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 2px 5px 10px rgba(73, 218, 234, 0.6);
+  background-color: rgba(83, 252, 255, 0.05); /* Subtle background highlight */
+}
+
+/* Add active state for when the card is being clicked */
+.therapist-card:active {
   transform: translateY(-2px);
+  box-shadow: 1px 3px 6px rgba(73, 218, 234, 0.4);
 }
 
+/* Ensure the Vector icons have good spacing and alignment */
 .Vector {
   display: flex;
   align-items: center;
@@ -497,18 +660,7 @@
   .Frame17 {
     grid-template-columns: repeat(2, 1fr); /* Maintaining 2-column layout on small screens */
     grid-gap: 10px;
-  }
-  
-  .Frame124 {
-    justify-content: space-between;
-  }
-  
-  .InputBar {
-    flex: 1;
-    min-width: 80px;
-    padding: 6px 8px;
-    font-size: 11px;
-    margin-bottom: 8px;
+    padding: 5px;
   }
   
   .therapist-card {
@@ -520,84 +672,531 @@
     min-height: 70px;
   }
   
+  .Frame124 {
+    justify-content: space-between;
+  }
+  
+  .InputBar {
+    padding: 8px;
+    font-size: 11px;
+    max-width: 45%;
+    margin-bottom: 8px;
+  }
+  
   .AndrewSchulz {
     font-size: 14px;
   }
   
-  .YearsOfExpereince, .DepressionAnxietyEmotional, .EnglishHindiMarathi {
-    font-size: 10px;
-  }
-  
-  .price-popup {
-    width: 200px;
-  }
-  
-  .filter-option {
-    padding: 6px 8px;
+  .YearsOfExpereince {
     font-size: 11px;
+  }
+  
+  .therapist-background-embed {
+    opacity: 0.15; /* Even lower opacity on mobile for better readability */
+  }
+  
+  .DepressionAnxietyEmotional, .EnglishHindiMarathi {
+    width: 90px;
+  }
+  
+  @keyframes ticker-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    15% {
+      transform: translateX(0);
+    }
+    85% {
+      transform: translateX(calc(-100% + 80px));
+    }
+    100% {
+      transform: translateX(0);
+    }
   }
 }
 
-/* Loading and Error Styles */
-.loader-container, .error-container {
+/* Loading and error states */
+.loading-container,
+.error-container,
+.no-therapists-message {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding: 40px 0;
-  gap: 16px;
+  padding: 60px 20px;
+  text-align: center;
+  font-family: 'Happy Monkey', cursive;
+  color: var(--primary);
+  min-height: 300px;
 }
 
-.loader-spinner {
-  animation: rotate 1.2s linear infinite;
+/* Stylish Loader Animation */
+.loader {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+}
+
+.loader-circle {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: rgba(20, 139, 175, 0.1);
+  box-shadow: inset 0 0 0 2px rgba(20, 139, 175, 0.1);
+}
+
+.loader-line-mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  height: 80px;
+  overflow: hidden;
+  transform-origin: 40px 40px;
+  mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+  animation: rotate 1.5s infinite ease;
+}
+
+.loader-line {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 3px var(--primary);
+}
+
+.loader-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  margin-left: -20px;
+  margin-top: -20px;
+  animation: pulse 1.5s infinite ease-in-out alternate;
 }
 
 .loader-text {
-  color: var(--text-color);
   font-family: 'Happy Monkey', cursive;
-  font-size: 1rem;
+  font-size: 16px;
+  color: var(--primary);
+  margin-top: 10px;
+  animation: fadeInOut 1.5s infinite ease-in-out alternate;
+  text-transform: lowercase;
 }
 
 @keyframes rotate {
-  from {
+  0% {
     transform: rotate(0deg);
   }
-  to {
+  100% {
     transform: rotate(360deg);
   }
 }
 
-.error-message {
+@keyframes pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.error-container {
   color: #ff4d4d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.error-icon {
+  margin-bottom: 15px;
+  animation: shake 0.5s ease-in-out;
+}
+
+.error-message {
   font-family: 'Happy Monkey', cursive;
-  font-size: 0.9rem;
+  font-size: 16px;
+  margin-bottom: 20px;
   text-align: center;
-  margin: 10px 0;
+  max-width: 300px;
+}
+
+.retry-button {
+  font-family: 'Righteous', cursive;
+  font-size: 14px;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(73, 218, 234, 0.6);
 }
 
 .button-group {
   display: flex;
   gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
 }
 
 .retry-button, .update-schema-button {
-  background: linear-gradient(90deg, #148BAF 0%, #04C4D5 100%);
-  color: white;
-  font-family: 'Righteous', cursive;
+  font-family: 'Happy Monkey', cursive;
+  padding: 10px 15px;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease-in-out;
+}
+
+.retry-button {
+  background-color: #148BAF;
+  color: white;
+}
+
+.retry-button:hover {
+  background-color: #0F7A9D;
+}
+
+.update-schema-button {
+  background-color: #FF8C00;
+  color: white;
+}
+
+.update-schema-button:hover {
+  background-color: #E67E00;
+}
+
+/* Existing styles */
+.no-therapists-message {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.no-results-icon {
+  margin-bottom: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.no-results-text {
+  font-family: 'Happy Monkey', cursive;
+  font-size: 16px;
+  color: var(--primary);
+  margin-bottom: 20px;
+  text-align: center;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.reset-filters-button {
+  font-family: 'Happy Monkey', cursive;
+  font-size: 14px;
+  text-transform: lowercase;
+  padding: 8px 24px;
+  background-color: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reset-filters-button:hover {
+  background-color: rgba(20, 139, 175, 0.1);
+  transform: translateY(-2px);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Ticker effect transitions and responsive behavior */
+.DepressionAnxietyEmotional, .EnglishHindiMarathi {
+  transition: background-color 0.3s ease;
+}
+
+.DepressionAnxietyEmotional.ticker:hover, .EnglishHindiMarathi.ticker:hover {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Add subtle visual indicators for overflow text */
+.DepressionAnxietyEmotional.ticker, .EnglishHindiMarathi.ticker {
+  padding-right: 16px; /* Make space for the gradient fade */
+}
+
+.DepressionAnxietyEmotional.ticker:hover::before, .EnglishHindiMarathi.ticker:hover::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 15px;
+  background: linear-gradient(to left, transparent, rgba(238, 255, 255, 0.7));
+  pointer-events: none;
+  animation: fade-in 0.3s ease-in;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Filter Popup Styles */
+.InputBar {
+  position: relative;
+}
+
+.filter-popup {
+  position: absolute;
+  top: calc(100% + 8px); /* Increased spacing from the chip */
+  left: 0; /* Align to the left edge of each filter chip */
+  transform: none; /* Remove X translation */
+  z-index: 1000; /* Higher z-index to ensure it appears over cards */
+  width: 220px; /* Slightly wider for better readability */
+  max-height: 250px; /* Slightly taller to show more options */
+  overflow-y: auto;
+  background-color: #fff;
+  border-radius: 12px; /* More rounded corners */
+  box-shadow: 0 8px 20px rgba(73, 218, 234, 0.4); /* Enhanced shadow for better depth */
+  margin-top: 8px;
+  padding: 10px 0; /* More vertical padding */
+  display: flex;
+  flex-direction: column;
+  animation: popupFadeIn 0.3s ease-out forwards;
+  border: 1px solid rgba(73, 218, 234, 0.2); /* Subtle border */
+}
+
+.filter-option {
+  padding: 10px 18px; /* Increased padding for better touch targets */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Happy Monkey', cursive;
+  font-size: 14px;
+  color: #333;
+  text-transform: lowercase;
+  text-align: left; /* Align text to the left */
+  white-space: nowrap; /* Keep options on one line */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
+  margin-bottom: 2px; /* Small spacing between options */
+}
+
+.filter-option:hover {
+  background-color: rgba(73, 218, 234, 0.1);
+}
+
+.filter-option.selected {
+  background-color: rgba(20, 139, 175, 0.15);
+  color: #148BAF;
+  font-weight: 600; /* Bolder text */
+  position: relative;
+  padding-left: 24px; /* Make space for checkmark */
+}
+
+.filter-option.selected::before {
+  content: "✓";
+  position: absolute;
+  left: 8px;
+  color: #148BAF;
+  font-weight: bold;
+}
+
+.price-popup {
+  position: absolute;
+  top: calc(100% + 8px); /* Increased spacing from the chip */
+  right: 0; /* Align to the right edge */
+  z-index: 1000; /* Higher z-index to ensure it appears over cards */
+  width: 220px; /* Slightly wider for better readability */
+  max-height: 250px; /* Slightly taller to show more options */
+  overflow-y: auto;
+  background-color: #fff;
+  border-radius: 12px; /* More rounded corners */
+  box-shadow: 0 8px 20px rgba(73, 218, 234, 0.4); /* Enhanced shadow for better depth */
+  margin-top: 8px;
+  padding: 16px; /* More padding for price popup content */
+  display: flex;
+  flex-direction: column;
+  animation: popupFadeIn 0.3s ease-out forwards;
+  border: 1px solid rgba(73, 218, 234, 0.2); /* Subtle border */
+}
+
+.price-range {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 5px 0;
+}
+
+.price-range input[type="range"] {
+  margin: 8px 0;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 5px;
+  background: #e1e1e1;
+  outline: none;
+}
+
+.price-range input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(20, 139, 175, 0.3);
   transition: all 0.2s;
 }
 
-.retry-button:hover, .update-schema-button:hover {
-  background: linear-gradient(90deg, #04C4D5 0%, #148BAF 100%);
-  transform: translateY(-1px);
+.price-range input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
 }
 
-/* Override any injected styles */
+.price-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-family: 'Happy Monkey', cursive;
+  font-size: 12px;
+  color: var(--primary);
+}
+
+/* Responsive adjustments for popups */
+@media screen and (max-width: 768px) {
+  .filter-popup {
+    width: 180px;
+  }
+  
+  .price-popup {
+    width: 220px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .filter-popup {
+    width: 160px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .price-popup {
+    width: 200px;
+  }
+}
+
+/* Keyframes for filter popup animation */
+@keyframes popupFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Animation for filter chip movement */
+@keyframes filterChipClick {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95) translateY(2px);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.InputBar.active-popup {
+  animation: filterChipClick 0.3s ease-out forwards;
+  background-color: rgba(20, 139, 175, 0.15); /* Slightly darker when popup is active */
+  box-shadow: 0 3px 8px rgba(73, 218, 234, 0.35);
+  z-index: 1002; /* Ensure active popup is above other elements */
+  position: relative; /* Ensure z-index works */
+}
+
+/* Enhanced animation for popup appearance */
+@keyframes popupFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Booking in progress styling */
+.Frame6.booking-in-progress {
+  background-color: rgba(6, 196, 213, 0.7);
+  box-shadow: 0 4px 8px rgba(73, 218, 234, 0.5);
+  transform: scale(0.98);
+  transition: all 0.3s ease;
+}
+
+.booking-spinner {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+/* Remove unnecessary margin/padding from all direct children of major containers */
+.Main > *,
+.Frame124 > *,
+.Frame125 > *,
 .Frame17 > *,
 .therapist-card > * {
   margin: 0 !important;
@@ -656,51 +1255,4 @@
     font-size: 24px;
     margin: 15px 0;
   }
-}
-
-/* Custom styles for therapist card with booking progress */
-.therapist-card-languages-label {
-  font-family: 'Happy Monkey', cursive;
-  color: #777;
-  font-size: 0.85rem;
-  margin-bottom: 2px;
-}
-
-.therapist-card-languages-value {
-  font-family: 'Happy Monkey', cursive;
-  color: #333;
-  font-size: 0.97rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 120px;
-}
-
-.therapist-card-footer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.therapist-card-booknow {
-  background: linear-gradient(90deg, #148BAF 0%, #04C4D5 100%);
-  color: #fff;
-  font-family: 'Righteous', cursive;
-  font-size: 1rem;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 22px;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(20,139,175,0.08);
-  transition: background 0.2s, box-shadow 0.2s;
-}
-
-.therapist-card-booknow:hover {
-  background: linear-gradient(90deg, #04C4D5 0%, #148BAF 100%);
-  box-shadow: 0 4px 16px rgba(20,139,175,0.13);
-}
-
-.therapist-card-booking-progress {
-  margin-left: 10px;
 }

@@ -1,0 +1,28 @@
+/* 
+ * Final overrides for therapist cards margin removal
+ * This file is designed to be loaded LAST and ensure no margins on therapist cards
+ */
+
+.TherapistCards {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.TherapistCards > div,
+.TherapistCards > .Card1,
+.TherapistCards > [class*="therapist-card"] {
+  margin: 0 !important;
+}
+
+.TherapySection {
+  margin-bottom: 0 !important;
+}
+
+/* Target mobile view specifically */
+@media (max-width: 768px) {
+  .TherapistCards > div,
+  .Card1 {
+    margin: 0 !important;
+    padding: 4px !important;
+  }
+}

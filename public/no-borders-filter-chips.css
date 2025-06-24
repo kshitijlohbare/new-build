@@ -1,0 +1,97 @@
+/* 
+   Remove all borders from filter chips
+   This is a high-priority override to ensure no borders appear in filter chips
+   Enhanced version with maximum specificity to override all borders within elements
+*/
+
+/* Target all filter chips with maximum specificity */
+html body .filter-chip,
+html body button.filter-chip,
+html body [class*="filter-chip"],
+html body #practices-filter-chips-container button,
+html body #learn-filter-chips-container button,
+html body #tribe-filter-chips-container button,
+html body div[id*="filter-chips-container"] button,
+html body div[id*="filter-chips-container"] .filter-chip,
+html body div[id*="filter-chips-container"] button.filter-chip {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Target all child elements within filter chips to remove any borders */
+html body .filter-chip *,
+html body button.filter-chip *,
+html body [class*="filter-chip"] *,
+html body #practices-filter-chips-container button *,
+html body #learn-filter-chips-container button *,
+html body #tribe-filter-chips-container button *,
+html body div[id*="filter-chips-container"] button *,
+html body div[id*="filter-chips-container"] .filter-chip *,
+html body div[id*="filter-chips-container"] button.filter-chip * {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Active state styling */
+html body .filter-chip-active,
+html body button.filter-chip-active,
+html body [class*="filter-chip-active"],
+html body #practices-filter-chips-container button[class*="active"],
+html body #learn-filter-chips-container button[class*="active"],
+html body #tribe-filter-chips-container button[class*="active"] {
+  background-color: #FCDF4D !important;
+  box-shadow: 0 2px 6px rgba(73, 218, 234, 0.4) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Inactive filter styles */
+html body .filter-chip-inactive,
+html body button.filter-chip-inactive,
+html body [class*="filter-chip-inactive"] {
+  background-color: rgba(83, 252, 255, 0.1) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Filter chip hover states */
+html body .filter-chip:hover,
+html body button.filter-chip:hover,
+html body [class*="filter-chip"]:hover,
+html body #practices-filter-chips-container button:hover,
+html body #learn-filter-chips-container button:hover {
+  background-color: rgba(83, 252, 255, 0.2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(20, 139, 175, 0.3) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Filter chip pressed states */
+html body .filter-chip:active,
+html body button.filter-chip:active,
+html body [class*="filter-chip"]:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 3px rgba(20, 139, 175, 0.2) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Target filter chip text elements specifically */
+html body .filter-chip-text,
+html body .filter-chip-text-active,
+html body .filter-chip-text-inactive,
+html body .filter-chip-count,
+html body .filter-chip-count-active,
+html body .filter-chip-count-inactive {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Override any inline style border attributes */
+html body [id*="filter-chips-container"] button[style*="border"],
+html body .filter-chip[style*="border"],
+html body button.filter-chip[style*="border"] {
+  border: none !important;
+  outline: none !important;
+}

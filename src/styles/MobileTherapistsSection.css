@@ -1,0 +1,113 @@
+/* 
+ * MobileTherapistsSection.css
+ * Provides horizontal scrolling for TherapistCards on mobile devices
+ * Ensures cards maintain proper dimensions and spacing
+ */
+
+/* Active scroll styles */
+.active-scroll {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* ScrollBehavior for mobile */
+.TherapistCards.scrolling {
+  scroll-behavior: auto;
+}
+
+@media screen and (max-width: 768px) {
+  .TherapySection {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+  }
+
+  .TherapistCards {
+    display: flex;
+    flex-wrap: nowrap !important; /* Override any flex-wrap */
+    overflow-x: auto !important; /* Enable horizontal scrolling */
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 !important; /* Ensure no margin */
+    gap: 0 !important; /* Remove any gap between cards */
+    justify-content: flex-start !important; /* Start alignment for scroll */
+    scrollbar-width: none; /* Hide scrollbar in Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar in IE/Edge */
+  }
+
+  /* Hide scrollbar in WebKit browsers */
+  .TherapistCards::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Ensure each card has a fixed width for horizontal scroll */
+  .TherapistCards > div {
+    flex: 0 0 auto !important; 
+    min-width: 220px !important;
+    max-width: 260px !important;
+    margin: 0 !important;
+    padding: 4px !important;
+    box-sizing: border-box;
+    scroll-snap-align: start; /* Improves scrolling experience */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  /* Add hover effect for cards */
+  .TherapistCards > div:hover,
+  .TherapistCards > div:focus {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Visual indicators for scrollable content */
+  .TherapySection::after,
+  .TherapySection::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 24px;
+    height: 100%;
+    pointer-events: none; /* Allow clicks to pass through */
+    z-index: 1;
+    display: block;
+  }
+  
+  /* Gradient on the right indicating more content */
+  .TherapySection::after {
+    right: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 100%);
+  }
+  
+  /* Gradient on the left when scrolled */
+  .TherapySection::before {
+    left: 0;
+    background: linear-gradient(270deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  /* Show left gradient when scrolled */
+  .TherapySection.scrolled::before {
+    opacity: 1;
+  }
+  
+  /* Add scroll hint animation */
+  @keyframes scrollHint {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    50% { transform: translateX(0); }
+    75% { transform: translateX(8px); }
+    100% { transform: translateX(0); }
+  }
+  
+  .TherapistCards:not(.scrolled) {
+    animation: scrollHint 2s ease-in-out 1s 2;
+  }
+}

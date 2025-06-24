@@ -1,0 +1,52 @@
+/* 
+   FINAL OVERRIDE for filter chip borders
+   This is the absolute highest-priority override that will remove all borders
+   from any elements inside filter chips
+*/
+
+html body .filter-chip,
+html body button.filter-chip,
+html body [class*="filter-chip"],
+html body #practices-filter-chips-container button,
+html body #learn-filter-chips-container button,
+html body #tribe-filter-chips-container button,
+html body div[id*="filter-chips-container"] button,
+html body div[id*="filter-chips-container"] .filter-chip,
+html body div[id*="filter-chips-container"] button.filter-chip,
+html body #practices-filter-chips-container button:not([class]),
+html body #learn-filter-chips-container button:not([class]),
+html body #tribe-filter-chips-container button:not([class]) {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Target every possible child element */
+html body .filter-chip *,
+html body button.filter-chip *,
+html body [class*="filter-chip"] *,
+html body #practices-filter-chips-container button *,
+html body #learn-filter-chips-container button *,
+html body #tribe-filter-chips-container button *,
+html body div[id*="filter-chips-container"] button *,
+html body div[id*="filter-chips-container"] .filter-chip *,
+html body div[id*="filter-chips-container"] button.filter-chip * {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Target filter chip text elements specifically with high specificity */
+html body .filter-chip-text,
+html body .filter-chip-text-active,
+html body .filter-chip-text-inactive,
+html body .filter-chip-count,
+html body .filter-chip-count-active,
+html body .filter-chip-count-inactive,
+html body .filter-chip div,
+html body button.filter-chip div,
+html body [class*="filter-chip"] div,
+html body #practices-filter-chips-container button div,
+html body #learn-filter-chips-container button div,
+html body #tribe-filter-chips-container button div {
+  border: none !important;
+  outline: none !important;
+}

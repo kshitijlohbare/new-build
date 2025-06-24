@@ -1,0 +1,84 @@
+/**
+ * therapist-cards-fix.css
+ * Critical CSS for fixing therapist card margins on the homepage
+ * Loaded as early as possible to prevent layout shifts
+ */
+
+/* Ultra-high specificity selectors to override any other styles */
+html body [class*="TherapistCard"],
+html body [class*="therapist-card"],
+html body .TherapistCards > div,
+html body .TherapySection .TherapistCards > div,
+html body .Card1,
+html body div[data-testid*="therapist-card"] {
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Container reset */
+html body .TherapistCards,
+html body .TherapySection .TherapistCards {
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Mobile specific overrides */
+@media (max-width: 768px) {
+  html body .TherapistCards {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    gap: 0 !important;
+    justify-content: flex-start !important;
+  }
+
+  html body .TherapistCards > div {
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    padding: 4px !important;
+    min-width: 220px !important;
+    max-width: 260px !important;
+  }
+  
+  /* Card internal content */
+  html body .TherapistCards > div > div {
+    padding: 4px !important;
+  }
+}
+
+/* Override specific desktop styling */
+@media (min-width: 769px) {
+  html body .TherapistCards {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  html body .TherapistCards > div {
+    margin: 0 !important;
+    padding: 8px !important;
+    min-width: 260px !important;
+    max-width: 340px !important;
+    flex: 0 0 auto !important;
+  }
+}
+
+/* Target content inside each card */
+html body .TherapistCards > div > * {
+  box-sizing: border-box !important;
+}
+
+/* Fix Banner inside therapist cards */
+html body .Banner,
+html body .TherapistCards .Banner {
+  margin: 0 !important;
+  padding: 8px !important;
+  box-sizing: border-box !important;
+}

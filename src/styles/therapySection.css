@@ -4,9 +4,11 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  gap: 20px;
+  gap: 12px; /* Reduced gap */
   display: inline-flex;
   width: 100%;
+  padding: 0;
+  margin: 0;
 }
 .Title {
   align-self: stretch;
@@ -26,12 +28,28 @@
   line-height: 18px;
   word-wrap: break-word;
 }
+
+.BookYourSession .ScrollHint {
+  display: none;
+  font-size: 12px;
+  font-family: Happy Monkey, sans-serif;
+  font-weight: 400;
+  opacity: 0.7;
+  margin-left: 8px;
+}
+
+@media screen and (max-width: 768px) {
+  .BookYourSession .ScrollHint {
+    display: inline-block;
+  }
+}
 .TherapistCards {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 16px;
-  padding-bottom: 8px;
+  gap: 0; /* Remove gap */
+  padding: 0;
+  margin: 0;
   width: 100%;
   overflow-x: visible;
   justify-content: center;
@@ -41,16 +59,24 @@
   max-width: 340px;
   flex: 1 1 260px;
   box-sizing: border-box;
+  margin: 0;
+  padding: 8px;
 }
-/* Ensure each card has a min/max width for horizontal scroll */
-.TherapistCards > div {
-  min-width: 260px;
-  max-width: 340px;
-  flex: 0 0 auto;
+/* Desktop styling for therapist cards */
+@media screen and (min-width: 769px) {
+  .TherapistCards > div,
+  .TherapistCards > .Card1,
+  .TherapistCards > [class*="therapist-card"] {
+    min-width: 260px;
+    max-width: 340px;
+    flex: 0 0 auto;
+    margin: 0 !important;
+    padding: 8px !important;
+  }
 }
 .Banner {
   align-self: stretch;
-  padding: 10px;
+  padding: 8px;
   /* Gradient background removed for UI consistency */
   box-shadow: 1px 2px 4px rgba(73, 217, 234, 0.5);
   border-radius: 10px;
@@ -61,8 +87,9 @@
   min-width: 300px;
   max-width: 500px;
   flex: 1 1 0;
-  gap: 10px;
+  gap: 8px;
   min-height: 180px; /* Match card min-height if set, or adjust as needed */
+  margin: 0;
 }
 .GetYourTherapySessionWithOurBestOfTheTherapist {
   width: 172px;
