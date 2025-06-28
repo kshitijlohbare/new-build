@@ -1,0 +1,150 @@
+/**
+ * PracticeCardSystem.css
+ * Consolidated styling for practice cards
+ * Uses design tokens for consistent appearance
+ */
+
+/* ---------- Core Card Structure ---------- */
+.practice-card {
+  background-color: var(--colors-background-subtle, rgba(237, 254, 255, 0.8));
+  box-shadow: var(--shadows-DEFAULT);
+  transition: transform var(--animation-durations-normal) var(--animation-easings-easeOut),
+              box-shadow var(--animation-durations-normal) var(--animation-easings-easeOut);
+  position: relative;
+  overflow: hidden;
+  min-height: 220px;
+  height: 220px;
+  width: 100%;
+}
+
+/* Daily variation */
+.practice-card-daily {
+  background-color: var(--colors-background-highlight, rgba(250, 248, 236, 0.8));
+}
+
+/* Hover state */
+.practice-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadows-md);
+}
+
+/* Focus state */
+.practice-card:focus {
+  outline: 2px solid var(--colors-primary-light);
+  outline-offset: 2px;
+}
+
+.practice-card:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ---------- Card Title ---------- */
+.practice-card-title {
+  font-family: var(--typography-fontFamily-secondary, "Righteous", cursive);
+  font-weight: var(--typography-fontWeight-normal, 400);
+  font-size: var(--typography-fontSize-base, 16px);
+  line-height: 18px;
+}
+
+.practice-card-title-regular {
+  color: var(--colors-primary-main, #148BAF);
+}
+
+.practice-card-title-daily {
+  color: var(--colors-secondary-main, #FCDF4D);
+}
+
+/* ---------- Card Description ---------- */
+.practice-card-description {
+  font-family: var(--typography-fontFamily-primary, "Happy Monkey", sans-serif);
+  font-weight: var(--typography-fontWeight-normal, 400);
+  font-size: var(--typography-fontSize-xs, 12px);
+  line-height: 16px;
+  color: var(--colors-text-primary, #111111);
+}
+
+/* ---------- Card Source ---------- */
+.practice-card-source {
+  background-color: var(--colors-neutral-white, #FFFFFF);
+  box-shadow: var(--shadows-sm);
+}
+
+.practice-card-source-text {
+  font-family: var(--typography-fontFamily-primary, "Happy Monkey", sans-serif);
+  font-weight: var(--typography-fontWeight-normal, 400);
+  font-size: var(--typography-fontSize-xs, 12px);
+  line-height: 16px;
+  color: var(--colors-primary-main, #148BAF);
+  text-align: center;
+  flex-grow: 1;
+}
+
+/* ---------- Card Action Button ---------- */
+.practice-card-action {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--borderRadius-lg, 8px);
+  transition: all var(--animation-durations-fast) var(--animation-easings-easeInOut);
+  font-family: var(--typography-fontFamily-secondary, "Righteous", cursive);
+  font-weight: var(--typography-fontWeight-normal, 400);
+  font-size: var(--typography-fontSize-base, 16px);
+  line-height: 18px;
+}
+
+.practice-card-action-regular {
+  background-color: var(--colors-neutral-white, #FFFFFF);
+  border: 1px solid var(--colors-primary-light, #04C4D5);
+  color: var(--colors-primary-main, #148BAF);
+  box-shadow: var(--shadows-sm);
+}
+
+.practice-card-action-daily {
+  background-color: var(--colors-secondary-light, #FFE066);
+  border: 1px solid var(--colors-secondary-light, #FFE066);
+  color: var(--colors-neutral-white, #FFFFFF);
+}
+
+.practice-card-action:hover {
+  transform: translateY(-1px);
+}
+
+.practice-card-action:active {
+  transform: translateY(1px);
+}
+
+/* ---------- Grid Layout ---------- */
+#practices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--spacing-2, 0.5rem);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-4, 1rem);
+}
+
+/* Responsive grid */
+@media (min-width: 640px) {
+  #practices-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--spacing-4, 1rem);
+  }
+}
+
+@media (min-width: 768px) {
+  #practices-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+/* ---------- Accessibility Improvements ---------- */
+.practice-card[role="button"] {
+  cursor: pointer;
+}
+
+.practice-card:focus-visible {
+  outline: 2px solid var(--colors-primary-light);
+  outline-offset: 2px;
+}

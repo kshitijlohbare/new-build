@@ -1,0 +1,150 @@
+/*
+ * TherapistCardsSystem.css
+ * A consolidated, systematic approach to therapist card styling
+ * Replaces multiple overlapping CSS files with a single source of styling truth
+ */
+
+/* ---------- Core Therapist Card Styles ---------- */
+.therapist-card,
+.Card1,
+.TherapistCards > div,
+.TherapistCards [class*="therapist-card"],
+.TherapistCards [class*="Card"] {
+  /* Sizing */
+  width: 100%;
+  height: auto;
+  
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  
+  /* Spacing */
+  margin: 0;
+  padding: 8px;
+  gap: 8px;
+  
+  /* Appearance */
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+/* ---------- Container Styles ---------- */
+.TherapistCards,
+.TherapySection .TherapistCards,
+[class*="therapist-cards-container"] {
+  /* Layout */
+  display: flex;
+  flex-direction: row;
+  
+  /* Spacing */
+  margin: 0;
+  padding: 0;
+  gap: 0;
+  
+  /* Mobile Styles */
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Hide scrollbar for Chrome/Safari/Opera */
+.TherapistCards::-webkit-scrollbar,
+.TherapySection .TherapistCards::-webkit-scrollbar,
+[class*="therapist-cards-container"]::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- Desktop vs Mobile Layout ---------- */
+/* Desktop: Grid layout with wrapping */
+@media (min-width: 769px) {
+  .TherapistCards,
+  .TherapySection .TherapistCards,
+  [class*="therapist-cards-container"] {
+    flex-wrap: wrap;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    overflow-x: visible;
+  }
+  
+  .therapist-card,
+  .Card1,
+  .TherapistCards > div,
+  .TherapistCards [class*="therapist-card"],
+  .TherapistCards [class*="Card"] {
+    width: calc(50% - 12px);
+    max-width: 300px;
+    margin: 6px;
+  }
+}
+
+/* Mobile: Horizontal scrolling layout */
+@media (max-width: 768px) {
+  .TherapistCards,
+  .TherapySection .TherapistCards,
+  [class*="therapist-cards-container"] {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 4px;
+  }
+  
+  .therapist-card,
+  .Card1,
+  .TherapistCards > div,
+  .TherapistCards [class*="therapist-card"],
+  .TherapistCards [class*="Card"] {
+    flex: 0 0 auto;
+    width: 240px;
+    min-width: 240px;
+    margin: 0 4px 0 0;
+  }
+  
+  /* Last card has no right margin */
+  .TherapistCards > div:last-child,
+  .TherapistCards [class*="therapist-card"]:last-child,
+  .TherapistCards [class*="Card"]:last-child {
+    margin-right: 0;
+  }
+}
+
+/* ---------- Card Content Styles ---------- */
+/* Therapist Name */
+.therapist-name,
+.Card1 h3,
+[class*="therapist-name"],
+[class*="therapist-card"] h3 {
+  font-family: 'Happy Monkey', cursive;
+  font-size: 16px;
+  line-height: 20px;
+  color: #148BAF;
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+}
+
+/* Therapist Specialty */
+.therapist-specialty,
+.Card1 p,
+[class*="therapist-specialty"],
+[class*="therapist-card"] p {
+  font-family: 'Happy Monkey', cursive;
+  font-size: 14px;
+  line-height: 18px;
+  color: #333333;
+  margin: 0;
+  padding: 0;
+}
+
+/* Therapist Image */
+.therapist-image,
+.Card1 img,
+[class*="therapist-image"],
+[class*="therapist-card"] img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  aspect-ratio: 4/3;
+}

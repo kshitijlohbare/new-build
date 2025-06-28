@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { usePractices } from '../../context/PracticeContext';
 import { X, Clock, BookOpen, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { logError } from '@/utils/ErrorHandling';
+import Modal from '../common/Modal';
+import Button from '../common/Button';
+import Card from '../common/Card';
 
 interface SimplePracticePopupProps {
   practiceId: number | null;
@@ -29,9 +33,15 @@ const SimplePracticePopup: React.FC<SimplePracticePopupProps> = ({ practiceId, o
   };
   
   const handleToggleDaily = (e: React.MouseEvent) => {
-    logClick('toggle daily')(e);
-    if (!practice) return;
-    addPractice({ ...practice, isDaily: !practice.isDaily });
+    try {
+      logClick('toggle daily')(e);
+      if (!practice) return;
+      addPractice({ ...practice, isDaily: !practice.isDaily });
+    } catch (error) {
+      logError('Failed to toggle daily status', { 
+        context: { practiceId: practice?.id, isDaily: practice?.isDaily }
+      });
+    }
   };
   
   const showStepDetail = (index: number) => (e: React.MouseEvent) => {
@@ -72,29 +82,25 @@ const SimplePracticePopup: React.FC<SimplePracticePopupProps> = ({ practiceId, o
     return iconMap[icon || ''] || '📝';
   };
   
-  return (
-    <div className="bg-white rounded-2xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-hidden">
+  // Create modal content
+  const modalContent = (
+    <>
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white p-4 md:p-6 relative">
+      <div className="bg-gradient-to-r from-[#04C4D5] to-[#148BAF] text-white p-4 md:p-6 -mt-4 -mx-4 mb-4">
         {/* Top action buttons row */}
         <div className="flex justify-end mb-2">
-          <button
+          <Button
             onClick={handleToggleDaily}
-            className={`mr-2 px-4 py-1 rounded-full font-happy-monkey text-sm lowercase flex items-center ${
-              practice.isDaily
-                ? 'bg-white/20 text-white border border-white/50 hover:bg-white/30'
-                : 'bg-white text-[#148BAF] hover:bg-white/90'
+            variant={practice.isDaily ? "ghost" : "secondary"}
+            className={`mr-2 lowercase ${
+              practice.isDaily 
+                ? 'bg-white/20 text-white border border-white/50 hover:bg-white/30' 
+                : ''
             }`}
+            testId="toggle-daily-button"
           >
             {practice.isDaily ? 'remove daily' : 'add to daily'}
-          </button>
-          <button
-            onClick={handleClose}
-            className="p-2 rounded-full bg-white/40 hover:bg-white/60 text-white active:scale-95 shadow border border-white/30"
-            aria-label="Close popup"
-          >
-            <X size={20} />
-          </button>
+          </Button>
         </div>
         
         <div className="flex items-center mb-2">
@@ -112,7 +118,7 @@ const SimplePracticePopup: React.FC<SimplePracticePopupProps> = ({ practiceId, o
         {/* Info cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
           {practice.duration && (
-            <div className="bg-[rgba(4,196,213,0.1)] p-3 rounded-xl flex items-center">
+            <Card variant="primary" glassmorphism className="p-3 flex items-center">
               <div className="w-9 h-9 rounded-full bg-[#04C4D5]/20 flex items-center justify-center mr-3">
                 <Clock size={18} className="text-[#148BAF]" />
               </div>
@@ -120,11 +126,11 @@ const SimplePracticePopup: React.FC<SimplePracticePopupProps> = ({ practiceId, o
                 <p className="text-xs text-gray-500">Duration</p>
                 <p className="text-[#148BAF] font-happy-monkey text-sm">{practice.duration} minutes</p>
               </div>
-            </div>
+            </Card>
           )}
           
           {practice.source && (
-            <div className="bg-[rgba(4,196,213,0.1)] p-3 rounded-xl flex items-center">
+            <Card variant="primary" glassmorphism className="p-3 flex items-center">
               <div className="w-9 h-9 rounded-full bg-[#04C4D5]/20 flex items-center justify-center mr-3">
                 <BookOpen size={18} className="text-[#148BAF]" />
               </div>
@@ -132,7 +138,7 @@ const SimplePracticePopup: React.FC<SimplePracticePopupProps> = ({ practiceId, o
                 <p className="text-xs text-gray-500">Source</p>
                 <p className="text-[#148BAF] font-happy-monkey text-sm">{practice.source}</p>
               </div>
-            </div>
+            </Card>
           )}
         </div>
 
@@ -146,10 +152,12 @@ const SimplePracticePopup: React.FC<SimplePracticePopupProps> = ({ practiceId, o
             {/* Step cards list */}
             <div className="grid grid-cols-1 gap-3">
               {practice.steps.map((step, index) => (
-                <div 
+                <Card 
                   key={index}
-                  onClick={showStepDetail(index)}
-                  className="bg-white border border-gray-200 hover:border-[#04C4D5] rounded-xl p-4 cursor-pointer hover:shadow-md transition-all"
+                  onClick={() => showStepDetail(index)(new MouseEvent('click') as unknown as React.MouseEvent)}
+                  variant="default"
+                  className="hover:border-[#04C4D5] p-4"
+                  testId={`practice-step-${index}`}
                 >
                   <div className="flex justify-between">
                     <div>
@@ -158,7 +166,7 @@ const SimplePracticePopup: React.FC<SimplePracticePopupProps> = ({ practiceId, o
                     </div>
                     <ArrowRight className="text-gray-400" />
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           </div>
@@ -166,13 +174,15 @@ const SimplePracticePopup: React.FC<SimplePracticePopupProps> = ({ practiceId, o
           <div>
             {/* Back button */}
             <div className="flex justify-between items-center mb-4">
-              <button 
+              <Button 
                 onClick={backToAllSteps}
-                className="flex items-center text-[#148BAF] hover:bg-[rgba(4,196,213,0.1)] px-3 py-2 rounded"
+                variant="ghost"
+                className="text-[#148BAF] hover:bg-[rgba(4,196,213,0.1)]"
+                testId="back-to-steps-button"
               >
                 <ArrowLeft size={18} className="mr-2" />
                 <span>Back to all steps</span>
-              </button>
+              </Button>
               <div className="text-sm text-gray-500">
                 Step {currentStep + 1} of {practice.steps.length}
               </div>
@@ -180,29 +190,35 @@ const SimplePracticePopup: React.FC<SimplePracticePopupProps> = ({ practiceId, o
             
             {/* Step navigation */}
             <div className="flex justify-between mb-4">
-              <button 
+              <Button 
                 onClick={goToPrevStep}
                 disabled={currentStep === 0}
+                variant="ghost"
                 className={`p-3 rounded-full ${
                   currentStep === 0 ? 'text-gray-300' : 'text-[#148BAF] hover:bg-[rgba(4,196,213,0.1)]'
                 }`}
+                testId="prev-step-button"
+                ariaLabel="Previous step"
               >
                 <ArrowLeft size={24} />
-              </button>
+              </Button>
               
-              <button 
+              <Button 
                 onClick={goToNextStep}
                 disabled={currentStep === practice.steps.length - 1}
+                variant="ghost"
                 className={`p-3 rounded-full ${
                   currentStep === practice.steps.length - 1 ? 'text-gray-300' : 'text-[#148BAF] hover:bg-[rgba(4,196,213,0.1)]'
                 }`}
+                testId="next-step-button"
+                ariaLabel="Next step"
               >
                 <ArrowRight size={24} />
-              </button>
+              </Button>
             </div>
             
             {/* Step content */}
-            <div className="bg-white border border-[rgba(4,196,213,0.2)] rounded-xl overflow-hidden">
+            <Card variant="primary" className="overflow-hidden">
               <div className="p-4">
                 <h3 className="text-xl font-happy-monkey text-[#148BAF] mb-3">
                   {practice.steps[currentStep].title}
@@ -211,14 +227,26 @@ const SimplePracticePopup: React.FC<SimplePracticePopupProps> = ({ practiceId, o
                   {practice.steps[currentStep].description}
                 </p>
               </div>
-            </div>
+            </Card>
           </div>
         ) : null}
       </div>
-      
-      {/* We've removed the footer and moved buttons to the header */}
-    </div>
+    </>
+  );
+  
+  return (
+    <Modal
+      isOpen={practice !== null}
+      onClose={onClose}
+      showCloseButton={true}
+      size="lg"
+      id="practice-detail-modal"
+      testId="practice-detail-modal"
+      className="max-h-[90vh] overflow-hidden bg-white rounded-2xl shadow-xl"
+    >
+      {modalContent}
+    </Modal>
   );
 };
 
-export default SimplePracticePopup;
+export default React.memo(SimplePracticePopup);

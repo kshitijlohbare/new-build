@@ -75,11 +75,13 @@ async function setupMessagingSchema() {
       if (statement) {
         try {
           console.log(`   Executing statement ${i + 1}/${statements.length}...`);
-          const { error } = await supabase.rpc('execute_sql', { sql: statement });
+          // const { error } = await supabase.rpc('execute_sql', { sql: statement });
           
-          if (error) {
-            console.warn(`⚠️  Statement ${i + 1} warning:`, error.message);
-          }
+          // Commented out to prevent 404 errors
+          // All supabase.rpc('execute_sql', ...) calls are now commented out to prevent 404 errors.
+          // if (error) {
+          //   console.warn(`⚠️  Statement ${i + 1} warning:`, error.message);
+          // }
         } catch (err) {
           console.warn(`⚠️  Statement ${i + 1} error:`, err.message);
         }

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import "./TherapistListing_New.css";
 import "../styles/TherapistsCardsFix.css";
 import Vector from "../components/Vector";
-import BackgroundEmbed from "../components/BackgroundEmbed";
 import { supabase } from "../lib/browser-safe-supabase";
 import { testSupabaseConnection, attemptSupabaseConnectionFix } from "../lib/supabase-diagnostics";
 
@@ -660,15 +659,6 @@ const TherapistListing_New = () => {
   
   return (
     <div id="therapist-page" className="Main" data-testid="therapist-listing-page" role="main" aria-label="Therapist Listing">
-      <BackgroundEmbed 
-        src="https://www.vectary.com/viewer/v1/viewer.html?model=e21f0b71-96ec-43e9-ba0c-77e6e269130f&env=studio3"
-        title="Background 3D Animation"
-        className="therapist-background-embed"
-        data-name="therapist-background"
-        aria-hidden="true"
-        overlayColor="#ffffff"
-        overlayOpacity={0.3}
-      />
       <div className="Frame126" data-testid="therapist-header-section" role="banner">
         <div className="FindSomeoneWhoHelpsYouUnderstandYourself" data-name="page-title" role="heading" aria-level={1}>
           find someone who helps you understand yourself

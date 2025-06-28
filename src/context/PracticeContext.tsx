@@ -1,9 +1,10 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { savePracticeData, addToDailyPractices, removeFromDailyPractices, updateUserDailyPractices } from './practiceUtils.fixed';
+import { savePracticeData } from './practiceUtils.fixed';
 import { savePracticeDataToLocalStorage } from './practiceUtils.localStorage';
 import { loadPracticeData } from './practiceUtils.enhanced';
 import { diagnoseAndFixDatabaseIssues } from '../scripts/databaseDiagnostic';
+import { useDailyPractices } from './DailyPracticeContext';
 
 // --- Interfaces (Consider moving to a types file) ---
 export interface Practice { // Export the interface
@@ -488,6 +489,8 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
   // Status for potential UI feedback in the future
   const [, setSaveStatus] = useState<'idle' | 'saving' | 'error' | 'success'>('idle');
 
+  const { dailyPractices } = useDailyPractices(); // Get enhanced daily practices
+
   // --- Effect for Data Loading from database with localStorage backup ---
   useEffect(() => {
     // This effect is used for data loading
@@ -573,9 +576,6 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
                 achievements: [],
               });
               console.log("Saved initial user data to localStorage");
-              
-              // Explicitly sync daily practices to make sure they're added to the database
-              await updateUserDailyPractices(user.id, defaultPractices);
             } catch (saveError) {
               console.error("Error saving initial user data:", saveError);
             }
@@ -855,8 +855,6 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
         // Immediately persist to backend after local state update
         if (user?.id) {
           savePracticeData(user.id, updatedPractices, userProgress);
-          // --- Ensure user_daily_practices is always in sync ---
-          updateUserDailyPractices(user.id, updatedPractices);
         }
         return updatedPractices;
       } else {
@@ -894,8 +892,6 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
         // Immediately persist to backend after local state update
         if (user?.id) {
           savePracticeData(user.id, [...prevPractices, practiceWithDefaults], userProgress);
-          // --- Ensure user_daily_practices is always in sync ---
-          updateUserDailyPractices(user.id, [...prevPractices, practiceWithDefaults]);
         }
         return [...prevPractices, practiceWithDefaults];
       }
@@ -905,17 +901,6 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
     // instead of waiting for the next auto-save cycle
     if (wasAddedToDaily && user?.id && practiceId !== undefined) {
       console.log(`Direct database update: Adding practice ID ${practiceId} to daily practices for user ${user.id}`);
-      addToDailyPractices(user.id, practiceId)
-        .then((success: boolean) => {
-          if (success) {
-            console.log(`Successfully added practice ID ${practiceId} to user_daily_practices table`);
-          } else {
-            console.error(`Failed to add practice ID ${practiceId} to user_daily_practices table`);
-          }
-        })
-        .catch((err: Error) => {
-          console.error('Error in direct daily practice update:', err);
-        });
     }
     
     return practiceToUpdate.id; // Return the ID for reference
@@ -952,8 +937,6 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
         if (user?.id) {
           console.log(`Saving updated practices after removing practice ${practiceId} from daily`);
           savePracticeData(user.id, updatedPractices, userProgress);
-          // --- Ensure user_daily_practices is always in sync ---
-          updateUserDailyPractices(user.id, updatedPractices);
         }
         
         return updatedPractices;
@@ -987,8 +970,6 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
           // Immediately persist to backend after local state update
           if (user?.id) {
             savePracticeData(user.id, updated, userProgress);
-            // --- Ensure user_daily_practices is always in sync ---
-            updateUserDailyPractices(user.id, updated);
           }
           return updated;
         }
@@ -998,17 +979,6 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
     // If the practice was removed from daily, immediately update the database relation
     if (wasRemovedFromDaily && user?.id) {
       console.log(`Direct database update: Removing practice ID ${practiceId} from daily practices for user ${user.id}`);
-      removeFromDailyPractices(user.id, practiceId)
-        .then((success: boolean) => {
-          if (success) {
-            console.log(`Successfully removed practice ID ${practiceId} from user_daily_practices table`);
-          } else {
-            console.error(`Failed to remove practice ID ${practiceId} from user_daily_practices table`);
-          }
-        })
-        .catch((err: Error) => {
-          console.error('Error in direct daily practice removal:', err);
-        });
     }
   }, [user?.id, userProgress]);
 
@@ -1140,6 +1110,18 @@ export const PracticeProvider: React.FC<PracticeProviderProps> = ({ children }) 
     }
   }, [practices, user?.id, userProgress]);
   
+  // Sync isDaily property in practices with dailyPractices
+  useEffect(() => {
+    if (!practices || !dailyPractices) return;
+    const dailyIds = new Set(dailyPractices.map(p => p.id));
+    setPractices(prevPractices => prevPractices.map(practice => ({
+      ...practice,
+      isDaily: dailyIds.has(practice.id)
+    })));
+    // Optionally log for debugging
+    // console.log('[PracticeContext] Synced isDaily for practices:', practices.map(p => ({ id: p.id, isDaily: p.isDaily })));
+  }, [dailyPractices]);
+
   // Create the context value with all required properties
   const contextValue: PracticeContextType = {
     practices,

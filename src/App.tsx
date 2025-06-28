@@ -4,6 +4,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
 import { PracticeProvider } from "./context/PracticeContext"; // Import the new provider
 import { AchievementProvider } from "./context/AchievementContext"; // Import the achievement provider
+import { DailyPracticeProvider } from "./context/DailyPracticeContext"; // Import the enhanced daily practice provider
 import { ProfileProvider } from "./context/ProfileContext"; // Import the profile provider
 import { SidebarProvider } from "./context/SidebarContext"; // Import the sidebar provider
 import { useEffect, useState, lazy, Suspense } from "react";
@@ -24,6 +25,7 @@ import Progress from "./pages/Progress";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Appointments from "./pages/Appointments";
+import EnhancedPracticesPage from "./pages/EnhancedPracticesPage";
 import TherapistListing from "./pages/TherapistListing_New";
 import PractitionerListing from "./pages/PractitionerListing"; // Import our new PractitionerListing page
 import TherapyBooking from "./pages/TherapyBooking";
@@ -33,6 +35,7 @@ import FitnessGroups from "./pages/FitnessGroups"; // Import the FitnessGroups p
 import SocialFeed from "./pages/SocialFeed"; // Import the new SocialFeed UI
 import PractitionerDetail from "./pages/PractitionerDetail"; // Import the new PractitionerDetail page
 import TherapistRegistration from "./pages/TherapistRegistration";
+import PracticeDetailPage from "./pages/PracticeDetail"; // Import the new PracticeDetail page
 // Import lazy loaded versions of Fitness Groups
 const FitnessGroupsNew = lazy(() => import("./pages/FitnessGroups.new"));
 const FitnessGroupsUpdated = lazy(() => import("./pages/FitnessGroups.updated"));
@@ -40,10 +43,13 @@ const FitnessGroupsUpdated = lazy(() => import("./pages/FitnessGroups.updated"))
 import FocusTimer from "./pages/FocusTimer";
 import PractitionerOnboarding from "./pages/PractitionerOnboarding"; // Import PractitionerOnboarding
 import PractitionerEditProfile from "./pages/PractitionerEditProfile"; // Import PractitionerEditProfile
+import PractitionerOnboardingImproved from "./pages/PractitionerOnboardingImproved"; // Import improved onboarding
+import PractitionerEditProfileImproved from "./pages/PractitionerEditProfileImproved"; // Import improved edit profile
 import { Home as Learn } from "./pages/Learn"; // Import Learn using named import
 import TestPage from "./pages/TestPage"; // Import TestPage for debugging
 import LandingPage from "./pages/LandingPage"; // Import the new LandingPage
 import FlashScreen from "./pages/FlashScreen";
+import './styles/variables.css'; // Import CSS variables generated from design tokens
 import './App.css';
 import './styles/TherapistsCardsFix.css'; // Import therapist cards margin fix
 import React from "react"; // Make sure React is imported
@@ -226,79 +232,85 @@ const App = () => {
             <Toaster />
             <QueryClientProvider client={queryClient}>
               <BrowserRouter>
-                <PracticeProvider> {/* Wrap with PracticeProvider */}
-                  <AchievementProvider> {/* Wrap with AchievementProvider */}
-                    <ProfileProvider> {/* Wrap with ProfileProvider */}
-                      <SidebarProvider> {/* Wrap with SidebarProvider */}
-                      <Routes>
-                        {/* Landing page for non-logged-in users */}
-                        <Route path="/welcome" element={<LandingPage />} />
-                        
-                        {/* Auth routes */}
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/auth/callback" element={<AuthCallback />} />
-                        <Route path="/forgot-password" element={<ForgotPassword />} /> {/* Add route for ForgotPassword */}
-                        <Route path="/reset-password" element={<ResetPassword />} /> {/* Add route for ResetPassword */}
-                        
-                        {/* Protected routes */}
-                        <Route path="/" element={
-                          <ProtectedRoute>
-                            <AppLayout />
-                          </ProtectedRoute>
-                        }>
-                          <Route index element={<ResponsiveHome />} />
-                          <Route path="dashboard" element={<Navigate to="/" replace />} />
-                          <Route path="practices" element={<Practices />} />
-                          <Route path="progress" element={<Progress />} />
-                          <Route path="profile" element={<Profile />} />
-                          <Route path="settings" element={<Settings />} />
-                          <Route path="appointments" element={<Appointments />} />
-                          <Route path="therapist-listing" element={<TherapistListing />} />
-                          <Route path="practitioner-listing" element={<PractitionerListing />} /> {/* New practitioners listing page */}
-                          <Route path="practitioner/:id" element={<PractitionerDetail />} /> {/* New detailed practitioner page */}
-                          <Route path="therapy-booking" element={<TherapyBooking />} />
-                          <Route path="therapy-booking/:id" element={<TherapyBooking />} />
-                          <Route path="booking" element={<Booking />} /> {/* Add the new booking route */}
-                          <Route path="therapist-registration" element={<TherapistRegistration />} />
-                          <Route path="focus-timer" element={<FocusTimer />} />
-                          <Route path="practitioner-onboarding" element={<PractitionerOnboarding />} />
-                          <Route path="practitioner-edit-profile" element={<PractitionerEditProfile />} />
-                          <Route path="learn" element={<Learn />} /> {/* Add the learn page route */}
-                          <Route path="fitness-groups" element={<Community />} /> {/* Add the fitness groups route */}
-                          <Route path="fitness" element={<FitnessGroups />} /> {/* Direct access to Fitness Groups page */}
-                          <Route path="social" element={<SocialFeed />} /> {/* New social feed UI based on the image */}
-                          <Route path="fitness-new" element={
+                <DailyPracticeProvider> {/* Wrap with DailyPracticeProvider */}
+                  <PracticeProvider> {/* Wrap with PracticeProvider */}
+                    <AchievementProvider> {/* Wrap with AchievementProvider */}
+                      <ProfileProvider> {/* Wrap with ProfileProvider */}
+                        <SidebarProvider> {/* Wrap with SidebarProvider */}
+                        <Routes>
+                          {/* Landing page for non-logged-in users */}
+                          <Route path="/welcome" element={<LandingPage />} />
+                          
+                          {/* Auth routes */}
+                          <Route path="/login" element={<Login />} />
+                          <Route path="/register" element={<Register />} />
+                          <Route path="/auth/callback" element={<AuthCallback />} />
+                          <Route path="/forgot-password" element={<ForgotPassword />} /> {/* Add route for ForgotPassword */}
+                          <Route path="/reset-password" element={<ResetPassword />} /> {/* Add route for ResetPassword */}
+                          
+                          {/* Protected routes */}
+                          <Route path="/" element={
                             <ProtectedRoute>
-                              {/* Special route to see the updated fitness groups implementation */}
-                              <div style={{height: '100%', width: '100%'}}>
-                                <Suspense fallback={<div>Loading...</div>}>
-                                  <FitnessGroupsNew />
-                                </Suspense>
-                              </div>
+                              <AppLayout />
                             </ProtectedRoute>
-                          } /> {/* Access to new version of Fitness Groups */}
-                          <Route path="fitness-updated" element={
-                            <ProtectedRoute>
-                              {/* Special route to see the updated fitness groups implementation */}
-                              <div style={{height: '100%', width: '100%'}}>
-                                <Suspense fallback={<div>Loading...</div>}>
-                                  <FitnessGroupsUpdated />
-                                </Suspense>
-                              </div>
-                            </ProtectedRoute>
-                          } /> {/* Access to updated version of Fitness Groups */}
-                          <Route path="test" element={<TestPage />} /> {/* Add the test page route for debugging */}
-                          <Route path="flash" element={<FlashScreen />} /> {/* Route kept for testing purposes only */}
-                        </Route>
-                        
-                        {/* Redirect root for non-authenticated users to landing page */}
-                        <Route path="*" element={<Navigate to="/welcome" replace />} />
-                      </Routes>
-                      </SidebarProvider>
-                    </ProfileProvider>
-                  </AchievementProvider>
-                </PracticeProvider>
+                          }>
+                            <Route index element={<ResponsiveHome />} />
+                            <Route path="dashboard" element={<Navigate to="/" replace />} />
+                            <Route path="practices" element={<Practices />} />
+                            <Route path="practices-enhanced" element={<EnhancedPracticesPage />} />
+                            <Route path="progress" element={<Progress />} />
+                            <Route path="profile" element={<Profile />} />
+                            <Route path="settings" element={<Settings />} />
+                            <Route path="appointments" element={<Appointments />} />
+                            <Route path="therapist-listing" element={<TherapistListing />} />
+                            <Route path="practitioner-listing" element={<PractitionerListing />} /> {/* New practitioners listing page */}
+                            <Route path="practitioner/:id" element={<PractitionerDetail />} /> {/* New detailed practitioner page */}
+                            <Route path="practices/:id" element={<PracticeDetailPage />} /> {/* New practice detail page */}
+                            <Route path="therapy-booking" element={<TherapyBooking />} />
+                            <Route path="therapy-booking/:id" element={<TherapyBooking />} />
+                            <Route path="booking" element={<Booking />} /> {/* Add the new booking route */}
+                            <Route path="therapist-registration" element={<TherapistRegistration />} />
+                            <Route path="focus-timer" element={<FocusTimer />} />
+                            <Route path="practitioner-onboarding" element={<PractitionerOnboardingImproved />} />
+                            <Route path="practitioner-edit-profile" element={<PractitionerEditProfileImproved />} />
+                            <Route path="practitioner-onboarding-legacy" element={<PractitionerOnboarding />} />
+                            <Route path="practitioner-edit-profile-legacy" element={<PractitionerEditProfile />} />
+                            <Route path="learn" element={<Learn />} /> {/* Add the learn page route */}
+                            <Route path="fitness-groups" element={<Community />} /> {/* Add the fitness groups route */}
+                            <Route path="fitness" element={<FitnessGroups />} /> {/* Direct access to Fitness Groups page */}
+                            <Route path="social" element={<SocialFeed />} /> {/* New social feed UI based on the image */}
+                            <Route path="fitness-new" element={
+                              <ProtectedRoute>
+                                {/* Special route to see the updated fitness groups implementation */}
+                                <div style={{height: '100%', width: '100%'}}>
+                                  <Suspense fallback={<div>Loading...</div>}>
+                                    <FitnessGroupsNew />
+                                  </Suspense>
+                                </div>
+                              </ProtectedRoute>
+                            } /> {/* Access to new version of Fitness Groups */}
+                            <Route path="fitness-updated" element={
+                              <ProtectedRoute>
+                                {/* Special route to see the updated fitness groups implementation */}
+                                <div style={{height: '100%', width: '100%'}}>
+                                  <Suspense fallback={<div>Loading...</div>}>
+                                    <FitnessGroupsUpdated />
+                                  </Suspense>
+                                </div>
+                              </ProtectedRoute>
+                            } /> {/* Access to updated version of Fitness Groups */}
+                            <Route path="test" element={<TestPage />} /> {/* Add the test page route for debugging */}
+                            <Route path="flash" element={<FlashScreen />} /> {/* Route kept for testing purposes only */}
+                          </Route>
+                          
+                          {/* Redirect root for non-authenticated users to landing page */}
+                          <Route path="*" element={<Navigate to="/welcome" replace />} />
+                        </Routes>
+                        </SidebarProvider>
+                      </ProfileProvider>
+                    </AchievementProvider>
+                  </PracticeProvider>
+                </DailyPracticeProvider>
               </BrowserRouter>
             </QueryClientProvider>
             <ToastViewport />

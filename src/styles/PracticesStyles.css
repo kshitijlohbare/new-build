@@ -1,0 +1,122 @@
+/**
+ * PracticesStyles.css
+ * Consolidated styles for the Practices page
+ * This file combines multiple smaller CSS imports into one comprehensive stylesheet
+ */
+
+/* Import other CSS files that we want to combine */
+@import './reset.css';
+@import './ChipFixes.css';
+@import './MinHeightFix.css';
+@import './HappyMonkeyFont.css';
+@import './overrideInjectedStyles.css';
+@import './FilterChipsSystem.css';
+@import './BorderlessFilters.css';
+@import './PracticeCardSystem.css';
+@import './LoadingStates.css';
+
+/* Additional styles specific to the Practices page */
+
+/* Content grid layout */
+#practices-grid,
+.practices-grid {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-4);
+}
+
+.practices-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--spacing-2);
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .practices-grid-layout {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--spacing-4);
+  }
+}
+
+@media (min-width: 768px) {
+  .practices-grid-layout {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+/* No practices message styling */
+.no-practices-message {
+  font-family: var(--typography-fontFamily-primary);
+  color: var(--colors-primary-light);
+  font-size: var(--typography-fontSize-lg);
+  width: 100%;
+  text-align: center;
+  margin-top: var(--spacing-8);
+}
+
+/* Title and filters container */
+#practices-title-filters-container {
+  max-width: 100%;
+  width: 100%;
+  margin-bottom: var(--spacing-4);
+}
+
+/* Fix search bar positioning */
+.practices-search-container,
+#practices-search-bar-container {
+  position: fixed;
+  bottom: var(--spacing-5);
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: var(--zIndex-fixed);
+  pointer-events: auto;
+}
+
+/* Search bar component styling */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Loading state styling */
+.loading-message {
+  font-family: var(--typography-fontFamily-primary);
+  color: var(--colors-primary-main);
+}
+
+/* Page container */
+#practices-page,
+.practices-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-5);
+  position: relative;
+}
+
+/* Header styling */
+#practices-title-filters-container,
+.practices-header {
+  max-width: 100%;
+  width: 100%;
+  margin-bottom: var(--spacing-4);
+  height: auto;
+  min-height: 74px;
+}
+
+/* Practice card minimal height fix */
+.practice-card {
+  min-height: 220px;
+}

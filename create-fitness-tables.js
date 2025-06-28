@@ -19,10 +19,10 @@ async function createFitnessTables() {
     const sqlContent = fs.readFileSync(sqlPath, 'utf8');
     
     // Execute the SQL to create tables
-    const { error } = await supabase.rpc('execute_sql', { sql_text: sqlContent });
+    // const { error } = await supabase.rpc('execute_sql', { sql_text: sqlContent });
     
-    if (error) {
-      console.error('❌ Error creating tables with execute_sql:', error);
+    // if (error) {
+    //   console.error('❌ Error creating tables with execute_sql:', error);
       
       // Try alternative approach - execute each statement separately
       console.log('🔄 Trying alternative approach...');
@@ -49,7 +49,7 @@ async function createFitnessTables() {
           }
         }
       }
-    }
+    // }
     
     // Verify tables were created
     console.log('🔍 Verifying tables were created...');

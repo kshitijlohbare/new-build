@@ -1,0 +1,146 @@
+/**
+ * BorderlessFilters.css
+ * Consolidated CSS for border removal from filter chips
+ * This combines filter-chip-fix.css, no-borders-filter-chips.css, and 
+ * final-filter-chips-no-borders.css into a single file
+ */
+
+/* ========================================
+   Core Filter Chip Styles
+   ======================================== */
+
+/* Ensure all filter chips are properly clickable and styled - with no borders */
+.filter-chip,
+button.filter-chip,
+#practices-filter-chips-container button,
+#learn-filter-chips-container button,
+#tribe-filter-chips-container button.filter-chip,
+[class*="filter-chip"] {
+  cursor: pointer !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Target all child elements of filter chips to ensure no borders */
+.filter-chip *,
+button.filter-chip *,
+#practices-filter-chips-container button *,
+#learn-filter-chips-container button *,
+#tribe-filter-chips-container button.filter-chip *,
+[class*="filter-chip"] * {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Add subtle visual indication on hover - without borders */
+.filter-chip:hover,
+button.filter-chip:hover,
+[class*="filter-chip"]:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 6px rgba(20, 139, 175, 0.3) !important;
+  background-color: rgba(83, 252, 255, 0.15) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Make text properly visible */
+.filter-chip-text {
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Fix padding issues */
+#practices-filter-chips-container,
+#learn-filter-chips-container,
+#tribe-filter-chips-container,
+div[id*="filter-chips-container"] {
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+/* ========================================
+   Extreme Border Removal (Maximum Specificity)
+   ======================================== */
+
+/* Target all filter chips with maximum specificity */
+html body .filter-chip,
+html body button.filter-chip,
+html body [class*="filter-chip"],
+html body #practices-filter-chips-container button,
+html body #learn-filter-chips-container button,
+html body #tribe-filter-chips-container button,
+html body div[id*="filter-chips-container"] button,
+html body div[id*="filter-chips-container"] .filter-chip,
+html body div[id*="filter-chips-container"] button.filter-chip,
+html body #practices-filter-chips-container button:not([class]),
+html body #learn-filter-chips-container button:not([class]),
+html body #tribe-filter-chips-container button:not([class]) {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Target every possible child element with maximum specificity */
+html body .filter-chip *,
+html body button.filter-chip *,
+html body [class*="filter-chip"] *,
+html body #practices-filter-chips-container button *,
+html body #learn-filter-chips-container button *,
+html body #tribe-filter-chips-container button *,
+html body div[id*="filter-chips-container"] button *,
+html body div[id*="filter-chips-container"] .filter-chip *,
+html body div[id*="filter-chips-container"] button.filter-chip * {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Target filter chip text elements specifically with high specificity */
+html body .filter-chip-text,
+html body .filter-chip-text-active,
+html body .filter-chip-text-inactive,
+html body .filter-chip-count,
+html body .filter-chip-count-active,
+html body .filter-chip-count-inactive,
+html body .filter-chip div,
+html body button.filter-chip div,
+html body [class*="filter-chip"] div,
+html body #practices-filter-chips-container button div,
+html body #learn-filter-chips-container button div,
+html body #tribe-filter-chips-container button div {
+  border: none !important;
+  outline: none !important;
+}
+
+/* ========================================
+   Active/Inactive State Styling
+   ======================================== */
+
+/* Active state styling */
+html body .filter-chip-active,
+html body button.filter-chip-active,
+html body [class*="filter-chip-active"],
+html body #practices-filter-chips-container button[class*="active"],
+html body #learn-filter-chips-container button[class*="active"],
+html body #tribe-filter-chips-container button[class*="active"] {
+  background-color: #FCDF4D !important;
+  box-shadow: 0 2px 6px rgba(73, 218, 234, 0.4) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Inactive filter styles */
+html body .filter-chip-inactive,
+html body button.filter-chip-inactive,
+html body [class*="filter-chip-inactive"],
+html body #practices-filter-chips-container button:not([class*="active"]),
+html body #learn-filter-chips-container button:not([class*="active"]),
+html body #tribe-filter-chips-container button:not([class*="active"]) {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 1px 3px rgba(73, 218, 234, 0.2) !important;
+  border: none !important;
+  outline: none !important;
+}

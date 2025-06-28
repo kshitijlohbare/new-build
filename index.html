@@ -38,13 +38,22 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     
     <!-- Preconnect to Supabase for faster loading -->
-    <!-- Final therapist cards fix to ensure no margins -->
-    <link rel="stylesheet" href="/final-therapist-cards-fix.css">
-    <!-- Remove borders from filter chips -->
-    <link rel="stylesheet" href="/no-borders-filter-chips.css">
-    <!-- Absolute final override for filter chip borders -->
-    <link rel="stylesheet" href="/final-filter-chips-no-borders.css">
     <link rel="preconnect" href="https://svnczxevigicuskppyfz.supabase.co">
+    
+    <!-- 
+      IMPORTANT: CSS Consolidation Note
+      Many of these separate CSS files are now consolidated into:
+      - src/styles/FilterChipsSystem.css (includes filter-chip-fix.css)
+      - src/styles/BorderlessFilters.css (includes no-borders-filter-chips.css and final-filter-chips-no-borders.css)
+      - src/styles/TherapistCardsSystem.css (includes therapist-cards-fix.css and final-therapist-cards-fix.css)
+      - src/styles/FocusTimerSystem.css (includes critical-focus-timer-fixes.css)
+      
+      We're keeping these files for now for backwards compatibility, but they
+      can be safely removed once we've fully tested the new consolidated files.
+    -->
+    <link rel="stylesheet" href="/final-therapist-cards-fix.css">
+    <link rel="stylesheet" href="/no-borders-filter-chips.css">
+    <link rel="stylesheet" href="/final-filter-chips-no-borders.css">
     
     <!-- Global configuration for Supabase -->
     <script>

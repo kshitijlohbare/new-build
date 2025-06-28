@@ -421,6 +421,24 @@ const PracticeDetailPopup: React.FC<PracticeDetailPopupProps> = ({ practiceId, o
           )}
         </div>
 
+        {/* Comments Section */}
+        <div className="border-t border-[rgba(4,196,213,0.2)] p-4">
+          <h3 className="font-bold text-lg mb-2 text-[#148BAF]">Comments</h3>
+          <textarea
+            className="w-full p-2 border rounded mb-2 text-black"
+            rows={3}
+            placeholder="Add a comment... (not yet saved)"
+            disabled
+          />
+          <button
+            className="px-4 py-2 bg-[#04C4D5] text-white rounded disabled:opacity-50"
+            disabled
+          >
+            Post Comment
+          </button>
+          <div className="text-xs text-gray-500 mt-1">(Commenting coming soon!)</div>
+        </div>
+
         {/* Footer with add to daily and close button */}
         <div className="border-t border-[rgba(4,196,213,0.2)] p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
           <button

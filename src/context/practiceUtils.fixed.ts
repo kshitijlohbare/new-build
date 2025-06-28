@@ -1,3 +1,6 @@
+// DEPRECATED: This file is no longer used. All daily practices logic has moved to the enhanced system (practicePointsUtils.ts, DailyPracticeContext.tsx).
+// All code that references user_daily_practices is now commented out or removed.
+
 // Daily practices with SSL workaround for Node.js
 import { supabase } from '@/lib/supabase'; // Use the centralized Supabase client
 import { Practice } from './PracticeContext';
@@ -175,7 +178,7 @@ export async function savePracticeData(userId: string, practices: Practice[], us
       // Important: Always update the daily practices relation table
       // to ensure both data sources are in sync
       if (saveSuccessful) {
-        await updateUserDailyPractices(userId, practices);
+        // await updateUserDailyPractices(userId, practices);
         return true;
       } else {
         return false;
@@ -400,32 +403,6 @@ export async function loadPracticeData(userId: string) {
       console.error('Exception during Supabase data fetch:', dbError);
     }
     
-    // Also fetch daily practices from the junction table to ensure consistency
-    try {
-      if (supabaseData && supabaseData.practices) {
-        console.log('Fetching daily practices from user_daily_practices table...');
-        const { data: dailyPracticesData, error: dailyPracticesError } = await supabase
-          .from('user_daily_practices')
-          .select('practice_id')
-          .eq('user_id', userId);
-          
-        if (!dailyPracticesError && dailyPracticesData) {
-          const dailyPracticeIds = dailyPracticesData.map((item: any) => item.practice_id);
-          console.log(`Found ${dailyPracticeIds.length} daily practices in junction table: ${dailyPracticeIds.join(', ')}`);
-          
-          // Ensure practices coming from Supabase have isDaily flag set based on the junction table
-          supabaseData.practices = supabaseData.practices.map(practice => ({
-            ...practice,
-            isDaily: dailyPracticeIds.includes(practice.id) ? true : (practice.isDaily === true)
-          }));
-          
-          console.log('Updated isDaily flags in practice data based on junction table');
-        }
-      }
-    } catch (dailyPracticesError) {
-      console.error('Error fetching daily practices from junction table:', dailyPracticesError);
-    }
-    
     // Decision logic: which data source to use
     if (supabaseData) {
       console.log('Using data from Supabase');
@@ -470,16 +447,16 @@ export async function loadPracticeData(userId: string) {
       console.log('Using data from localStorage');
       
       // Try to sync localStorage data back to Supabase
-      if (tablesExist) {
-        console.log('Syncing localStorage data to Supabase...');
-        savePracticeData(userId, localStorageData.practices, localStorageData.progress)
-          .then(success => {
-            console.log('Sync result:', success ? 'success' : 'failed');
-          })
-          .catch(err => {
-            console.error('Error during sync:', err);
-          });
-      }
+      // if (tablesExist) {
+      //   console.log('Syncing localStorage data to Supabase...');
+      //   savePracticeData(userId, localStorageData.practices, localStorageData.progress)
+      //     .then(success => {
+      //       console.log('Sync result:', success ? 'success' : 'failed');
+      //     })
+      //     .catch(err => {
+      //       console.error('Error during sync:', err);
+      //     });
+      // }
       
       return localStorageData;
     }
@@ -701,3 +678,35 @@ export async function removeFromDailyPractices(userId: string, practiceId: numbe
     return false;
   }
 }
+
+// All supabase.rpc('execute_sql', ...) calls are now commented out to prevent 404 errors.
+// Uncomment and modify the following lines if direct SQL execution is required in the future
+
+/*
+try {
+  // Create a basic version of the table
+  const { error: sqlError } = await supabase.rpc('execute_sql', { 
+    sql: `
+      CREATE TABLE IF NOT EXISTS user_practices (
+        id SERIAL PRIMARY KEY,
+        user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+        practices JSONB DEFAULT '[]'::jsonb,
+        progress JSONB DEFAULT '{}'::jsonb,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id)
+      );
+    `
+  });
+  
+  if (sqlError) {
+    console.error('Failed to create user_practices table via SQL:', sqlError);
+    tablesOk = false;
+  } else {
+    console.log('Created user_practices table using SQL');
+  }
+} catch (sqlError) {
+  console.error('Failed to execute SQL to create table:', sqlError);
+  tablesOk = false;
+}
+*/

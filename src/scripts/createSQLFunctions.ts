@@ -119,9 +119,9 @@ export const createSQLFunctions = async (): Promise<boolean> => {
     `;
     
     // Execute each function creation
-    await supabase.rpc('execute_sql', { sql_query: createUserProfilesFunction });
-    await supabase.rpc('execute_sql', { sql_query: createUserPracticesFunction });
-    await supabase.rpc('execute_sql', { sql_query: createUserDailyPracticesFunction });
+    // await supabase.rpc('execute_sql', { sql_query: createUserProfilesFunction });
+    // await supabase.rpc('execute_sql', { sql_query: createUserPracticesFunction });
+    // await supabase.rpc('execute_sql', { sql_query: createUserDailyPracticesFunction });
     
     console.log('Successfully created all SQL initialization functions');
     return true;

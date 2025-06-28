@@ -148,17 +148,6 @@ export function Login() {
               <Mail className="mr-2 h-4 w-4" />
               Continue with Google
             </Button>
-            
-            <Button
-              type="button"
-              onClick={() => handleProviderSignIn('github')}
-              disabled={loading}
-              variant="outline"
-              className="w-full"
-            >
-              <GithubIcon className="mr-2 h-4 w-4" />
-              Continue with GitHub
-            </Button>
           </div>
         </div>
         

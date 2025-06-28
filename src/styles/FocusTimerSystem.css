@@ -1,0 +1,130 @@
+/**
+ * FocusTimerSystem.css
+ * Consolidated styling for Focus Timer components
+ */
+
+/* ========================================
+   Core Focus Timer Styles 
+   ======================================== */
+
+/* Player controls center panel - ensure perfect centering */
+[data-testid="player-controls-center-panel"] {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+  max-width: 90%;
+  margin: 0 auto;
+  z-index: 50;
+}
+
+/* Ensure proper spacing within the controls */
+[data-testid="player-controls-container"] {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Make sure buttons inside are clickable */
+[data-testid="player-controls-center-panel"] button {
+  pointer-events: auto;
+}
+
+/* ========================================
+   Header Styles 
+   ======================================== */
+
+/* Remove background from header */
+.header,
+[data-testid="focus-timer-header-bar"],
+header[data-testid="focus-timer-header-bar"],
+.focus-timer-header {
+  background: none !important;
+  background-color: transparent !important;
+}
+
+/* This fixes the header padding and alignment issues */
+.focus-timer-header {
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* ========================================
+   Control Buttons 
+   ======================================== */
+
+/* Remove padding from play/pause and stop buttons */
+.control-button, 
+[data-testid="play-pause-button"],
+[data-testid="stop-button"],
+button[data-testid="play-pause-button"],
+button[data-testid="stop-button"],
+.reset-button {
+  padding: 0 !important;
+}
+
+/* ========================================
+   Music Drawer
+   ======================================== */
+
+/* Music drawer styling */
+.music-drawer,
+[data-testid="music-drawer"],
+div[data-testid="music-drawer"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #fff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 8px 0;
+  width: auto !important;
+  min-width: 0;
+  max-width: 90vw;
+  height: auto !important;
+}
+
+/* Music Drawer Buttons */
+div[data-testid="music-drawer"] button {
+  background: none !important;
+  border-radius: 6px !important;
+}
+
+div[data-testid="music-drawer"] button:hover {
+  background: #FAF8EC !important;
+}
+
+/* ========================================
+   Timer Circle
+   ======================================== */
+
+/* Ensure perfect circle for timer */
+.circular-timer-container {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   Responsive Adjustments
+   ======================================== */
+
+/* Mobile optimization */
+@media (max-width: 640px) {
+  .circular-timer-container {
+    max-width: 220px;
+  }
+  
+  [data-testid="player-controls-center-panel"] {
+    bottom: 10px;
+  }
+}
